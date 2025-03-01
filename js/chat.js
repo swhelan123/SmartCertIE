@@ -1,82 +1,76 @@
-// chat.js
+// chat.js (hypothetical example)
 
-// 1) Function to query the BlenderBot model on Hugging Face
-async function queryChatbot(question) {
-  // Replace the model path here with the BlenderBot model
-  const apiUrl = "https://api-inference.huggingface.co/models/facebook/blenderbot-400M-distill";
+// 1) The function to query the AI model on aimlapi.com
+async function queryAimlApi(question) {
+  // Suppose aimlapi.com provides you with a model-specific endpoint & API key
+  const apiUrl = "https://aimlapi.com/v3/deepseek"; // EXAMPLE: adjust to real path
+  const apiKey = "6f38c7556ee5413694304b0be2c3fa33"; // from your aimlapi.com account
 
-  const headers = {
-    "Content-Type": "application/json",
-    // If you have a Hugging Face API token, uncomment and add it:
-    // "Authorization": "Bearer YOUR_HF_API_TOKEN"
-  };
-
-  // "inputs" is the user query; "options" can force waiting for model
+  // The request payload can vary depending on the model's requirements
   const payload = {
-    inputs: question,
-    options: { wait_for_model: true },
+    prompt: question,
+    // ... any other parameters from aimlapi docs
   };
 
   try {
+    // 2) Make a POST request
     const response = await fetch(apiUrl, {
       method: "POST",
-      headers: headers,
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${apiKey}`, // If aimlapi uses Bearer tokens
+      },
       body: JSON.stringify(payload),
     });
-    const result = await response.json();
 
-    // The returned result can be an array or object
-    if (Array.isArray(result) && result.length > 0 && result[0].generated_text) {
-      return result[0].generated_text;
-    } else if (result && result.generated_text) {
-      return result.generated_text;
-    } else if (result.error) {
-      // If the API returns an "error" field, show it
-      console.error("BlenderBot error:", result.error);
-      return "Sorry, I'm having trouble responding right now.";
-    } else {
-      return "Sorry, I didn't understand that.";
+    // 3) Process the response
+    if (!response.ok) {
+      throw new Error(`API returned status ${response.status}`);
     }
+
+    const data = await response.json();
+
+    // 4) Return text from the result – structure depends on the API
+    // Example: if the JSON has { answer: "...the AI's text..." }
+    return data.answer || "Sorry, I didn't understand that.";
   } catch (error) {
-    console.error("Chatbot API error:", error);
-    return "Error connecting to the chatbot API.";
+    console.error("aimlapi error:", error);
+    return "Error connecting to aimlapi.";
   }
 }
 
-// 2) DOM elements from your chat window
+// 5) Use the function in your chat event
 const sendBtn = document.getElementById("sendBtn");
 const chatInput = document.getElementById("chatInput");
 const chatMessages = document.getElementById("chatMessages");
 const savedResponses = document.getElementById("savedResponses");
 
-// 3) Event listener for the "Send" button
 if (sendBtn && chatInput && chatMessages) {
   sendBtn.addEventListener("click", async () => {
     const question = chatInput.value.trim();
     if (!question) return;
 
-    // Display user message
+    // Display user's message
     const userMsg = document.createElement("div");
     userMsg.className = "chat-message message-user";
     userMsg.textContent = question;
     chatMessages.appendChild(userMsg);
 
-    // Clear the input box and scroll down
     chatInput.value = "";
     chatMessages.scrollTop = chatMessages.scrollHeight;
 
-    // Show a placeholder "Thinking..."
+    // Placeholder for AI response
     const botMsg = document.createElement("div");
     botMsg.className = "chat-message message-bot";
     botMsg.textContent = "Thinking...";
     chatMessages.appendChild(botMsg);
     chatMessages.scrollTop = chatMessages.scrollHeight;
 
-    // Call the BlenderBot API via Hugging Face
-    const answer = await queryChatbot(question);
+    // Query aimlapi with the user’s question
+    const answer = await queryAimlApi(question);
     botMsg.textContent = answer;
 
-    // 4) Optional: let users save the bot response to a "Notebook"
+    // Optionally add a button to save the response
     const saveBtn = document.createElement("button");
     saveBtn.textContent = "Save to Notebook";
     saveBtn.style.marginLeft = "10px";
@@ -88,17 +82,14 @@ if (sendBtn && chatInput && chatMessages) {
     saveBtn.style.backgroundColor = "var(--primary-color)";
     saveBtn.style.color = "#fff";
 
-    // When "Save" is clicked, append the bot's text to #savedResponses
     saveBtn.addEventListener("click", () => {
       const li = document.createElement("li");
-      li.textContent = answer;
+      li.textContent = botMsg.textContent;
       savedResponses.appendChild(li);
       alert("Response saved to notebook!");
     });
-
     botMsg.appendChild(saveBtn);
 
-    // Ensure chat window stays scrolled to bottom
     chatMessages.scrollTop = chatMessages.scrollHeight;
   });
 }
