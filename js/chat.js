@@ -141,3 +141,4 @@ if (sendBtn && chatInput && chatMessages) {
   }
 }
 
+//use this version if shit goes tits up
