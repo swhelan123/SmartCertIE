@@ -167,40 +167,46 @@ if (sendBtn && chatInput && chatMessages) {
 }
 
 /*******************************************************
- * Dropdown topic menue
+ * Dropdown topic menu
  *******************************************************/
-// Get the elements
-// Get references to our new topic selection elements
+
+// References to the DOM elements
 const unitContainer = document.getElementById("unitContainer");
 const chapterContainer = document.getElementById("chapterContainer");
 const selectedTopicContainer = document.getElementById("selectedTopicContainer");
 const selectedTopicLabel = document.getElementById("selectedTopicLabel");
 const changeTopicBtn = document.getElementById("changeTopicBtn");
 
-// Define chapters for each unit (using keys A, B, C)
+// Define chapters for each unit (A, B, C)
 const chapters = {
   A: ["The Scientific Method", "The Characteristics of Life", "Nutrition", "General Principles of Ecology", "A Study of an Ecosystem"],
   B: ["Cell Structure", "Cell Metabolism", "Cell Continuity", "Cell Diversity", "Genetics"],
   C: ["Diversity of Organisms", "Organisation and the Vascular Structures", "Transport and Nutrition", "Breathing System and Excretion", "Responses to Stimuli", "Reproduction and Growth"],
 };
 
-// Add event listeners to unit buttons
+// Grab all unit buttons (A/B/C)
 const unitButtons = document.querySelectorAll(".unit-button");
+
+// For each unit button, when clicked:
 unitButtons.forEach((button) => {
   button.addEventListener("click", () => {
-    // Get the selected unit identifier from the data attribute
+    // 1) Identify which unit was chosen (A/B/C)
     const unit = button.getAttribute("data-unit");
-    // Hide the unit container
+
+    // 2) Hide the unit container
     unitContainer.classList.add("hidden");
-    // Clear any existing chapter buttons
+
+    // 3) Clear any existing chapter buttons
     chapterContainer.innerHTML = "";
-    // Create chapter buttons for this unit
+
+    // 4) Create new buttons for each chapter in that unit
     if (chapters[unit]) {
       chapters[unit].forEach((chapter) => {
         const chapterBtn = document.createElement("button");
         chapterBtn.textContent = chapter;
         chapterBtn.classList.add("chapter-button");
-        // Add the same color class as the selected unit
+
+        // Apply color styling based on the unit
         if (unit === "A") {
           chapterBtn.classList.add("unit-green");
         } else if (unit === "B") {
@@ -208,31 +214,34 @@ unitButtons.forEach((button) => {
         } else if (unit === "C") {
           chapterBtn.classList.add("unit-red");
         }
-        // When a chapter is selected...
+
+        // When a chapter is selected:
         chapterBtn.addEventListener("click", () => {
           // Hide the chapter container
           chapterContainer.classList.add("hidden");
-          // Set the selected topic label to this chapter
+          // Display the selected chapter name
           selectedTopicLabel.textContent = chapter;
-          // Show the selected topic container (with the "Change Topic" button)
+          // Show the container that holds the "Change Topic" button
           selectedTopicContainer.classList.remove("hidden");
         });
+
         chapterContainer.appendChild(chapterBtn);
       });
     }
-    // Show the chapter container now that it's populated
+
+    // 5) Show the chapter container with the newly created buttons
     chapterContainer.classList.remove("hidden");
   });
 });
 
-// Handle the "Change Topic" button click
+// Handle the "Change Topic" button (reset selection)
 if (changeTopicBtn) {
   changeTopicBtn.addEventListener("click", () => {
     // Hide the selected topic container
     selectedTopicContainer.classList.add("hidden");
-    // Clear the selected topic label
+    // Clear the label
     selectedTopicLabel.textContent = "";
-    // Show the unit container again to restart the process
+    // Show the unit container again so user can pick a new unit
     unitContainer.classList.remove("hidden");
     // Clear and hide the chapter container
     chapterContainer.innerHTML = "";
