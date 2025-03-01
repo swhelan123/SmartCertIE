@@ -574,36 +574,81 @@ body.dark-mode .account-welcome-text {
 
   /*Founders Pictures and description style*/
   
-  .founders-container {
-    display: flex;
-    justify-content: space-around;
-    align-items: flex-start;
-    flex-wrap: wrap;
-    gap: 1rem;
-    margin: 2rem 0;
+/* TEAM SECTION CONTAINER */
+.team-section {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+    font-family: sans-serif;
   }
   
-  .founder {
-    flex: 1 1 30%;
-    max-width: 30%;
+  /* INTRO HEADING */
+  .team-intro {
     text-align: center;
+    margin-bottom: 3rem;
+  }
+  .team-intro h2 {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+  }
+  .team-intro p {
+    font-size: 1.2rem;
+    color: #555;
   }
   
-  .founder img {
+  /* TEAM MEMBER ROW */
+  .team-member {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 3rem;
+  }
+  
+  /* PHOTO AREA */
+  .member-photo {
+    flex: 0 0 250px; /* Fixed width for the photo */
+    margin-right: 2rem;
+  }
+  .member-photo img {
     width: 100%;
     height: auto;
-    border-radius: 8px; /* Optional: for rounded corners */
+    border-radius: 8px; /* Slight rounding for a modern look */
+    object-fit: cover;
   }
   
-  /* Mobile responsive: stack founders in one column */
+  /* INFO AREA */
+  .member-info {
+    flex: 1; /* Take up remaining space */
+  }
+  .member-info h3 {
+    margin-top: 0;
+    margin-bottom: 0.3rem;
+    font-size: 1.5rem;
+  }
+  .member-info h4 {
+    margin: 0;
+    margin-bottom: 1rem;
+    font-weight: 400;
+    color: #888;
+  }
+  .member-info p {
+    line-height: 1.5;
+    color: #333;
+  }
+  
+  /* MEDIA QUERY FOR RESPONSIVE (Stack in one column on smaller screens) */
   @media (max-width: 768px) {
-    .founders-container {
+    .team-member {
       flex-direction: column;
       align-items: center;
+      margin-bottom: 2rem;
     }
-    .founder {
-      flex: 1 1 100%;
-      max-width: 100%;
+    .member-photo {
+      margin-right: 0;
+      margin-bottom: 1rem;
+      flex: 0 0 auto;
+    }
+    .member-info {
+      text-align: center;
     }
   }
   
