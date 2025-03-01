@@ -574,6 +574,7 @@ body.dark-mode .account-welcome-text {
 .team-section {
     padding: 2rem;
     background-color: #f9f9f9;
+    flex: 1;
 }
 
 /* Single, unified .founder-box style */
@@ -642,4 +643,23 @@ body.dark-mode .founder-info p {
 }
 .founder-info a:hover {
     text-decoration: underline;
+}
+
+/* Two-column layout for the about page */
+.two-column-layout {
+    display: flex;
+    gap: 2rem; /* space between columns */
+}
+
+/* Let the about column take a bit less or more space if you like */
+.about-column {
+    flex: 1;
+    /* optional: min-width: 300px; */
+}
+
+/* Make it responsive: stack columns on smaller screens */
+@media (max-width: 800px) {
+    .two-column-layout {
+        flex-direction: column;
+    }
 }
