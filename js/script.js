@@ -87,6 +87,13 @@ onAuthStateChanged(auth, (user) => {
   }
 });
 
+//Event listener for pfp -> account
+if (profilePic) {
+  profilePic.addEventListener("click", () => {
+    window.location.href = "account.html";
+  });
+}
+
 //Event listener for clicking login
 if (loginBtn) {
   loginBtn.addEventListener("click", () => {
