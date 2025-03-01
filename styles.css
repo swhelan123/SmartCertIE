@@ -571,4 +571,39 @@ body.dark-mode .account-welcome-text {
   .profile-pic {
     cursor: pointer;
   }
+
+  /*Founders Pictures and description style*/
+  
+  .founders-container {
+    display: flex;
+    justify-content: space-around;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin: 2rem 0;
+  }
+  
+  .founder {
+    flex: 1 1 30%;
+    max-width: 30%;
+    text-align: center;
+  }
+  
+  .founder img {
+    width: 100%;
+    height: auto;
+    border-radius: 8px; /* Optional: for rounded corners */
+  }
+  
+  /* Mobile responsive: stack founders in one column */
+  @media (max-width: 768px) {
+    .founders-container {
+      flex-direction: column;
+      align-items: center;
+    }
+    .founder {
+      flex: 1 1 100%;
+      max-width: 100%;
+    }
+  }
   
