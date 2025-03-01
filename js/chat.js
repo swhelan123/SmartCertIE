@@ -1,19 +1,20 @@
+
 /**************************************
  * chat.js — Using AIMLAPI's OpenAI-compatible endpoint
  **************************************/
 
-// 1) The function to query the AIML API with OpenAI-compatible parameters
+// 1) The function to query the AIML API with extended parameters
 async function queryAimlApi(question) {
-  // Endpoint for AIMLAPI's chat completions (check docs if different)
+  // Endpoint for AIML API's chat completions
   const apiUrl = "https://api.aimlapi.com/v1/chat/completions";
 
-  // Insert your AIMLAPI key here
+  // Your AIMLAPI key
   const apiKey = "22c47683998944ef8ee37f799a1b679e";
 
-  // We can provide a "system" role to set context. Adjust as desired.
-  const systemPrompt = "You are a helpful AI assistant.";
+  // Provide a system prompt for context
+  const systemPrompt = "You are an expert biology tutor for 17-19 year olds.";
 
-  // Construct the chat history with system & user messages
+  // Standard messages array (OpenAI-style)
   const messages = [
     {
       role: "system",
@@ -25,12 +26,56 @@ async function queryAimlApi(question) {
     },
   ];
 
-  // The body for the POST request
+  // Merge your advanced fields with the messages array
   const payload = {
-    model: "mistralai/Mistral-7B-Instruct-v0.2", // Example model from aimlapi
+    // The model you want to call (example: "o1-mini")
+    model: "o1-mini",
+    
+    // The standard chat messages
     messages: messages,
-    temperature: 0.7,
-    max_tokens: 256,
+
+    // Example of advanced fields from your snippet:
+    frequency_penalty: 1,
+    logprobs: true,
+    top_logprobs: 1,
+    max_tokens: 512,
+    max_completion_tokens: 1,
+    n: 1,
+    presence_penalty: 1,
+    seed: 1,
+    stream: false,
+    top_p: 1,
+    temperature: 1,
+    parallel_tool_calls: true,
+    reasoning_effort: "low",
+    logit_bias: {
+      "ANY_ADDITIONAL_PROPERTY": 1
+    },
+    stream_options: {
+      "include_usage": true
+    },
+    stop: "text",
+    tool_choice: "none",
+    tools: [
+      {
+        type: "function",
+        function: {
+          description: "text",
+          name: "text",
+          parameters: null,
+          required: [
+            "text"
+          ]
+        }
+      }
+    ],
+    response_format: {
+      type: "text"
+    },
+    prediction: {
+      type: "content",
+      content: "text"
+    }
   };
 
   try {
@@ -38,7 +83,7 @@ async function queryAimlApi(question) {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${apiKey}`, // AIMLAPI typically uses Bearer tokens
+        Authorization: `Bearer ${apiKey}`, // AIMLAPI uses Bearer tokens
       },
       body: JSON.stringify(payload),
     });
@@ -51,10 +96,7 @@ async function queryAimlApi(question) {
     // Parse JSON data from the API
     const data = await response.json();
 
-    /**
-     * Based on the OpenAI-like spec, we expect:
-     * data.choices[0].message.content
-     */
+    // We expect data.choices[0].message.content in an OpenAI-like response
     if (
       data.choices &&
       data.choices.length > 0 &&
@@ -63,7 +105,7 @@ async function queryAimlApi(question) {
     ) {
       return data.choices[0].message.content;
     } else {
-      return "Sorry, I didn’t understand that.";
+      return "Sorry, I didn't understand that.";
     }
   } catch (error) {
     console.error("aimlapi error:", error);
@@ -71,13 +113,13 @@ async function queryAimlApi(question) {
   }
 }
 
-// 2) Grab DOM elements from your chat interface
+// 2) DOM elements for your chat interface
 const sendBtn = document.getElementById("sendBtn");
 const chatInput = document.getElementById("chatInput");
 const chatMessages = document.getElementById("chatMessages");
 const savedResponses = document.getElementById("savedResponses");
 
-// 3) Setup the event listener for the "Send" button
+// 3) Event listener for the "Send" button
 if (sendBtn && chatInput && chatMessages) {
   sendBtn.addEventListener("click", async () => {
     const question = chatInput.value.trim();
@@ -93,14 +135,14 @@ if (sendBtn && chatInput && chatMessages) {
     chatInput.value = "";
     chatMessages.scrollTop = chatMessages.scrollHeight;
 
-    // Insert a temporary bot message
+    // Show a "Thinking..." placeholder
     const botMsg = document.createElement("div");
     botMsg.className = "chat-message message-bot";
     botMsg.textContent = "Thinking...";
     chatMessages.appendChild(botMsg);
     chatMessages.scrollTop = chatMessages.scrollHeight;
 
-    // Call AIMLAPI with the user’s question
+    // Query AIMLAPI with the user’s question
     const answer = await queryAimlApi(question);
     botMsg.textContent = answer;
 
@@ -124,11 +166,11 @@ if (sendBtn && chatInput && chatMessages) {
     });
     botMsg.appendChild(saveBtn);
 
-    // Ensure the chat stays scrolled to bottom
+    // Scroll to bottom again
     chatMessages.scrollTop = chatMessages.scrollHeight;
   });
 
-  // Optionally, allow pressing Enter to send the message
+  // Optionally allow pressing Enter to send
   if (chatInput) {
     chatInput.addEventListener("keydown", (event) => {
       if (event.key === "Enter") {
