@@ -133,7 +133,7 @@ if (loginForm) {
     // For demo, any username/pw logs you in
     // In reality, you'd fetch() to a server, verify credentials, etc.
     localStorage.setItem("isLoggedIn", "true");
-    alert("Logged in successfully (demo)!");
+    alert("Logged in successfully!");
     // Redirect to home or account page
     window.location.href = "index.html";
   });
