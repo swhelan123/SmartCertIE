@@ -13,7 +13,7 @@ async function queryAimlApi(question) {
   const apiKey = "22c47683998944ef8ee37f799a1b679e";
 
   // We can provide a "system" role to set context. Adjust as desired.
-  const systemPrompt = "You are an expert Biology tutor for 18-19 year old 5th and 6th ";
+  const systemPrompt = "You are an expert Biology tutor for 18-19 year old 5th and 6th year Leaving Cert students";
 
   // Construct the chat history with system & user messages
   const messages = [
