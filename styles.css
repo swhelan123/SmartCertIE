@@ -568,96 +568,53 @@ body.dark-mode .account-welcome-text {
     cursor: pointer;
 }
 
-/*Founders Pictures and description style*/
-
-/* Update Founders Pictures and Description Styles */
-
-/* Change the founder box to match the standalone-page/card style */
-.founder-box {
-    display: flex;
-    align-items: flex-start;
-    padding: 2rem;
-    margin-bottom: 2rem;
-    border-radius: var(--border-radius);
-    background-color: #fff;
-    box-shadow: var(--shadow-blue);
-    border: none;
-}
-
-/* Updated founder-photo styling for extra spacing */
-.founder-photo {
-    flex: 0 0 250px;
-    margin-right: 2.5rem; /* Increased space between photo and text */
-    overflow: hidden; /* Ensure images stay within the container */
-}
-
-/* Updated image settings to ensure a uniform square shape */
-.founder-photo img {
-    width: 250px;
-    height: 250px;
-    object-fit: cover;
-    object-position: center;
-    border-radius: var(--border-radius);
-}
-
-/* Update text colors for consistency with the site */
-.founder-info h3 {
-    margin: 0 0 0.3rem;
-    font-size: 1.5rem;
-    color: var(--light-text);
-}
-
-.founder-info h4 {
-    margin: 0 0 1rem;
-    font-weight: 400;
-    color: #888;
-}
-
-.founder-info p {
-    line-height: 1.5;
-    color: var(--light-text);
-}
-
-/* Optional: Adjust dark mode for the founders section */
-body.dark-mode .founder-box {
-    background-color: #2b2b2b;
-}
-
-/* Styles for the team section */
+/* ================================
+   Founder Section (Unified)
+   ================================ */
 .team-section {
     padding: 2rem;
     background-color: #f9f9f9;
 }
 
-/* Founder box styling */
+/* Single, unified .founder-box style */
 .founder-box {
     display: flex;
     align-items: flex-start;
-    background: #fff;
-    border: 1px solid #ddd;
-    border-radius: 8px;
+    background-color: #fff;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-blue);
     padding: 1.5rem;
     margin: 1rem 0;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-/* Ensure some spacing between the photo and the info */
+/* Dark mode override */
+body.dark-mode .founder-box {
+    background-color: #2b2b2b;
+    border: 1px solid #444;
+}
+
+/* Photo container */
 .founder-photo {
     flex-shrink: 0;
     margin-right: 1.5rem;
 }
-
 .founder-photo img {
     display: block;
-    width: 150px;
-    height: auto;
-    border-radius: 8px;
+    width: 200px;
+    height: 200px;
+    object-fit: cover;
+    object-position: center;
+    border-radius: var(--border-radius);
 }
 
-/* Founder info styling */
+/* Text info */
 .founder-info h3 {
     margin: 0 0 0.5rem;
     font-size: 1.25rem;
+    color: #333;
+}
+body.dark-mode .founder-info h3 {
+    color: #eee;
 }
 
 .founder-info h4 {
@@ -665,10 +622,17 @@ body.dark-mode .founder-box {
     font-size: 1rem;
     color: #555;
 }
+body.dark-mode .founder-info h4 {
+    color: #bbb;
+}
 
 .founder-info p {
     line-height: 1.5;
     margin-bottom: 1rem;
+    color: #333;
+}
+body.dark-mode .founder-info p {
+    color: #ddd;
 }
 
 .founder-info a {
@@ -676,7 +640,6 @@ body.dark-mode .founder-box {
     color: var(--primary-color);
     text-decoration: none;
 }
-
 .founder-info a:hover {
     text-decoration: underline;
 }
