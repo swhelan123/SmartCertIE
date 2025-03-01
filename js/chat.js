@@ -1,76 +1,105 @@
-// chat.js (hypothetical example)
+/**************************************
+ * chat.js — Using AIMLAPI's OpenAI-compatible endpoint
+ **************************************/
 
-// 1) The function to query the AI model on aimlapi.com
+// 1) The function to query the AIML API with OpenAI-compatible parameters
 async function queryAimlApi(question) {
-  // Suppose aimlapi.com provides you with a model-specific endpoint & API key
-  const apiUrl = "https://aimlapi.com/v3/deepseek"; // EXAMPLE: adjust to real path
-  const apiKey = "6f38c7556ee5413694304b0be2c3fa33"; // from your aimlapi.com account
+  // Endpoint for AIMLAPI's chat completions (check docs if different)
+  const apiUrl = "https://api.aimlapi.com/v1/chat/completions";
 
-  // The request payload can vary depending on the model's requirements
+  // Insert your AIMLAPI key here
+  const apiKey = "6f38c7556ee5413694304b0be2c3fa33";
+
+  // We can provide a "system" role to set context. Adjust as desired.
+  const systemPrompt = "You are an expert biology tutor for 17-19 year olds.";
+
+  // Construct the chat history with system & user messages
+  const messages = [
+    {
+      role: "system",
+      content: systemPrompt,
+    },
+    {
+      role: "user",
+      content: question,
+    },
+  ];
+
+  // The body for the POST request
   const payload = {
-    prompt: question,
-    // ... any other parameters from aimlapi docs
+    model: "mistralai/Mistral-7B-Instruct-v0.2", // Example model from aimlapi
+    messages: messages,
+    temperature: 0.7,
+    max_tokens: 256,
   };
 
   try {
-    // 2) Make a POST request
     const response = await fetch(apiUrl, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${apiKey}`, // If aimlapi uses Bearer tokens
+        Authorization: `Bearer ${apiKey}`, // AIMLAPI typically uses Bearer tokens
       },
       body: JSON.stringify(payload),
     });
 
-    // 3) Process the response
+    // Check if the response is valid
     if (!response.ok) {
       throw new Error(`API returned status ${response.status}`);
     }
 
+    // Parse JSON data from the API
     const data = await response.json();
 
-    // 4) Return text from the result – structure depends on the API
-    // Example: if the JSON has { answer: "...the AI's text..." }
-    return data.answer || "Sorry, I didn't understand that.";
+    /**
+     * Based on the OpenAI-like spec, we expect:
+     * data.choices[0].message.content
+     */
+    if (data.choices && data.choices.length > 0 && data.choices[0].message && data.choices[0].message.content) {
+      return data.choices[0].message.content;
+    } else {
+      return "Sorry, I didn’t understand that.";
+    }
   } catch (error) {
     console.error("aimlapi error:", error);
-    return "Error connecting to aimlapi.";
+    return "Error connecting to AIMLAPI.";
   }
 }
 
-// 5) Use the function in your chat event
+// 2) Grab DOM elements from your chat interface
 const sendBtn = document.getElementById("sendBtn");
 const chatInput = document.getElementById("chatInput");
 const chatMessages = document.getElementById("chatMessages");
 const savedResponses = document.getElementById("savedResponses");
 
+// 3) Setup the event listener for the "Send" button
 if (sendBtn && chatInput && chatMessages) {
   sendBtn.addEventListener("click", async () => {
     const question = chatInput.value.trim();
     if (!question) return;
 
-    // Display user's message
+    // Display the user's message
     const userMsg = document.createElement("div");
     userMsg.className = "chat-message message-user";
     userMsg.textContent = question;
     chatMessages.appendChild(userMsg);
 
+    // Clear the input and scroll to bottom
     chatInput.value = "";
     chatMessages.scrollTop = chatMessages.scrollHeight;
 
-    // Placeholder for AI response
+    // Insert a temporary bot message
     const botMsg = document.createElement("div");
     botMsg.className = "chat-message message-bot";
     botMsg.textContent = "Thinking...";
     chatMessages.appendChild(botMsg);
     chatMessages.scrollTop = chatMessages.scrollHeight;
 
-    // Query aimlapi with the user’s question
+    // Call AIMLAPI with the user’s question
     const answer = await queryAimlApi(question);
     botMsg.textContent = answer;
 
-    // Optionally add a button to save the response
+    // Add a "Save to Notebook" button to the bot message
     const saveBtn = document.createElement("button");
     saveBtn.textContent = "Save to Notebook";
     saveBtn.style.marginLeft = "10px";
@@ -90,16 +119,17 @@ if (sendBtn && chatInput && chatMessages) {
     });
     botMsg.appendChild(saveBtn);
 
+    // Ensure the chat stays scrolled to bottom
     chatMessages.scrollTop = chatMessages.scrollHeight;
   });
 
+  // Optionally, allow pressing Enter to send the message
   if (chatInput) {
     chatInput.addEventListener("keydown", (event) => {
       if (event.key === "Enter") {
-        event.preventDefault(); // Prevent default form submission, if any.
+        event.preventDefault();
         sendBtn.click();
       }
     });
   }
-  
 }
