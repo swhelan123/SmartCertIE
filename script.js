@@ -208,24 +208,33 @@ onAuthStateChanged(auth, (user) => {
 });
 
 /*******************************************************
- * OPTIONAL: SIGN-UP LOGIC
+ * SIGN-UP PAGE (signup.html)
  *******************************************************/
-/*
-   If you want a sign-up flow, create a "Sign Up" button or form
-   with <button id="signupBtn"> or similar, then:
 
-const signupBtn = document.getElementById("signupBtn");
-if (signupBtn) {
-  signupBtn.addEventListener("click", async () => {
+const signupForm = document.getElementById("signupForm");
+if (signupForm) {
+  signupForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
     const emailVal = document.getElementById("emailInput")?.value.trim();
     const passVal = document.getElementById("passwordInput")?.value.trim();
+    const confirmVal = document.getElementById("confirmPasswordInput")?.value.trim();
+
+    if (!emailVal || !passVal || !confirmVal) {
+      alert("Please fill in all fields.");
+      return;
+    }
+    if (passVal !== confirmVal) {
+      alert("Passwords do not match.");
+      return;
+    }
+
     try {
+      // Create the user with Firebase Auth
       await createUserWithEmailAndPassword(auth, emailVal, passVal);
-      alert("Account created!");
-      window.location.href = "index.html";
+      alert("Account created successfully!");
+      window.location.href = "index.html"; // go to main page
     } catch (err) {
-      alert("Signup error: " + err.message);
+      alert("Sign-up error: " + err.message);
     }
   });
 }
-*/
