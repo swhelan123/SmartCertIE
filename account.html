@@ -19,17 +19,24 @@
         <div class="standalone-page">
             <h1>Your Account</h1>
 
-            <div id="accountDetails">
-                <!-- We'll display username or some placeholder data here -->
-                <p id="accountInfo"></p>
-                <button id="logoutBtn">Log Out</button>
+            <!-- Account Info Container -->
+            <div class="account-card">
+                <img id="accountProfilePic" class="account-profile-pic" src="assets/img/pfp.avif" alt="Profile" />
+                <div class="account-details">
+                    <p id="accountInfo" class="account-welcome-text"></p>
+                    <!-- If you want to show more user info (like displayName, creation time),
+               you could add placeholders here and fill them in script.js. -->
+                </div>
             </div>
 
-            <p>
+            <button id="logoutBtn" class="logout-button">Log Out</button>
+
+            <p style="margin-top: 1rem">
                 <a href="index.html" class="back-link">← Back to Home</a>
             </p>
         </div>
 
-        <script src="script.js"></script>
+        <!-- Link to your main script, which handles Firebase auth & logout -->
+        <script type="module" src="script.js"></script>
     </body>
 </html>

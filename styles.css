@@ -400,6 +400,59 @@ body.dark-mode .standalone-page {
         right: 6rem;
     }
 }
+<<<<<<< HEAD
+/* A container for user info on the account page */
+.account-card {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin: 1rem 0;
+    background-color: #fff;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-blue);
+    padding: 1rem;
+    transition: background-color 0.3s;
+}
+body.dark-mode .account-card {
+    background-color: #2b2b2b;
+}
+
+/* Larger profile pic on the account page */
+.account-profile-pic {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    object-fit: cover;
+    box-shadow: var(--shadow-blue);
+}
+
+/* The text that welcomes the user by email */
+.account-welcome-text {
+    font-size: 1.1rem;
+    color: #333;
+}
+body.dark-mode .account-welcome-text {
+    color: #eee;
+}
+
+/* A distinct logout button style */
+.logout-button {
+    background-color: #e53e3e; /* a red color for emphasis */
+    color: #fff;
+    border: none;
+    border-radius: var(--border-radius);
+    padding: 0.8rem 1.2rem;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background-color 0.2s;
+    font-size: 1rem;
+    margin-top: 1rem;
+    box-shadow: var(--shadow-blue);
+}
+.logout-button:hover {
+    background-color: #c53030; /* darker red on hover */
+}
+=======
 
 /*******************************************************
  * Topic Selector Styling
@@ -448,3 +501,4 @@ body.dark-mode .standalone-page {
     font-size: 1rem;
   }
   
+>>>>>>> 3eda47201183343d6d500e01e557a81036f2cd33
