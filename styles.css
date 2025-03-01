@@ -716,10 +716,4 @@ body.dark-mode .highlight-box {
 /* Dark mode override → remove shadow */
 body.dark-mode .about-column {
     background-color: var(--dark-bg);
-    box-shadow: none; /* No shadow in dark mode */
-}
-
-.login-form,
-.signup-form {
-    width: 100%;
-}
+    box-shadow: none; /* No sha

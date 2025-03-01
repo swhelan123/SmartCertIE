@@ -113,14 +113,39 @@ if (sidebarLinks && chatSection && notebookSection) {
     link.addEventListener("click", (e) => {
       e.preventDefault();
       const target = link.getAttribute("data-section");
-      // Hide both sections
+
+      // 1) Hide both sections
       chatSection.classList.add("hidden");
       notebookSection.classList.add("hidden");
-      // Show the chosen section
-      if (target === "chatSection") chatSection.classList.remove("hidden");
-      if (target === "notebookSection") notebookSection.classList.remove("hidden");
+
+      // 2) Show the chosen section
+      if (target === "chatSection") {
+        chatSection.classList.remove("hidden");
+      }
+      if (target === "notebookSection") {
+        notebookSection.classList.remove("hidden");
+      }
+
+      // 3) Remove 'active' from all sidebar links
+      sidebarLinks.forEach((lnk) => {
+        lnk.classList.remove("active");
+      });
+
+      // 4) Add 'active' to the clicked link
+      link.classList.add("active");
     });
   });
+
+  // MAKE CHAT ACTIVE BY DEFAULT:
+  // (1) Show chat, hide notebook
+  chatSection.classList.remove("hidden");
+  notebookSection.classList.add("hidden");
+
+  // (2) Add "active" to the chat link
+  const chatLink = document.querySelector(".sidebar-nav a[data-section='chatSection']");
+  if (chatLink) {
+    chatLink.classList.add("active");
+  }
 }
 
 /*******************************************************
