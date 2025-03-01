@@ -181,4 +181,51 @@ if (loginForm) {
   });
 }
 
-/**************************************
+/*******************************************************
+ * ACCOUNT PAGE (account.html)
+ *******************************************************/
+// We expect <p id="accountInfo"> and <button id="logoutBtn">
+const accountInfo = document.getElementById("accountInfo");
+const logoutBtn = document.getElementById("logoutBtn");
+
+// We'll check auth state to see if user is logged in
+onAuthStateChanged(auth, (user) => {
+  if (accountInfo && logoutBtn) {
+    if (!user) {
+      accountInfo.textContent = "You are not logged in. Redirecting to login...";
+      setTimeout(() => {
+        window.location.href = "login.html";
+      }, 2000);
+    } else {
+      accountInfo.textContent = "Welcome to your account page! (Firebase user: " + user.email + ")";
+      logoutBtn.addEventListener("click", async () => {
+        await signOut(auth);
+        alert("Logged out!");
+        window.location.href = "index.html";
+      });
+    }
+  }
+});
+
+/*******************************************************
+ * OPTIONAL: SIGN-UP LOGIC
+ *******************************************************/
+/*
+   If you want a sign-up flow, create a "Sign Up" button or form
+   with <button id="signupBtn"> or similar, then:
+
+const signupBtn = document.getElementById("signupBtn");
+if (signupBtn) {
+  signupBtn.addEventListener("click", async () => {
+    const emailVal = document.getElementById("emailInput")?.value.trim();
+    const passVal = document.getElementById("passwordInput")?.value.trim();
+    try {
+      await createUserWithEmailAndPassword(auth, emailVal, passVal);
+      alert("Account created!");
+      window.location.href = "index.html";
+    } catch (err) {
+      alert("Signup error: " + err.message);
+    }
+  });
+}
+*/
