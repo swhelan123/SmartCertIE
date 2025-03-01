@@ -497,3 +497,33 @@ if (updateAccountForm) {
     }
   });
 }
+
+// Grab references to the chat elements
+const chatContainer = document.getElementById("chatSection");
+const chatInput = document.getElementById("chatInput");
+const sendBtn = document.getElementById("sendBtn");
+const chatMessages = document.getElementById("chatMessages");
+
+// Listen for auth changes
+onAuthStateChanged(auth, (user) => {
+  if (!chatContainer || !chatInput || !sendBtn || !chatMessages) {
+    return; // not on index.html or chat elements don't exist
+  }
+
+  if (user) {
+    // If user is logged in, enable the chat
+    chatInput.disabled = false;
+    sendBtn.disabled = false;
+  } else {
+    // If user is not logged in, disable (or hide) the chat
+    chatInput.disabled = true;
+    sendBtn.disabled = true;
+
+    // Optionally show a message so user knows why it’s disabled
+    chatMessages.innerHTML = `
+      <div class="chat-message message-bot" style="color:red;">
+        You must be logged in to use the chat.
+        <a href="login.html">Log in here</a>.
+      </div>`;
+  }
+});
