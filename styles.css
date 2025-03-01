@@ -456,7 +456,6 @@ body.dark-mode .account-welcome-text {
  * Topic Selector Styling
  *******************************************************/
 
-
 /* Topic Selector Container */
 /* ----- Topic Selector Styling ----- */
 
@@ -468,20 +467,19 @@ body.dark-mode .account-welcome-text {
     margin: 1.5rem auto;
     width: 90%;
     max-width: 400px;
-  }
-  
-  /* Unit Container: lays out the three unit buttons in a row (wrap if needed) */
-  .unit-container {
+}
+
+/* Unit Container: lays out the three unit buttons in a row (wrap if needed) */
+.unit-container {
     display: flex;
     flex-direction: row; /* Ensure a row layout */
     justify-content: center;
     gap: 1rem;
     flex-wrap: nowrap; /* Prevent wrapping */
-  }
-  
-  
-  /* Unit Buttons (round and colored) */
-  .unit-button {
+}
+
+/* Unit Buttons (round and colored) */
+.unit-button {
     border: none;
     border-radius: 9999px; /* fully round */
     padding: 0.8rem 1.2rem;
@@ -489,38 +487,37 @@ body.dark-mode .account-welcome-text {
     cursor: pointer;
     box-shadow: var(--shadow-blue);
     transition: background-color 0.3s;
-  }
-  
-  /* Specific unit colors */
-  .unit-green {
+}
+
+/* Specific unit colors */
+.unit-green {
     background-color: #a8e6a3; /* pale green */
     color: #1f1f1f;
-  }
-  .unit-purple {
+}
+.unit-purple {
     background-color: #d3b3e5; /* pale purple */
     color: #1f1f1f;
-  }
-  .unit-red {
+}
+.unit-red {
     background-color: #f7a1a1; /* pale red */
     color: #1f1f1f;
-  }
-  
-  /* Hover effect for unit buttons */
-  .unit-button:hover {
+}
+
+/* Hover effect for unit buttons */
+.unit-button:hover {
     opacity: 0.9;
-  }
-  
-  /* Chapter Container: Grid layout with columns of 4 rows */
-  .chapter-container {
+}
+
+/* Chapter Container: Grid layout with columns of 4 rows */
+.chapter-container {
     display: grid;
     grid-template-columns: repeat(4, minmax(150px, auto));
     gap: 1rem;
     justify-content: center;
-  }
-  
-  
-  /* Chapter Buttons: Full width within each grid cell */
-  .chapter-button {
+}
+
+/* Chapter Buttons: Full width within each grid cell */
+.chapter-button {
     width: 100%;
     border: none;
     border-radius: 9999px;
@@ -529,29 +526,28 @@ body.dark-mode .account-welcome-text {
     cursor: pointer;
     box-shadow: var(--shadow-blue);
     transition: background-color 0.3s;
-  }
-  
-  /* For smaller screens: force a single column layout */
-  @media (max-width: 600px) {
+}
+
+/* For smaller screens: force a single column layout */
+@media (max-width: 600px) {
     .chapter-container {
-      grid-auto-flow: row;
-      grid-template-columns: 1fr;
-      grid-template-rows: none;
+        grid-auto-flow: row;
+        grid-template-columns: 1fr;
+        grid-template-rows: none;
     }
-  }
-  
-  
-  /* Selected Topic Container */
-  .selected-topic-container {
+}
+
+/* Selected Topic Container */
+.selected-topic-container {
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 0.5rem;
     margin-top: 1rem;
-  }
-  
-  /* Change Topic Button */
-  .change-topic-button {
+}
+
+/* Change Topic Button */
+.change-topic-button {
     background-color: var(--primary-color);
     color: #fff;
     border: none;
@@ -561,19 +557,19 @@ body.dark-mode .account-welcome-text {
     cursor: pointer;
     box-shadow: var(--shadow-blue);
     transition: background-color 0.3s;
-  }
-  
-  .change-topic-button:hover {
-    background-color: #2563eb;
-  }
-  
-  /* Make pfp button cursor style */
-  .profile-pic {
-    cursor: pointer;
-  }
+}
 
-  /*Founders Pictures and description style*/
-  
+.change-topic-button:hover {
+    background-color: #2563eb;
+}
+
+/* Make pfp button cursor style */
+.profile-pic {
+    cursor: pointer;
+}
+
+/*Founders Pictures and description style*/
+
 /* Update Founders Pictures and Description Styles */
 
 /* Change the founder box to match the standalone-page/card style */
@@ -625,4 +621,62 @@ body.dark-mode .account-welcome-text {
 /* Optional: Adjust dark mode for the founders section */
 body.dark-mode .founder-box {
     background-color: #2b2b2b;
+}
+
+/* Styles for the team section */
+.team-section {
+    padding: 2rem;
+    background-color: #f9f9f9;
+}
+
+/* Founder box styling */
+.founder-box {
+    display: flex;
+    align-items: flex-start;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin: 1rem 0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Ensure some spacing between the photo and the info */
+.founder-photo {
+    flex-shrink: 0;
+    margin-right: 1.5rem;
+}
+
+.founder-photo img {
+    display: block;
+    width: 150px;
+    height: auto;
+    border-radius: 8px;
+}
+
+/* Founder info styling */
+.founder-info h3 {
+    margin: 0 0 0.5rem;
+    font-size: 1.25rem;
+}
+
+.founder-info h4 {
+    margin: 0 0 1rem;
+    font-size: 1rem;
+    color: #555;
+}
+
+.founder-info p {
+    line-height: 1.5;
+    margin-bottom: 1rem;
+}
+
+.founder-info a {
+    margin-right: 1rem;
+    color: var(--primary-color);
+    text-decoration: none;
+}
+
+.founder-info a:hover {
+    text-decoration: underline;
 }
