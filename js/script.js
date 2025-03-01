@@ -94,7 +94,6 @@ if (loginBtn) {
   });
 }
 
-
 /*******************************************************
  * SIDEBAR NAV ON index.html (Single-Page Sections)
  *******************************************************/
@@ -114,61 +113,6 @@ if (sidebarLinks && chatSection && notebookSection) {
       if (target === "chatSection") chatSection.classList.remove("hidden");
       if (target === "notebookSection") notebookSection.classList.remove("hidden");
     });
-  });
-}
-
-/*******************************************************
- * BASIC CHAT FUNCTIONALITY (PLACEHOLDER)
- *******************************************************/
-const sendBtn = document.getElementById("sendBtn");
-const chatInput = document.getElementById("chatInput");
-const chatMessages = document.getElementById("chatMessages");
-const savedResponses = document.getElementById("savedResponses");
-
-if (sendBtn && chatInput && chatMessages) {
-  sendBtn.addEventListener("click", () => {
-    const question = chatInput.value.trim();
-    if (!question) return;
-
-    // User message
-    const userMsg = document.createElement("div");
-    userMsg.className = "chat-message message-user";
-    userMsg.textContent = question;
-    chatMessages.appendChild(userMsg);
-
-    chatInput.value = "";
-    chatMessages.scrollTop = chatMessages.scrollHeight;
-
-    // Placeholder bot response
-    setTimeout(() => {
-      const botMsg = document.createElement("div");
-      botMsg.className = "chat-message message-bot";
-      botMsg.textContent = "This is a placeholder answer about: " + question;
-
-      // "Save to Notebook" button
-      const saveBtn = document.createElement("button");
-      saveBtn.textContent = "Save to Notebook";
-      saveBtn.style.marginLeft = "10px";
-      saveBtn.style.padding = "2px 6px";
-      saveBtn.style.fontSize = "0.8rem";
-      saveBtn.style.cursor = "pointer";
-      saveBtn.style.borderRadius = "6px";
-      saveBtn.style.border = "none";
-      saveBtn.style.backgroundColor = "var(--primary-color)";
-      saveBtn.style.color = "#fff";
-      saveBtn.addEventListener("click", () => {
-        // Save to local list
-        // (In real app, store in Firestore if you want persistence)
-        const li = document.createElement("li");
-        li.textContent = botMsg.textContent;
-        savedResponses.appendChild(li);
-        alert("Response saved to notebook!");
-      });
-
-      botMsg.appendChild(saveBtn);
-      chatMessages.appendChild(botMsg);
-      chatMessages.scrollTop = chatMessages.scrollHeight;
-    }, 1000);
   });
 }
 
