@@ -400,7 +400,6 @@ body.dark-mode .standalone-page {
         right: 6rem;
     }
 }
-<<<<<<< HEAD
 /* A container for user info on the account page */
 .account-card {
     display: flex;
@@ -452,7 +451,6 @@ body.dark-mode .account-welcome-text {
 .logout-button:hover {
     background-color: #c53030; /* darker red on hover */
 }
-=======
 
 /*******************************************************
  * Topic Selector Styling
@@ -460,21 +458,30 @@ body.dark-mode .account-welcome-text {
 
 
 /* Topic Selector Container */
+/* ----- Topic Selector Styling ----- */
+
+/* Container for the entire topic selector */
 .topic-selector {
     display: flex;
     flex-direction: column;
     align-items: center;
     margin: 1.5rem auto;
-    width: 80%;
-    max-width: 300px;
+    width: 90%;
+    max-width: 400px;
   }
   
-  /* Round Topic Button */
-  .topic-button {
-    background-color: var(--primary-color);
-    color: #fff;
+  /* Unit Container: lays out the three unit buttons in a row (wrap if needed) */
+  .unit-container {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+  
+  /* Unit Buttons (round and colored) */
+  .unit-button {
     border: none;
-    border-radius: 9999px; /* fully rounded */
+    border-radius: 9999px; /* fully round */
     padding: 0.8rem 1.2rem;
     font-size: 1rem;
     cursor: pointer;
@@ -482,23 +489,71 @@ body.dark-mode .account-welcome-text {
     transition: background-color 0.3s;
   }
   
-  .topic-button:hover {
+  /* Specific unit colors */
+  .unit-green {
+    background-color: #a8e6a3; /* pale green */
+    color: #1f1f1f;
+  }
+  .unit-purple {
+    background-color: #d3b3e5; /* pale purple */
+    color: #1f1f1f;
+  }
+  .unit-red {
+    background-color: #f7a1a1; /* pale red */
+    color: #1f1f1f;
+  }
+  
+  /* Hover effect for unit buttons */
+  .unit-button:hover {
+    opacity: 0.9;
+  }
+  
+  /* Chapter Container: grid layout with wrapping */
+  .chapter-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: center;
+    margin-top: 1rem;
+  }
+  
+  /* Chapter Buttons (round, same color as unit) */
+  .chapter-button {
+    border: none;
+    border-radius: 9999px;
+    padding: 0.6rem 1rem;
+    font-size: 0.9rem;
+    cursor: pointer;
+    box-shadow: var(--shadow-blue);
+    transition: background-color 0.3s;
+    /* Ensure roughly 4 per row */
+    flex: 1 1 calc(25% - 1rem);
+    max-width: calc(25% - 1rem);
+  }
+  
+  /* Selected Topic Container */
+  .selected-topic-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-top: 1rem;
+  }
+  
+  /* Change Topic Button */
+  .change-topic-button {
+    background-color: var(--primary-color);
+    color: #fff;
+    border: none;
+    border-radius: var(--border-radius);
+    padding: 0.4rem 0.8rem;
+    font-size: 0.8rem;
+    cursor: pointer;
+    box-shadow: var(--shadow-blue);
+    transition: background-color 0.3s;
+  }
+  
+  .change-topic-button:hover {
     background-color: #2563eb;
   }
   
-  /* Dropdown Containers */
-  .dropdown-container {
-    margin-top: 0.5rem;
-    width: 100%;
-  }
-  
-  /* Dropdown Styling */
-  .dropdown {
-    width: 100%;
-    padding: 0.8rem;
-    border: 1px solid #ccc;
-    border-radius: var(--border-radius);
-    font-size: 1rem;
-  }
-  
->>>>>>> 3eda47201183343d6d500e01e557a81036f2cd33

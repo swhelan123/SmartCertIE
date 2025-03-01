@@ -163,14 +163,15 @@ if (sendBtn && chatInput && chatMessages) {
  * Dropdown topic menue
  *******************************************************/
 // Get the elements
-const topicButton = document.getElementById("topicButton");
-const groupDropdownContainer = document.getElementById("groupDropdownContainer");
-const topicDropdownContainer = document.getElementById("topicDropdownContainer");
-const groupDropdown = document.getElementById("groupDropdown");
-const topicDropdown = document.getElementById("topicDropdown");
+// Get references to our new topic selection elements
+const unitContainer = document.getElementById("unitContainer");
+const chapterContainer = document.getElementById("chapterContainer");
+const selectedTopicContainer = document.getElementById("selectedTopicContainer");
+const selectedTopicLabel = document.getElementById("selectedTopicLabel");
+const changeTopicBtn = document.getElementById("changeTopicBtn");
 
-// Define topics for each group
-const topics = {
+// Define chapters for each unit (using keys A, B, C)
+const chapters = {
   A: [
     "The Scientific Method",
     "The Characteristics of Life",
@@ -184,7 +185,6 @@ const topics = {
     "Cell Continuity",
     "Cell Diversity",
     "Genetics"
-
   ],
   C: [
     "Diversity of Organisms",
@@ -193,35 +193,65 @@ const topics = {
     "Breathing System and Excretion",
     "Responses to Stimuli",
     "Reproduction and Growth"
-
   ]
 };
 
-// When the "Select Topic" button is clicked, toggle the visibility of the group dropdown
-topicButton.addEventListener("click", () => {
-  groupDropdownContainer.classList.toggle("hidden");
-  // Hide the topic dropdown until a group is selected
-  topicDropdownContainer.classList.add("hidden");
+// Add event listeners to unit buttons
+const unitButtons = document.querySelectorAll(".unit-button");
+unitButtons.forEach(button => {
+  button.addEventListener("click", () => {
+    // Get the selected unit identifier from the data attribute
+    const unit = button.getAttribute("data-unit");
+    // Hide the unit container
+    unitContainer.classList.add("hidden");
+    // Clear any existing chapter buttons
+    chapterContainer.innerHTML = "";
+    // Create chapter buttons for this unit
+    if (chapters[unit]) {
+      chapters[unit].forEach(chapter => {
+        const chapterBtn = document.createElement("button");
+        chapterBtn.textContent = chapter;
+        chapterBtn.classList.add("chapter-button");
+        // Add the same color class as the selected unit
+        if (unit === "A") {
+          chapterBtn.classList.add("unit-green");
+        } else if (unit === "B") {
+          chapterBtn.classList.add("unit-purple");
+        } else if (unit === "C") {
+          chapterBtn.classList.add("unit-red");
+        }
+        // When a chapter is selected...
+        chapterBtn.addEventListener("click", () => {
+          // Hide the chapter container
+          chapterContainer.classList.add("hidden");
+          // Set the selected topic label to this chapter
+          selectedTopicLabel.textContent = chapter;
+          // Show the selected topic container (with the "Change Topic" button)
+          selectedTopicContainer.classList.remove("hidden");
+        });
+        chapterContainer.appendChild(chapterBtn);
+      });
+    }
+    // Show the chapter container now that it's populated
+    chapterContainer.classList.remove("hidden");
+  });
 });
 
-// When a group is selected, populate and show the topic dropdown
-groupDropdown.addEventListener("change", (e) => {
-  const selectedGroup = e.target.value;
-  // Clear previous topics from the dropdown
-  topicDropdown.innerHTML = `<option value="">Select Topic</option>`;
-  if (selectedGroup && topics[selectedGroup]) {
-    topics[selectedGroup].forEach((topic) => {
-      const option = document.createElement("option");
-      option.value = topic;
-      option.textContent = topic;
-      topicDropdown.appendChild(option);
-    });
-    // Show the topic dropdown container
-    topicDropdownContainer.classList.remove("hidden");
-  } else {
-    topicDropdownContainer.classList.add("hidden");
-  }
-});
+// Handle the "Change Topic" button click
+if (changeTopicBtn) {
+  changeTopicBtn.addEventListener("click", () => {
+    // Hide the selected topic container
+    selectedTopicContainer.classList.add("hidden");
+    // Clear the selected topic label
+    selectedTopicLabel.textContent = "";
+    // Show the unit container again to restart the process
+    unitContainer.classList.remove("hidden");
+    // Clear and hide the chapter container
+    chapterContainer.innerHTML = "";
+    chapterContainer.classList.add("hidden");
+  });
+};
+
 
 
 /*******************************************************

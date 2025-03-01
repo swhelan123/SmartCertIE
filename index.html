@@ -49,22 +49,23 @@
         <!--Button for selecting topic-->
         <section id="chatSection" class="chat-container">
             <!-- Topic Selector (Centered and round) -->
-            <div class="topic-selector">
-              <button id="topicButton" class="topic-button">Select Topic</button>
-              <div id="groupDropdownContainer" class="dropdown-container hidden">
-                <select id="groupDropdown" class="dropdown">
-                  <option value="">Select Group</option>
-                  <option value="A">Unit 1: The Study of Life</option>
-                  <option value="B">Unit 2: The Cell</option>
-                  <option value="C">Unit 3: The Organism</option>
-                </select>
+            <div class="topic-selector" id="topicSelector">
+                <!-- Unit Buttons Container (initially visible) -->
+                <div id="unitContainer" class="unit-container">
+                  <button class="unit-button unit-green" data-unit="A">Unit 1: The Study of Life</button>
+                  <button class="unit-button unit-purple" data-unit="B">Unit 2: The Cell</button>
+                  <button class="unit-button unit-red" data-unit="C">Unit 3: The Organism</button>
+                </div>
+                
+                <!-- Chapter Buttons Container (initially hidden) -->
+                <div id="chapterContainer" class="chapter-container hidden"></div>
+                
+                <!-- Selected Topic Display (initially hidden) -->
+                <div id="selectedTopicContainer" class="selected-topic-container hidden">
+                  <span id="selectedTopicLabel" class="selected-topic-label"></span>
+                  <button id="changeTopicBtn" class="change-topic-button">Change Topic</button>
+                </div>
               </div>
-              <div id="topicDropdownContainer" class="dropdown-container hidden">
-                <select id="topicDropdown" class="dropdown">
-                  <option value="">Select Topic</option>
-                </select>
-              </div>
-            </div>
 
 
         <!-- Main Content -->
