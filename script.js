@@ -160,6 +160,59 @@ if (sendBtn && chatInput && chatMessages) {
 }
 
 /*******************************************************
+ * Dropdown topic menue
+ *******************************************************/
+// Get the elements
+const topicButton = document.getElementById("topicButton");
+const groupDropdownContainer = document.getElementById("groupDropdownContainer");
+const topicDropdownContainer = document.getElementById("topicDropdownContainer");
+const groupDropdown = document.getElementById("groupDropdown");
+const topicDropdown = document.getElementById("topicDropdown");
+
+// Define topics for each group
+const topics = {
+  A: [
+    "Topic A1", "Topic A2", "Topic A3", "Topic A4", "Topic A5",
+    "Topic A6", "Topic A7", "Topic A8", "Topic A9", "Topic A10"
+  ],
+  B: [
+    "Topic B1", "Topic B2", "Topic B3", "Topic B4", "Topic B5",
+    "Topic B6", "Topic B7", "Topic B8", "Topic B9", "Topic B10"
+  ],
+  C: [
+    "Topic C1", "Topic C2", "Topic C3", "Topic C4", "Topic C5",
+    "Topic C6", "Topic C7", "Topic C8", "Topic C9", "Topic C10"
+  ]
+};
+
+// When the "Select Topic" button is clicked, toggle the visibility of the group dropdown
+topicButton.addEventListener("click", () => {
+  groupDropdownContainer.classList.toggle("hidden");
+  // Hide the topic dropdown until a group is selected
+  topicDropdownContainer.classList.add("hidden");
+});
+
+// When a group is selected, populate and show the topic dropdown
+groupDropdown.addEventListener("change", (e) => {
+  const selectedGroup = e.target.value;
+  // Clear previous topics from the dropdown
+  topicDropdown.innerHTML = `<option value="">Select Topic</option>`;
+  if (selectedGroup && topics[selectedGroup]) {
+    topics[selectedGroup].forEach((topic) => {
+      const option = document.createElement("option");
+      option.value = topic;
+      option.textContent = topic;
+      topicDropdown.appendChild(option);
+    });
+    // Show the topic dropdown container
+    topicDropdownContainer.classList.remove("hidden");
+  } else {
+    topicDropdownContainer.classList.add("hidden");
+  }
+});
+
+
+/*******************************************************
  * LOGIN PAGE (login.html) - Real Firebase Login
  *******************************************************/
 const loginForm = document.getElementById("loginForm");

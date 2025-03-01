@@ -400,6 +400,7 @@ body.dark-mode .standalone-page {
         right: 6rem;
     }
 }
+<<<<<<< HEAD
 /* A container for user info on the account page */
 .account-card {
     display: flex;
@@ -451,3 +452,53 @@ body.dark-mode .account-welcome-text {
 .logout-button:hover {
     background-color: #c53030; /* darker red on hover */
 }
+=======
+
+/*******************************************************
+ * Topic Selector Styling
+ *******************************************************/
+
+
+/* Topic Selector Container */
+.topic-selector {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 1.5rem auto;
+    width: 80%;
+    max-width: 300px;
+  }
+  
+  /* Round Topic Button */
+  .topic-button {
+    background-color: var(--primary-color);
+    color: #fff;
+    border: none;
+    border-radius: 9999px; /* fully rounded */
+    padding: 0.8rem 1.2rem;
+    font-size: 1rem;
+    cursor: pointer;
+    box-shadow: var(--shadow-blue);
+    transition: background-color 0.3s;
+  }
+  
+  .topic-button:hover {
+    background-color: #2563eb;
+  }
+  
+  /* Dropdown Containers */
+  .dropdown-container {
+    margin-top: 0.5rem;
+    width: 100%;
+  }
+  
+  /* Dropdown Styling */
+  .dropdown {
+    width: 100%;
+    padding: 0.8rem;
+    border: 1px solid #ccc;
+    border-radius: var(--border-radius);
+    font-size: 1rem;
+  }
+  
+>>>>>>> 3eda47201183343d6d500e01e557a81036f2cd33
