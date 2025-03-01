@@ -1,14 +1,17 @@
 // chat.js
 
-// Function to query the DialoGPT model via Hugging Face API
+// 1) Function to query the BlenderBot model on Hugging Face
 async function queryChatbot(question) {
-  const apiUrl = "https://api-inference.huggingface.co/models/microsoft/DialoGPT-medium";
+  // Replace the model path here with the BlenderBot model
+  const apiUrl = "https://api-inference.huggingface.co/models/facebook/blenderbot-400M-distill";
+
   const headers = {
     "Content-Type": "application/json",
-    // If you have a Hugging Face API token, uncomment the line below:
+    // If you have a Hugging Face API token, uncomment and add it:
     // "Authorization": "Bearer YOUR_HF_API_TOKEN"
   };
 
+  // "inputs" is the user query; "options" can force waiting for model
   const payload = {
     inputs: question,
     options: { wait_for_model: true },
@@ -21,53 +24,59 @@ async function queryChatbot(question) {
       body: JSON.stringify(payload),
     });
     const result = await response.json();
-    if (Array.isArray(result) && result.length > 0) {
+
+    // The returned result can be an array or object
+    if (Array.isArray(result) && result.length > 0 && result[0].generated_text) {
       return result[0].generated_text;
     } else if (result && result.generated_text) {
       return result.generated_text;
+    } else if (result.error) {
+      // If the API returns an "error" field, show it
+      console.error("BlenderBot error:", result.error);
+      return "Sorry, I'm having trouble responding right now.";
     } else {
       return "Sorry, I didn't understand that.";
     }
   } catch (error) {
     console.error("Chatbot API error:", error);
-    return "Error connecting to chatbot API.";
+    return "Error connecting to the chatbot API.";
   }
 }
 
-// Get DOM elements
+// 2) DOM elements from your chat window
 const sendBtn = document.getElementById("sendBtn");
 const chatInput = document.getElementById("chatInput");
 const chatMessages = document.getElementById("chatMessages");
 const savedResponses = document.getElementById("savedResponses");
 
-// Attach event listener for chat messages
+// 3) Event listener for the "Send" button
 if (sendBtn && chatInput && chatMessages) {
   sendBtn.addEventListener("click", async () => {
     const question = chatInput.value.trim();
     if (!question) return;
 
-    // Display user's message
+    // Display user message
     const userMsg = document.createElement("div");
     userMsg.className = "chat-message message-user";
     userMsg.textContent = question;
     chatMessages.appendChild(userMsg);
 
-    // Clear input and scroll
+    // Clear the input box and scroll down
     chatInput.value = "";
     chatMessages.scrollTop = chatMessages.scrollHeight;
 
-    // Display a placeholder for the bot's response
+    // Show a placeholder "Thinking..."
     const botMsg = document.createElement("div");
     botMsg.className = "chat-message message-bot";
     botMsg.textContent = "Thinking...";
     chatMessages.appendChild(botMsg);
     chatMessages.scrollTop = chatMessages.scrollHeight;
 
-    // Get answer from chatbot API
+    // Call the BlenderBot API via Hugging Face
     const answer = await queryChatbot(question);
     botMsg.textContent = answer;
 
-    // Add "Save to Notebook" button to the bot message
+    // 4) Optional: let users save the bot response to a "Notebook"
     const saveBtn = document.createElement("button");
     saveBtn.textContent = "Save to Notebook";
     saveBtn.style.marginLeft = "10px";
@@ -78,14 +87,18 @@ if (sendBtn && chatInput && chatMessages) {
     saveBtn.style.border = "none";
     saveBtn.style.backgroundColor = "var(--primary-color)";
     saveBtn.style.color = "#fff";
+
+    // When "Save" is clicked, append the bot's text to #savedResponses
     saveBtn.addEventListener("click", () => {
       const li = document.createElement("li");
-      li.textContent = botMsg.textContent;
+      li.textContent = answer;
       savedResponses.appendChild(li);
       alert("Response saved to notebook!");
     });
+
     botMsg.appendChild(saveBtn);
 
+    // Ensure chat window stays scrolled to bottom
     chatMessages.scrollTop = chatMessages.scrollHeight;
   });
 }
