@@ -328,7 +328,7 @@ body.dark-mode .section-content {
 
 /* Standalone pages (about, login, account) */
 .standalone-page {
-    max-width: 600px;
+    max-width: 1200px;
     margin: 4rem auto;
     background-color: #fff;
     border-radius: var(--border-radius);
@@ -573,8 +573,8 @@ body.dark-mode .account-welcome-text {
    ================================ */
 .team-section {
     padding: 2rem;
-    background-color: #f9f9f9;
-    flex: 1;
+    background-color: transpart; /*#f9f9f9;*/
+    padding: 0;
 }
 
 /* Single, unified .founder-box style */
@@ -645,19 +645,33 @@ body.dark-mode .founder-info p {
     text-decoration: underline;
 }
 
-/* Two-column layout for the about page */
-.two-column-layout {
+/* Then your override (below) */
+.standalone-page.two-column-layout {
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background-color: #fff;
     display: flex;
-    gap: 2rem; /* space between columns */
+    gap: 2rem;
+    align-items: flex-start;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-blue);
 }
 
-/* Let the about column take a bit less or more space if you like */
 .about-column {
     flex: 1;
-    /* optional: min-width: 300px; */
+    min-width: 300px; /* optional, so it doesn’t get too narrow */
 }
 
-/* Make it responsive: stack columns on smaller screens */
+/* The team-section can also flex:1, or flex:1.2 if you want it bigger */
+.team-section {
+    flex: 1;
+    background-color: #f9f9f9; /* If you still want a distinct background */
+    border-radius: var(--border-radius);
+    padding: 2rem;
+}
+
+/* On smaller screens, stack them vertically */
 @media (max-width: 800px) {
     .two-column-layout {
         flex-direction: column;
