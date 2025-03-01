@@ -186,7 +186,7 @@ const chapters = {
 
 // Add event listeners to unit buttons
 const unitButtons = document.querySelectorAll(".unit-button");
-unitButtons.forEach((button) => {
+unitButtons.forEach(button => {
   button.addEventListener("click", () => {
     // Get the selected unit identifier from the data attribute
     const unit = button.getAttribute("data-unit");
@@ -196,7 +196,7 @@ unitButtons.forEach((button) => {
     chapterContainer.innerHTML = "";
     // Create chapter buttons for this unit
     if (chapters[unit]) {
-      chapters[unit].forEach((chapter) => {
+      chapters[unit].forEach(chapter => {
         const chapterBtn = document.createElement("button");
         chapterBtn.textContent = chapter;
         chapterBtn.classList.add("chapter-button");
