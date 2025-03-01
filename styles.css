@@ -473,10 +473,12 @@ body.dark-mode .account-welcome-text {
   /* Unit Container: lays out the three unit buttons in a row (wrap if needed) */
   .unit-container {
     display: flex;
+    flex-direction: row; /* Ensure a row layout */
     justify-content: center;
     gap: 1rem;
-    flex-wrap: wrap;
+    flex-wrap: nowrap; /* Prevent wrapping */
   }
+  
   
   /* Unit Buttons (round and colored) */
   .unit-button {
