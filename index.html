@@ -81,12 +81,23 @@
                 </div>
             </section>
 
-            <!-- Notebook Section (hidden by default) -->
+            <!-- Notebook Section -->
             <section id="notebookSection" class="section-content hidden">
                 <h2>Notebook</h2>
                 <p>Saved chatbot responses will appear here.</p>
+            
+                <!-- Topic Selector -->
+                <div>
+                <label for="notebookTopicSelect">Choose a topic:</label>
+                <select id="notebookTopicSelect">
+                    <option value="all">All</option>
+                    <!-- We'll programmatically add other topics here -->
+                </select>
+                </div>
+            
                 <ul id="savedResponses" style="list-style: disc; margin-left: 1.5rem"></ul>
             </section>
+            
         </div>
 
         <!-- Link to our main JS (Firebase logic + chat + chatbot integration) -->

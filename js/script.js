@@ -207,6 +207,164 @@ if (changeTopicBtn) {
 }
 
 /*******************************************************
+ * MULTI-NOTEBOOK LOGIC
+ *******************************************************/
+// In-memory structure for notebooks
+// "all" stores all responses; each topic has its own array too
+const notebooks = {
+  all: [],
+};
+
+// Utility function: get current topic name
+function getCurrentTopic() {
+  return selectedTopicLabel.textContent || "General";
+}
+
+/*******************************************************
+ * BASIC CHAT FUNCTIONALITY (WITH MULTI-NOTEBOOK)
+ *******************************************************/
+// Chat elements
+const sendBtn = document.getElementById("sendBtn");
+const chatInput = document.getElementById("chatInput");
+const chatMessages = document.getElementById("chatMessages");
+
+// Notebook elements
+const savedResponses = document.getElementById("savedResponses"); 
+// <ul> for displaying responses
+const notebookTopicSelect = document.getElementById("notebookTopicSelect"); 
+// <select> for choosing which notebook to view
+
+// Send button event (basic chat + placeholder response)
+if (sendBtn && chatInput && chatMessages) {
+  sendBtn.addEventListener("click", () => {
+    const question = chatInput.value.trim();
+    if (!question) return;
+
+    // User message
+    const userMsg = document.createElement("div");
+    userMsg.className = "chat-message message-user";
+    userMsg.textContent = question;
+    chatMessages.appendChild(userMsg);
+
+    chatInput.value = "";
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+
+    // Placeholder bot response
+    setTimeout(() => {
+      const botMsg = document.createElement("div");
+      botMsg.className = "chat-message message-bot";
+      botMsg.textContent = "This is a placeholder answer about: " + question;
+
+      // "Save to Notebook" button
+      const saveBtn = document.createElement("button");
+      saveBtn.textContent = "Save to Notebook";
+      saveBtn.style.marginLeft = "10px";
+      saveBtn.style.padding = "2px 6px";
+      saveBtn.style.fontSize = "0.8rem";
+      saveBtn.style.cursor = "pointer";
+      saveBtn.style.borderRadius = "6px";
+      saveBtn.style.border = "none";
+      saveBtn.style.backgroundColor = "var(--primary-color)";
+      saveBtn.style.color = "#fff";
+
+      saveBtn.addEventListener("click", () => {
+        const currentTopic = getCurrentTopic();
+        // Create array for this topic if needed
+        if (!notebooks[currentTopic]) {
+          notebooks[currentTopic] = [];
+        }
+        // Add to that topic's array
+        notebooks[currentTopic].push(botMsg.textContent);
+        // Also add to "all"
+        notebooks.all.push(botMsg.textContent);
+
+        // Update the dropdown in case it's a new topic
+        updateNotebookTopicsDropdown();
+        alert(`Response saved to notebook: ${currentTopic}`);
+      });
+
+      botMsg.appendChild(saveBtn);
+      chatMessages.appendChild(botMsg);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }, 1000);
+  });
+
+  // Allow pressing Enter to send message
+  chatInput.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      sendBtn.click();
+    }
+  });
+}
+
+/*******************************************************
+ * NOTEBOOK VIEWING (TOPIC-SPECIFIC & ALL)
+ *******************************************************/
+// Populate <select> with all topics (besides "all") + "all"
+function updateNotebookTopicsDropdown() {
+  if (!notebookTopicSelect) return;
+
+  // Save the currently selected value (if any)
+  const oldVal = notebookTopicSelect.value;
+
+  // Clear existing options
+  notebookTopicSelect.innerHTML = "";
+
+  // Always have an "all" option at the top
+  const allOption = document.createElement("option");
+  allOption.value = "all";
+  allOption.textContent = "All Topics";
+  notebookTopicSelect.appendChild(allOption);
+
+  // Add each topic from notebooks, except "all"
+  Object.keys(notebooks).forEach((topic) => {
+    if (topic === "all") return;
+    const option = document.createElement("option");
+    option.value = topic;
+    option.textContent = topic;
+    notebookTopicSelect.appendChild(option);
+  });
+
+  // Restore previous selection if possible
+  if (oldVal) {
+    notebookTopicSelect.value = oldVal;
+  } else {
+    notebookTopicSelect.value = "all"; 
+  }
+
+  // Re-render the notebook list
+  renderNotebook(notebookTopicSelect.value);
+}
+
+// Render whichever notebook is selected in the <ul> (#savedResponses)
+function renderNotebook(topic) {
+  if (!savedResponses) return;
+  savedResponses.innerHTML = "";
+
+  const items = notebooks[topic] || [];
+  if (items.length === 0) {
+    const li = document.createElement("li");
+    li.textContent = "No responses saved yet.";
+    savedResponses.appendChild(li);
+    return;
+  }
+
+  items.forEach((response) => {
+    const li = document.createElement("li");
+    li.textContent = response;
+    savedResponses.appendChild(li);
+  });
+}
+
+// If the <select> exists, listen for changes to display that notebook
+if (notebookTopicSelect) {
+  notebookTopicSelect.addEventListener("change", () => {
+    renderNotebook(notebookTopicSelect.value);
+  });
+}
+
+/*******************************************************
  * LOGIN PAGE (login.html) - Real Firebase Login
  *******************************************************/
 const loginForm = document.getElementById("loginForm");
