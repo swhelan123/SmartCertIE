@@ -364,6 +364,7 @@ if (setupForm) {
       await setDoc(
         doc(db, "users", user.uid),
         {
+          email: user.email,
           firstName,
           lastName,
           phone: phoneNumber,
