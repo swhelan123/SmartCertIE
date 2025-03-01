@@ -3,18 +3,31 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>SmartCert POC</title>
+        <title>SmartCert - Home</title>
 
-        <!-- Google Font for a clean, modern look -->
+        <!-- Google Font -->
         <link rel="preconnect" href="https://fonts.gstatic.com" />
         <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet" />
 
-        <!-- Link to external CSS -->
+        <!-- Shared CSS -->
         <link rel="stylesheet" href="styles.css" />
     </head>
     <body>
-        <!-- Dark Mode Toggle -->
-        <button class="dark-mode-toggle" id="darkModeToggle">Dark Mode</button>
+        <!--
+    PILL CONTAINER at top-right:
+    Includes either the Login button OR the Profile Pic,
+    plus the Mode Toggle icon
+  -->
+        <div id="topRightContainer" class="pill-container">
+            <!-- The login button is shown if user NOT logged in -->
+            <button id="loginBtn" class="login-button hidden">Login</button>
+
+            <!-- The user’s profile pic (hidden if not logged in) -->
+            <img id="profilePic" class="profile-pic hidden" src="assets/img/pfp.avif" alt="Profile" />
+
+            <!-- The theme toggle icon (sun or moon) -->
+            <img id="modeIcon" class="mode-icon" src="assets/img/dark.png" alt="Toggle Theme" />
+        </div>
 
         <!-- Sidebar -->
         <aside class="sidebar" id="sidebar">
@@ -25,9 +38,13 @@
             <nav class="sidebar-nav">
                 <a href="#" data-section="chatSection">💬 Chat</a>
                 <a href="#" data-section="notebookSection">📓 Notebook</a>
-                <a href="#" data-section="accountSection">👤 Account</a>
-                <a href="about.html" data-section="aboutSection">🔍 About Us</a>
+                <a href="about.html">🔍 About Us</a>
             </nav>
+
+            <!-- Account button at bottom -->
+            <div class="sidebar-footer">
+                <a href="#" id="accountLink">👤 Account</a>
+            </div>
         </aside>
 
         <!-- Main Content -->
@@ -52,16 +69,9 @@
                 <p>Saved chatbot responses will appear here.</p>
                 <ul id="savedResponses" style="list-style: disc; margin-left: 1.5rem"></ul>
             </section>
-
-            <!-- Account Section (hidden by default) -->
-            <section id="accountSection" class="section-content hidden">
-                <h2>Your Account</h2>
-                <p>Log in or view account details here.</p>
-                <!-- You can add a login form or account info here later -->
-            </section>
         </div>
 
-        <!-- Link to external JS -->
+        <!-- Shared JS -->
         <script src="script.js"></script>
     </body>
 </html>
