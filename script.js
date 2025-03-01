@@ -1,51 +1,82 @@
 /*******************************************************
- * DARK MODE
+ * FIREBASE v9 SETUP (MODULAR)
+ *******************************************************/
+// 1) Import only what you need from the CDN
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.17.2/firebase-app.js";
+import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.17.2/firebase-analytics.js";
+import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/9.17.2/firebase-auth.js";
+import { getFirestore } from "https://www.gstatic.com/firebasejs/9.17.2/firebase-firestore.js";
+
+// 2) Your Firebase configuration (replace with your real config)
+const firebaseConfig = {
+  apiKey: "YOUR_API_KEY",
+  authDomain: "smartcert-f1965.firebaseapp.com",
+  projectId: "smartcert-f1965",
+  storageBucket: "smartcert-f1965.appspot.com",
+  messagingSenderId: "1075815326636",
+  appId: "1:1075815326636:web:ffd63ed204d2832e295009",
+  measurementId: "G-6CJR44Z4MK",
+};
+
+// 3) Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
+
+// 4) Get Auth & Firestore instances
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+/*******************************************************
+ * DARK MODE ICON (SUN/MOON)
  *******************************************************/
 const body = document.body;
-const darkModeToggle = document.getElementById("darkModeToggle");
-if (darkModeToggle) {
+const modeIcon = document.getElementById("modeIcon");
+
+if (modeIcon) {
+  // On page load, see if theme is 'dark'
   if (localStorage.getItem("theme") === "dark") {
     body.classList.add("dark-mode");
-    darkModeToggle.textContent = "Light Mode";
+    // If currently dark, show sun icon (light.png)
+    modeIcon.src = "assets/img/light.png";
+  } else {
+    // If currently light, show moon icon (dark.png)
+    modeIcon.src = "assets/img/dark.png";
   }
 
-  darkModeToggle.addEventListener("click", () => {
+  // When the icon is clicked
+  modeIcon.addEventListener("click", () => {
     body.classList.toggle("dark-mode");
     const isDark = body.classList.contains("dark-mode");
     localStorage.setItem("theme", isDark ? "dark" : "light");
-    darkModeToggle.textContent = isDark ? "Light Mode" : "Dark Mode";
+    // Switch icon accordingly
+    modeIcon.src = isDark ? "assets/img/light.png" : "assets/img/dark.png";
   });
 }
 
 /*******************************************************
- * LOGIN STATE UI TOGGLING
+ * AUTH STATE & UI TOGGLING
  *******************************************************/
-// We track user login with localStorage key "isLoggedIn" = "true" or null.
-const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
-
-// On index.html, top-right container:
+// Elements for top-right container
 const loginBtn = document.getElementById("loginBtn");
 const profilePic = document.getElementById("profilePic");
 const accountLink = document.getElementById("accountLink");
 
-if (loginBtn && profilePic && accountLink) {
-  // If user is logged in, show profile pic & link to account page
-  // Otherwise, show login button & link to login page
-  if (isLoggedIn) {
-    loginBtn.classList.add("hidden");
-    profilePic.classList.remove("hidden");
-    accountLink.setAttribute("href", "account.html");
-  } else {
-    loginBtn.classList.remove("hidden");
-    profilePic.classList.add("hidden");
-    accountLink.setAttribute("href", "login.html");
+// Listen for Firebase auth changes (logged in/out)
+onAuthStateChanged(auth, (user) => {
+  if (loginBtn && profilePic && accountLink) {
+    if (user) {
+      // User is logged in
+      loginBtn.classList.add("hidden");
+      profilePic.classList.remove("hidden");
+      accountLink.setAttribute("href", "account.html");
+    } else {
+      // User is logged out
+      loginBtn.classList.remove("hidden");
+      profilePic.classList.add("hidden");
+      accountLink.setAttribute("href", "login.html");
+    }
   }
-
-  // Clicking login button (if shown) -> login page
-  loginBtn.addEventListener("click", () => {
-    window.location.href = "login.html";
-  });
-}
+});
 
 /*******************************************************
  * SIDEBAR NAV ON index.html (Single-Page Sections)
@@ -110,6 +141,7 @@ if (sendBtn && chatInput && chatMessages) {
       saveBtn.style.color = "#fff";
       saveBtn.addEventListener("click", () => {
         // Save this response to the notebook
+        // In a real app, you'd store it in Firestore if you want persistence
         const li = document.createElement("li");
         li.textContent = botMsg.textContent;
         savedResponses.appendChild(li);
@@ -124,64 +156,29 @@ if (sendBtn && chatInput && chatMessages) {
 }
 
 /*******************************************************
- * LOGIN PAGE (login.html)
+ * LOGIN PAGE (login.html) - Real Firebase Login
  *******************************************************/
+// We expect an <form id="loginForm"> with <input id="emailInput">, <input id="passwordInput">
 const loginForm = document.getElementById("loginForm");
 if (loginForm) {
-  loginForm.addEventListener("submit", (e) => {
+  loginForm.addEventListener("submit", async (e) => {
     e.preventDefault();
-    // For demo, any username/pw logs you in
-    // In reality, you'd fetch() to a server, verify credentials, etc.
-    localStorage.setItem("isLoggedIn", "true");
-    alert("Logged in successfully!");
-    // Redirect to home or account page
-    window.location.href = "index.html";
+    const emailVal = document.getElementById("emailInput")?.value.trim();
+    const passVal = document.getElementById("passwordInput")?.value.trim();
+    if (!emailVal || !passVal) {
+      alert("Please enter email and password");
+      return;
+    }
+
+    try {
+      // Attempt to sign in with Firebase
+      await signInWithEmailAndPassword(auth, emailVal, passVal);
+      alert("Logged in successfully!");
+      window.location.href = "index.html"; // go back to home
+    } catch (err) {
+      alert("Login error: " + err.message);
+    }
   });
 }
 
-/*******************************************************
- * ACCOUNT PAGE (account.html)
- *******************************************************/
-const accountInfo = document.getElementById("accountInfo");
-const logoutBtn = document.getElementById("logoutBtn");
-
-if (accountInfo && logoutBtn) {
-  // Display some user info (in real life, you'd fetch from server)
-  if (!isLoggedIn) {
-    accountInfo.textContent = "You are not logged in. Redirecting to login...";
-    setTimeout(() => {
-      window.location.href = "login.html";
-    }, 2000);
-  } else {
-    accountInfo.textContent = "Welcome to your account page! (Demo text)";
-    logoutBtn.addEventListener("click", () => {
-      localStorage.removeItem("isLoggedIn");
-      alert("Logged out!");
-      window.location.href = "index.html";
-    });
-  }
-}
-/*******************************************************
- * DARK MODE ICON
- *******************************************************/
-const modeIcon = document.getElementById("modeIcon");
-if (modeIcon) {
-  // On page load, see if theme is 'dark'
-  if (localStorage.getItem("theme") === "dark") {
-    body.classList.add("dark-mode");
-    // If currently dark, show sun icon (light.png)
-    modeIcon.src = "assets/img/light.png";
-  } else {
-    // If currently light, show moon icon (dark.png)
-    modeIcon.src = "assets/img/dark.png";
-  }
-
-  // When the icon is clicked
-  modeIcon.addEventListener("click", () => {
-    body.classList.toggle("dark-mode");
-    const isDark = body.classList.contains("dark-mode");
-    localStorage.setItem("theme", isDark ? "dark" : "light");
-    // Switch icon accordingly
-    modeIcon.src = isDark ? "assets/img/light.png" : "assets/img/dark.png";
-  });
-}
+/**************************************

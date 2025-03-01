@@ -19,18 +19,25 @@
         <div class="standalone-page">
             <h1>Login to SmartCert</h1>
 
+            <!-- Firebase Login Form -->
             <form id="loginForm" class="login-form">
-                <input type="text" id="usernameInput" placeholder="Username (demo)" required />
-                <input type="password" id="passwordInput" placeholder="Password (demo)" required />
+                <input type="email" id="emailInput" placeholder="Email" required />
+                <input type="password" id="passwordInput" placeholder="Password" required />
                 <button type="submit">Log In</button>
             </form>
 
-            <p class="note">For this demo, any username/password is accepted. In a real app, you'd validate credentials.</p>
+            <p class="note">
+                Don’t have an account yet?
+                <!-- Link to a sign-up page or your sign-up flow, if you have one -->
+                <a href="signup.html">Create one here.</a>
+            </p>
+
             <p>
                 <a href="index.html" class="back-link">← Back to Home</a>
             </p>
         </div>
 
-        <script src="script.js"></script>
+        <!-- IMPORTANT: load script.js as a module if using v9 modular approach -->
+        <script type="module" src="script.js"></script>
     </body>
 </html>
