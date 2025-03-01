@@ -574,83 +574,50 @@ body.dark-mode .account-welcome-text {
 
   /*Founders Pictures and description style*/
   
-/* TEAM SECTION CONTAINER */
-.team-section {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 2rem;
-    font-family: 'Poppins', sans-serif;
-  }
-  
-  /* INTRO HEADING */
-  .team-intro {
-    text-align: center;
-    margin-bottom: 3rem;
-  }
-  .team-intro h2 {
-    font-size: 2.5rem;
-    margin-bottom: 0.5rem;
-  }
-  .team-intro p {
-    font-size: 1.2rem;
-    color: #555;
-  }
-  
-  /* FOUNDER BOX STYLE */
-  .founder-box {
+/* Update Founders Pictures and Description Styles */
+
+/* Change the founder box to match the standalone-page/card style */
+.founder-box {
     display: flex;
     align-items: flex-start;
-    border: 1px solid #ccc;
-    padding: 1.5rem;
+    padding: 2rem;
     margin-bottom: 2rem;
-    border-radius: 8px;
-    background-color: #fafafa; /* Optional: adds a subtle background */
-  }
-  
-  /* FOUNDER PHOTO */
-  .founder-photo {
-    flex: 0 0 250px;
-    margin-right: 2rem;
-  }
-  .founder-photo img {
+    border-radius: var(--border-radius);
+    background-color: #fff;
+    box-shadow: var(--shadow-blue);
+    /* Remove the hard-coded border */
+    border: none;
+}
+
+/* Use the same border radius for founder photos */
+.founder-photo img {
     width: 100%;
     height: auto;
-    border-radius: 8px;
+    border-radius: var(--border-radius);
     object-fit: cover;
-  }
-  
-  /* FOUNDER INFO */
-  .founder-info {
-    flex: 1;
-  }
-  .founder-info h3 {
-    margin: 0;
-    margin-bottom: 0.3rem;
+}
+
+/* Update text colors for consistency with the site */
+.founder-info h3 {
+    margin: 0 0 0.3rem;
     font-size: 1.5rem;
-  }
-  .founder-info h4 {
-    margin: 0;
-    margin-bottom: 1rem;
+    color: var(--light-text);
+}
+
+.founder-info h4 {
+    margin: 0 0 1rem;
     font-weight: 400;
     color: #888;
-  }
-  .founder-info p {
+}
+
+.founder-info p {
     line-height: 1.5;
-    color: #333;
-  }
-  
-  /* Responsive adjustments */
-  @media (max-width: 768px) {
-    .founder-box {
-      flex-direction: column;
-      align-items: center;
-    }
-    .founder-photo {
-      margin-right: 0;
-      margin-bottom: 1rem;
-    }
-    .founder-info {
-      text-align: center;
-    }
-  }
+    color: var(--light-text);
+}
+
+/* Optional: Adjust dark mode for the founders section */
+body.dark-mode .founder-box {
+    background-color: #2b2b2b;
+}
+
   
