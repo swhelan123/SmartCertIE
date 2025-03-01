@@ -579,7 +579,7 @@ body.dark-mode .account-welcome-text {
     max-width: 1200px;
     margin: 0 auto;
     padding: 2rem;
-    font-family: sans-serif;
+    font-family: 'Poppins', sans-serif;
   }
   
   /* INTRO HEADING */
@@ -596,58 +596,60 @@ body.dark-mode .account-welcome-text {
     color: #555;
   }
   
-  /* TEAM MEMBER ROW */
-  .team-member {
+  /* FOUNDER BOX STYLE */
+  .founder-box {
     display: flex;
     align-items: flex-start;
-    margin-bottom: 3rem;
+    border: 1px solid #ccc;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    border-radius: 8px;
+    background-color: #fafafa; /* Optional: adds a subtle background */
   }
   
-  /* PHOTO AREA */
-  .member-photo {
-    flex: 0 0 250px; /* Fixed width for the photo */
+  /* FOUNDER PHOTO */
+  .founder-photo {
+    flex: 0 0 250px;
     margin-right: 2rem;
   }
-  .member-photo img {
+  .founder-photo img {
     width: 100%;
     height: auto;
-    border-radius: 8px; /* Slight rounding for a modern look */
+    border-radius: 8px;
     object-fit: cover;
   }
   
-  /* INFO AREA */
-  .member-info {
-    flex: 1; /* Take up remaining space */
+  /* FOUNDER INFO */
+  .founder-info {
+    flex: 1;
   }
-  .member-info h3 {
-    margin-top: 0;
+  .founder-info h3 {
+    margin: 0;
     margin-bottom: 0.3rem;
     font-size: 1.5rem;
   }
-  .member-info h4 {
+  .founder-info h4 {
     margin: 0;
     margin-bottom: 1rem;
     font-weight: 400;
     color: #888;
   }
-  .member-info p {
+  .founder-info p {
     line-height: 1.5;
     color: #333;
   }
   
-  /* MEDIA QUERY FOR RESPONSIVE (Stack in one column on smaller screens) */
+  /* Responsive adjustments */
   @media (max-width: 768px) {
-    .team-member {
+    .founder-box {
       flex-direction: column;
       align-items: center;
-      margin-bottom: 2rem;
     }
-    .member-photo {
+    .founder-photo {
       margin-right: 0;
       margin-bottom: 1rem;
-      flex: 0 0 auto;
     }
-    .member-info {
+    .founder-info {
       text-align: center;
     }
   }
