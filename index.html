@@ -16,19 +16,15 @@
         <link rel="icon" type="image/png" href="assets/img/tab_icon.png" />
     </head>
     <body>
-        <!--
-      PILL CONTAINER at top-right:
-      Includes either the Login button OR the Profile Pic,
-      plus the Mode Toggle icon
-    -->
+        <!-- PILL CONTAINER at top-right -->
         <div id="topRightContainer" class="pill-container">
-            <!-- The login button is shown if user NOT logged in -->
+            <!-- Login button (hidden if user is logged in) -->
             <button id="loginBtn" class="login-button hidden">Login</button>
 
-            <!-- The user’s profile pic (hidden if not logged in) -->
+            <!-- Profile pic (hidden if user is logged out) -->
             <img id="profilePic" class="profile-pic hidden" src="assets/img/pfp.avif" alt="Profile" />
 
-            <!-- The theme toggle icon (sun or moon) -->
+            <!-- Theme toggle icon (sun/moon) -->
             <img id="modeIcon" class="mode-icon" src="assets/img/dark.png" alt="Toggle Theme" />
         </div>
 
@@ -44,7 +40,7 @@
                 <a href="about.html">🔍 About Us</a>
             </nav>
 
-            <!-- Account button at bottom -->
+            <!-- Account link at bottom -->
             <div class="sidebar-footer">
                 <a href="#" id="accountLink">👤 Account</a>
             </div>
@@ -55,10 +51,7 @@
             <!-- Chat Section -->
             <section id="chatSection" class="chat-container">
                 <div class="chat-messages" id="chatMessages">
-                    <!-- Example chat messages -->
                     <div class="chat-message message-bot">Hi there! Ask me anything about Biology.</div>
-                    <div class="chat-message message-user">What is photosynthesis?</div>
-                    <div class="chat-message message-bot">Photosynthesis is how green plants convert sunlight into chemical energy.</div>
                 </div>
                 <div class="chat-input-area">
                     <input type="text" id="chatInput" placeholder="Ask a Biology question..." />
@@ -74,67 +67,7 @@
             </section>
         </div>
 
-        <!-- Firebase v9 (Modular) - load directly from CDN -->
-        <script type="module">
-            // 1) Import only what you need from Firebase v9
-            import { initializeApp } from "https://www.gstatic.com/firebasejs/9.17.2/firebase-app.js";
-            import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.17.2/firebase-analytics.js";
-            import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/9.17.2/firebase-auth.js";
-            import { getFirestore, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/9.17.2/firebase-firestore.js";
-
-            // 2) Your Firebase configuration (from the Firebase console)
-            const firebaseConfig = {
-                apiKey: "AIzaSyDe5pXEGR015hQbXvoSGyJc955hgXO8tio",
-                authDomain: "smartcert-f1965.firebaseapp.com",
-                projectId: "smartcert-f1965",
-                storageBucket: "smartcert-f1965.appspot.com",
-                messagingSenderId: "1075815326636",
-                appId: "1:1075815326636:web:ffd63ed204d2832e295009",
-                measurementId: "G-6CJR44Z4MK",
-            };
-
-            // 3) Initialize Firebase
-            const app = initializeApp(firebaseConfig);
-            const analytics = getAnalytics(app);
-
-            // 4) Initialize Auth & Firestore
-            const auth = getAuth(app);
-            const db = getFirestore(app);
-
-            // 5) Example: watch auth state changes
-            onAuthStateChanged(auth, (user) => {
-                if (user) {
-                    console.log("User logged in:", user.uid);
-                    // e.g., show profile pic, hide login button
-                    document.getElementById("loginBtn").classList.add("hidden");
-                    document.getElementById("profilePic").classList.remove("hidden");
-                } else {
-                    console.log("User logged out or not logged in.");
-                    // e.g., hide profile pic, show login button
-                    document.getElementById("loginBtn").classList.remove("hidden");
-                    document.getElementById("profilePic").classList.add("hidden");
-                }
-            });
-
-            // 6) For demonstration: hooking up your "Login" button
-            //    (In real usage, you'd do this on a separate login page, etc.)
-            const loginBtn = document.getElementById("loginBtn");
-            if (loginBtn) {
-                loginBtn.addEventListener("click", async () => {
-                    try {
-                        // Hard-coded example (replace with real form input)
-                        const email = "test@example.com";
-                        const password = "123456";
-                        await signInWithEmailAndPassword(auth, email, password);
-                        alert("Logged in (demo)!");
-                    } catch (err) {
-                        alert("Login error: " + err.message);
-                    }
-                });
-            }
-        </script>
-
-        <!-- Your custom logic (chat, notebook, etc.) can go in script.js or inline -->
-        <script src="script.js" type="module"></script>
+        <!-- Link to our main JS (Firebase logic + chat) -->
+        <script type="module" src="script.js"></script>
     </body>
 </html>
