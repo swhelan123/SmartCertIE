@@ -716,4 +716,23 @@ body.dark-mode .highlight-box {
 /* Dark mode override → remove shadow */
 body.dark-mode .about-column {
     background-color: var(--dark-bg);
-    box-shadow: none; /* No sha
+    box-shadow: none; /* No shadow in dark mode */
+}
+
+.login-form,
+.signup-form {
+    width: 100%;
+}
+
+/* Highlight the active link in the sidebar */
+.sidebar-nav a.active {
+    background-color: #edf2fe;
+    color: #000;
+}
+
+/* Highlight the active link in the sidebar */
+body.dark-mode .sidebar-nav a.active {
+    background-color: #3b3f44;
+    color: #fff;
+    box-shadow: none;
+}
