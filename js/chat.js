@@ -8,7 +8,7 @@ async function queryAimlApi(question) {
   const apiUrl = "https://api.aimlapi.com/v1/chat/completions";
 
   // Insert your AIMLAPI key here
-  const apiKey = "6f38c7556ee5413694304b0be2c3fa33";
+  const apiKey = "22c47683998944ef8ee37f799a1b679e";
 
   // We can provide a "system" role to set context. Adjust as desired.
   const systemPrompt = "You are a helpful AI assistant.";
