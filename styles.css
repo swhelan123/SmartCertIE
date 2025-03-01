@@ -400,3 +400,51 @@ body.dark-mode .standalone-page {
         right: 6rem;
     }
 }
+
+/*******************************************************
+ * Topic Selector Styling
+ *******************************************************/
+
+
+/* Topic Selector Container */
+.topic-selector {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 1.5rem auto;
+    width: 80%;
+    max-width: 300px;
+  }
+  
+  /* Round Topic Button */
+  .topic-button {
+    background-color: var(--primary-color);
+    color: #fff;
+    border: none;
+    border-radius: 9999px; /* fully rounded */
+    padding: 0.8rem 1.2rem;
+    font-size: 1rem;
+    cursor: pointer;
+    box-shadow: var(--shadow-blue);
+    transition: background-color 0.3s;
+  }
+  
+  .topic-button:hover {
+    background-color: #2563eb;
+  }
+  
+  /* Dropdown Containers */
+  .dropdown-container {
+    margin-top: 0.5rem;
+    width: 100%;
+  }
+  
+  /* Dropdown Styling */
+  .dropdown {
+    width: 100%;
+    padding: 0.8rem;
+    border: 1px solid #ccc;
+    border-radius: var(--border-radius);
+    font-size: 1rem;
+  }
+  

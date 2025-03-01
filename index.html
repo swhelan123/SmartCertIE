@@ -48,21 +48,19 @@
 
         <!--Button for selecting topic-->
         <section id="chatSection" class="chat-container">
-            <!-- Topic Selection Section -->
-            <div id="topicSelection" style="margin-bottom: 1rem;">
-              <button id="topicButton">Select Topic</button>
-              <!-- Group Dropdown (hidden by default) -->
-              <div id="groupDropdownContainer" class="hidden" style="margin-top: 0.5rem;">
-                <select id="groupDropdown">
+            <!-- Topic Selector (Centered and round) -->
+            <div class="topic-selector">
+              <button id="topicButton" class="topic-button">Select Topic</button>
+              <div id="groupDropdownContainer" class="dropdown-container hidden">
+                <select id="groupDropdown" class="dropdown">
                   <option value="">Select Group</option>
                   <option value="A">Group A</option>
                   <option value="B">Group B</option>
                   <option value="C">Group C</option>
                 </select>
               </div>
-              <!-- Topics Dropdown (hidden by default) -->
-              <div id="topicDropdownContainer" class="hidden" style="margin-top: 0.5rem;">
-                <select id="topicDropdown">
+              <div id="topicDropdownContainer" class="dropdown-container hidden">
+                <select id="topicDropdown" class="dropdown">
                   <option value="">Select Topic</option>
                 </select>
               </div>
