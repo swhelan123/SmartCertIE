@@ -178,6 +178,8 @@ unitButtons.forEach((button) => {
           chapterContainer.classList.add("hidden");
           // Display the selected chapter name
           selectedTopicLabel.textContent = chapter;
+          //New - set global selected topicd variable
+          selectedTopic = chapter;
           // Show the container that holds the "Change Topic" button
           selectedTopicContainer.classList.remove("hidden");
         });
@@ -198,6 +200,8 @@ if (changeTopicBtn) {
     selectedTopicContainer.classList.add("hidden");
     // Clear the label
     selectedTopicLabel.textContent = "";
+    // --- NEW: Clear the global selectedTopic variable ---
+    selectedTopic = "";
     // Show the unit container again so user can pick a new unit
     unitContainer.classList.remove("hidden");
     // Clear and hide the chapter container

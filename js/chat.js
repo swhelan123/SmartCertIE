@@ -1,8 +1,29 @@
-
-
 /**************************************
  * chat.js — Using AIMLAPI's OpenAI-compatible endpoint
  **************************************/
+
+// --- NEW: Define topic-specific context data ---
+const topicData = {
+  "The Scientific Method": "Context: Review key steps of the scientific method, including hypothesis formulation, experimentation, and analysis.",
+  "The Characteristics of Life": "Context: Cover cellular organization, metabolism, growth, reproduction, and homeostasis in living organisms.",
+  "Nutrition": "Context: Focus on the role of nutrients, digestion, absorption, and the importance of a balanced diet.",
+  "General Principles of Ecology": "Context: Emphasize ecosystems, energy flow, nutrient cycling, and population dynamics.",
+  "A Study of an Ecosystem": "Context: Consider real-life case studies of ecosystems, interactions among species, and environmental factors.",
+  "Cell Structure": "Context: Dive into the details of organelles, membrane structures, and the differences between prokaryotic and eukaryotic cells.",
+  "Cell Metabolism": "Context: Review key metabolic pathways, enzyme activity, and energy production within cells.",
+  "Cell Continuity": "Context: Explore cell cycle regulation, mitosis, meiosis, and mechanisms that ensure continuity of life.",
+  "Cell Diversity": "Context: Understand the variety of cell types and their specialized functions within an organism.",
+  "Genetics": "Context: Cover DNA structure, replication, gene expression, and basic genetic inheritance patterns.",
+  "Diversity of Organisms": "Context: Examine the classification, evolution, and diversity of life forms on Earth.",
+  "Organisation and the Vascular Structures": "Context: Focus on how organisms are organized, including tissue types and the role of vascular systems.",
+  "Transport and Nutrition": "Context: Explain mechanisms for nutrient and gas transport in organisms.",
+  "Breathing System and Excretion": "Context: Detail the processes of respiration and excretion, and how organisms maintain internal balance.",
+  "Responses to Stimuli": "Context: Review the ways organisms detect and respond to environmental changes.",
+  "Reproduction and Growth": "Context: Discuss sexual and asexual reproduction, developmental biology, and growth processes."
+};
+
+// --- NEW: Global variable to keep track of the selected topic ---
+let selectedTopic = "";
 
 // 1) The function to query the AIML API with OpenAI-compatible parameters
 async function queryAimlApi(question) {
@@ -12,8 +33,13 @@ async function queryAimlApi(question) {
   // Insert your AIMLAPI key here
   const apiKey = "22c47683998944ef8ee37f799a1b679e";
 
-  // We can provide a "system" role to set context. Adjust as desired.
-  const systemPrompt = "You are an expert Biology tutor for 18-19 year old 5th and 6th year Leaving Cert students";
+  // Base system prompt
+  let systemPrompt = "You are an expert Biology tutor for 18-19 year old 5th and 6th year Leaving Cert students";
+
+  // --- NEW: Append topic context if a topic is selected ---
+  if (selectedTopic && topicData[selectedTopic]) {
+    systemPrompt += "\n\n" + topicData[selectedTopic];
+  }
 
   // Construct the chat history with system & user messages
   const messages = [
@@ -40,23 +66,17 @@ async function queryAimlApi(question) {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${apiKey}`, // AIMLAPI typically uses Bearer tokens
+        Authorization: `Bearer ${apiKey}`,
       },
       body: JSON.stringify(payload),
     });
 
-    // Check if the response is valid
     if (!response.ok) {
       throw new Error(`API returned status ${response.status}`);
     }
 
-    // Parse JSON data from the API
     const data = await response.json();
 
-    /**
-     * Based on the OpenAI-like spec, we expect:
-     * data.choices[0].message.content
-     */
     if (
       data.choices &&
       data.choices.length > 0 &&
@@ -102,7 +122,7 @@ if (sendBtn && chatInput && chatMessages) {
     chatMessages.appendChild(botMsg);
     chatMessages.scrollTop = chatMessages.scrollHeight;
 
-    // Call AIMLAPI with the user’s question
+    // Call AIMLAPI with the user’s question. The system prompt now includes topic context if available.
     const answer = await queryAimlApi(question);
     botMsg.textContent = answer;
 
@@ -130,7 +150,7 @@ if (sendBtn && chatInput && chatMessages) {
     chatMessages.scrollTop = chatMessages.scrollHeight;
   });
 
-  // Optionally, allow pressing Enter to send the message
+  // Allow pressing Enter to send the message
   if (chatInput) {
     chatInput.addEventListener("keydown", (event) => {
       if (event.key === "Enter") {
@@ -140,5 +160,3 @@ if (sendBtn && chatInput && chatMessages) {
     });
   }
 }
-
-//use this version if shit goes tits up
