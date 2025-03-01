@@ -510,17 +510,19 @@ body.dark-mode .account-welcome-text {
     opacity: 0.9;
   }
   
-  /* Chapter Container: grid layout with wrapping */
-  .chapter-container {
-    display: flex;
-    flex-wrap: wrap;
+  /* Chapter Container: Grid layout with columns of 4 rows */
+.chapter-container {
+    display: grid;
+    /* Place items in columns, with 4 rows per column */
+    grid-auto-flow: column;
+    grid-template-rows: repeat(4, auto);
     gap: 1rem;
     justify-content: center;
-    margin-top: 1rem;
   }
   
-  /* Chapter Buttons (round, same color as unit) */
+  /* Chapter Buttons: Full width within each grid cell */
   .chapter-button {
+    width: 100%;
     border: none;
     border-radius: 9999px;
     padding: 0.6rem 1rem;
@@ -528,10 +530,17 @@ body.dark-mode .account-welcome-text {
     cursor: pointer;
     box-shadow: var(--shadow-blue);
     transition: background-color 0.3s;
-    /* Ensure roughly 4 per row */
-    flex: 1 1 calc(25% - 1rem);
-    max-width: calc(25% - 1rem);
   }
+  
+  /* For smaller screens: force a single column layout */
+  @media (max-width: 600px) {
+    .chapter-container {
+      grid-auto-flow: row;
+      grid-template-columns: 1fr;
+      grid-template-rows: none;
+    }
+  }
+  
   
   /* Selected Topic Container */
   .selected-topic-container {
