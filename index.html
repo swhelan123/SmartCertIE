@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>SmartCert Biology Chatbot POC</title>
+        <link rel="stylesheet" href="styles.css" />
+        <!-- Link to external CSS -->
+    </head>
+    <body>
+        <!-- Sidebar Navigation -->
+        <aside id="sidebar">
+            <h2>SmartCert</h2>
+            <nav>
+                <ul>
+                    <li><a href="#chat">🤖 Chatbot</a></li>
+                    <li><a href="#notebook">📓 Notebook</a></li>
+                    <li><a href="#account">👤 Account</a></li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- Main Chat Area -->
+        <main id="chat">
+            <div id="chat-window">
+                <!-- Example chat messages -->
+                <div class="message bot">Hello! I’m here to help with Biology.</div>
+                <div class="message user">What is photosynthesis?</div>
+                <div class="message bot">Photosynthesis is the process by which green plants convert sunlight into chemical energy, producing oxygen as a byproduct.</div>
+                <!-- More Q&A exchanges could go here -->
+            </div>
+            <div class="chat-input">
+                <input type="text" id="questionInput" placeholder="Ask a Biology question..." />
+                <button id="sendBtn">Send</button>
+            </div>
+        </main>
+
+        <!-- Dark Mode Toggle Switch -->
+        <button id="darkModeToggle">Toggle Dark Mode 🌗</button>
+
+        <!-- (Optional) Notebook and Account Sections could be additional <main> or <section> elements -->
+        <section id="notebook" style="display: none">
+            <h2>Saved Notebook</h2>
+            <p>(User's saved answers will appear here.)</p>
+        </section>
+        <section id="account" style="display: none">
+            <h2>Account</h2>
+            <p>(Login/Signup or user info goes here.)</p>
+        </section>
+
+        <script src="script.js"></script>
+        <!-- Link to external JavaScript -->
+    </body>
+</html>

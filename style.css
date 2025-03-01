@@ -1,0 +1,100 @@
+/* Basic layout */
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #fafafa;
+    color: #222;
+}
+#sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 200px;
+    background: #ffffff;
+    border-right: 1px solid #ddd;
+    padding: 1rem;
+}
+#sidebar h2 {
+    font-size: 1.2em;
+    margin-bottom: 1em;
+}
+#sidebar ul {
+    list-style: none;
+    padding: 0;
+}
+#sidebar li {
+    margin: 0.5em 0;
+}
+#sidebar a {
+    text-decoration: none;
+    color: #333;
+}
+
+/* Main content area next to sidebar */
+main {
+    margin-left: 200px; /* leave space for sidebar */
+    padding: 1rem;
+}
+#chat-window {
+    background: #fff;
+    border: 1px solid #ccc;
+    padding: 1rem;
+    height: 60vh;
+    overflow-y: auto;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+    margin-bottom: 0.5rem;
+}
+.message {
+    max-width: 70%;
+    margin: 0.5em 0;
+    padding: 0.7em 1em;
+    border-radius: 5px;
+}
+.message.bot {
+    background: #f1f5ff; /* light blue background for bot replies */
+    align-self: flex-start;
+}
+.message.user {
+    background: #e2ffe1; /* light green background for user question */
+    align-self: flex-end;
+    text-align: right;
+}
+.chat-input {
+    display: flex;
+    gap: 0.5rem;
+}
+.chat-input input {
+    flex: 1;
+    padding: 0.5em;
+    font-size: 1em;
+}
+.chat-input button {
+    padding: 0.5em 1em;
+    font-size: 1em;
+    cursor: pointer;
+}
+
+/* Dark mode styles */
+body.dark-mode {
+    background: #121212;
+    color: #eaeaea;
+}
+body.dark-mode #sidebar {
+    background: #1e1e1e;
+    border-color: #444;
+}
+body.dark-mode #chat-window {
+    background: #1e1e1e;
+    border-color: #555;
+    color: #eaeaea;
+}
+body.dark-mode .message.bot {
+    background: #2a3d5e;
+    color: #fff;
+}
+body.dark-mode .message.user {
+    background: #3d5e2a;
+    color: #fff;
+}
