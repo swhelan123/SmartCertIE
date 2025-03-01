@@ -172,16 +172,28 @@ const topicDropdown = document.getElementById("topicDropdown");
 // Define topics for each group
 const topics = {
   A: [
-    "Topic A1", "Topic A2", "Topic A3", "Topic A4", "Topic A5",
-    "Topic A6", "Topic A7", "Topic A8", "Topic A9", "Topic A10"
+    "The Scientific Method",
+    "The Characteristics of Life",
+    "Nutrition",
+    "General Principles of Ecology",
+    "A Study of an Ecosystem"
   ],
   B: [
-    "Topic B1", "Topic B2", "Topic B3", "Topic B4", "Topic B5",
-    "Topic B6", "Topic B7", "Topic B8", "Topic B9", "Topic B10"
+    "Cell Structure",
+    "Cell Metabolism",
+    "Cell Continuity",
+    "Cell Diversity",
+    "Genetics"
+
   ],
   C: [
-    "Topic C1", "Topic C2", "Topic C3", "Topic C4", "Topic C5",
-    "Topic C6", "Topic C7", "Topic C8", "Topic C9", "Topic C10"
+    "Diversity of Organisms",
+    "Organisation and the Vascular Structures",
+    "Transport and Nutrition",
+    "Breathing System and Excretion",
+    "Responses to Stimuli",
+    "Reproduction and Growth"
+
   ]
 };
 
