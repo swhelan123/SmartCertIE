@@ -87,6 +87,14 @@ onAuthStateChanged(auth, (user) => {
   }
 });
 
+//Event listener for clicking login
+if (loginBtn) {
+  loginBtn.addEventListener("click", () => {
+    window.location.href = "login.html";
+  });
+}
+
+
 /*******************************************************
  * SIDEBAR NAV ON index.html (Single-Page Sections)
  *******************************************************/
