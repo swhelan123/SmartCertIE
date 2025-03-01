@@ -8,7 +8,7 @@ async function queryAimlApi(question) {
   const apiUrl = "https://api.aimlapi.com/v1/chat/completions";
 
   // Your AIMLAPI key
-  const apiKey = "YOUR_API_KEY_HERE";
+  const apiKey = "6f38c7556ee5413694304b0be2c3fa33";
 
   // Provide a system prompt for context
   const systemPrompt = "You are an expert biology tutor for 17-19 year olds.";
