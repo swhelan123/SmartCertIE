@@ -585,16 +585,23 @@ body.dark-mode .account-welcome-text {
     border-radius: var(--border-radius);
     background-color: #fff;
     box-shadow: var(--shadow-blue);
-    /* Remove the hard-coded border */
     border: none;
 }
 
-/* Use the same border radius for founder photos */
+/* Updated founder-photo styling for extra spacing */
+.founder-photo {
+    flex: 0 0 250px;
+    margin-right: 2.5rem; /* Increased space between photo and text */
+    overflow: hidden; /* Ensure images stay within the container */
+}
+
+/* Updated image settings to ensure a uniform square shape */
 .founder-photo img {
-    width: 100%;
-    height: auto;
-    border-radius: var(--border-radius);
+    width: 250px;
+    height: 250px;
     object-fit: cover;
+    object-position: center;
+    border-radius: var(--border-radius);
 }
 
 /* Update text colors for consistency with the site */
@@ -619,5 +626,3 @@ body.dark-mode .account-welcome-text {
 body.dark-mode .founder-box {
     background-color: #2b2b2b;
 }
-
-  
