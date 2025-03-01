@@ -3,52 +3,64 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>SmartCert Biology Chatbot POC</title>
-        <link rel="stylesheet" href="styles.css" />
+        <title>SmartCert POC</title>
+
+        <!-- Google Font for a clean, modern look -->
+        <link rel="preconnect" href="https://fonts.gstatic.com" />
+        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet" />
+
         <!-- Link to external CSS -->
+        <link rel="stylesheet" href="styles.css" />
     </head>
     <body>
-        <!-- Sidebar Navigation -->
-        <aside id="sidebar">
-            <h2>SmartCert</h2>
-            <nav>
-                <ul>
-                    <li><a href="#chat">🤖 Chatbot bum</a></li>
-                    <li><a href="#notebook">📓 Notebook</a></li>
-                    <li><a href="#account">👤 Account</a></li>
-                </ul>
+        <!-- Dark Mode Toggle -->
+        <button class="dark-mode-toggle" id="darkModeToggle">Dark Mode</button>
+
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <h1>SmartCert</h1>
+                <p>Leaving Cert Biology</p>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="#" data-section="chatSection">💬 Chat</a>
+                <a href="#" data-section="notebookSection">📓 Notebook</a>
+                <a href="#" data-section="accountSection">👤 Account</a>
             </nav>
         </aside>
 
-        <!-- Main Chat Area -->
-        <main id="chat">
-            <div id="chat-window">
-                <!-- Example chat messages -->
-                <div class="message bot">Hello! I’m here to help with Biology.</div>
-                <div class="message user">What is photosynthesis?</div>
-                <div class="message bot">Photosynthesis is the process by which green plants convert sunlight into chemical energy, producing oxygen as a byproduct.</div>
-                <!-- More Q&A exchanges could go here -->
-            </div>
-            <div class="chat-input">
-                <input type="text" id="questionInput" placeholder="Ask a Biology question..." />
-                <button id="sendBtn">Send</button>
-            </div>
-        </main>
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Chat Section -->
+            <section id="chatSection" class="chat-container">
+                <div class="chat-messages" id="chatMessages">
+                    <!-- Example chat messages -->
+                    <div class="chat-message message-bot">Hi there! Ask me anything about Biology.</div>
+                    <div class="chat-message message-user">What is photosynthesis?</div>
+                    <div class="chat-message message-bot">Photosynthesis is how green plants convert sunlight into chemical energy.</div>
+                </div>
+                <div class="chat-input-area">
+                    <input type="text" id="chatInput" placeholder="Ask a Biology question..." />
+                    <button id="sendBtn">Send</button>
+                </div>
+            </section>
 
-        <!-- Dark Mode Toggle Switch -->
-        <button id="darkModeToggle">Toggle Dark Mode 🌗</button>
+            <!-- Notebook Section (hidden by default) -->
+            <section id="notebookSection" class="section-content hidden">
+                <h2>Notebook</h2>
+                <p>Saved chatbot responses will appear here.</p>
+                <ul id="savedResponses" style="list-style: disc; margin-left: 1.5rem"></ul>
+            </section>
 
-        <!-- (Optional) Notebook and Account Sections could be additional <main> or <section> elements -->
-        <section id="notebook" style="display: none">
-            <h2>Saved Notebook</h2>
-            <p>(User's saved answers will appear here.)</p>
-        </section>
-        <section id="account" style="display: none">
-            <h2>Account</h2>
-            <p>(Login/Signup or user info goes here.)</p>
-        </section>
+            <!-- Account Section (hidden by default) -->
+            <section id="accountSection" class="section-content hidden">
+                <h2>Your Account</h2>
+                <p>Log in or view account details here.</p>
+                <!-- You can add a login form or account info here later -->
+            </section>
+        </div>
 
+        <!-- Link to external JS -->
         <script src="script.js"></script>
-        <!-- Link to external JavaScript -->
     </body>
 </html>

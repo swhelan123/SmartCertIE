@@ -1,100 +1,66 @@
-/* Basic layout */
-body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-    background: #fafafa;
-    color: #222;
-}
-#sidebar {
-    position: fixed;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    width: 200px;
-    background: #ffffff;
-    border-right: 1px solid #ddd;
-    padding: 1rem;
-}
-#sidebar h2 {
-    font-size: 1.2em;
-    margin-bottom: 1em;
-}
-#sidebar ul {
-    list-style: none;
-    padding: 0;
-}
-#sidebar li {
-    margin: 0.5em 0;
-}
-#sidebar a {
-    text-decoration: none;
-    color: #333;
-}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SmartCert POC</title>
 
-/* Main content area next to sidebar */
-main {
-    margin-left: 200px; /* leave space for sidebar */
-    padding: 1rem;
-}
-#chat-window {
-    background: #fff;
-    border: 1px solid #ccc;
-    padding: 1rem;
-    height: 60vh;
-    overflow-y: auto;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
-    margin-bottom: 0.5rem;
-}
-.message {
-    max-width: 70%;
-    margin: 0.5em 0;
-    padding: 0.7em 1em;
-    border-radius: 5px;
-}
-.message.bot {
-    background: #f1f5ff; /* light blue background for bot replies */
-    align-self: flex-start;
-}
-.message.user {
-    background: #e2ffe1; /* light green background for user question */
-    align-self: flex-end;
-    text-align: right;
-}
-.chat-input {
-    display: flex;
-    gap: 0.5rem;
-}
-.chat-input input {
-    flex: 1;
-    padding: 0.5em;
-    font-size: 1em;
-}
-.chat-input button {
-    padding: 0.5em 1em;
-    font-size: 1em;
-    cursor: pointer;
-}
+  <!-- Google Font for a clean, modern look -->
+  <link rel="preconnect" href="https://fonts.gstatic.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet" />
 
-/* Dark mode styles */
-body.dark-mode {
-    background: #121212;
-    color: #eaeaea;
-}
-body.dark-mode #sidebar {
-    background: #1e1e1e;
-    border-color: #444;
-}
-body.dark-mode #chat-window {
-    background: #1e1e1e;
-    border-color: #555;
-    color: #eaeaea;
-}
-body.dark-mode .message.bot {
-    background: #2a3d5e;
-    color: #fff;
-}
-body.dark-mode .message.user {
-    background: #3d5e2a;
-    color: #fff;
-}
+  <!-- Link to external CSS -->
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- Dark Mode Toggle -->
+  <button class="dark-mode-toggle" id="darkModeToggle">Dark Mode</button>
+
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <h1>SmartCert</h1>
+      <p>Leaving Cert Biology</p>
+    </div>
+    <nav class="sidebar-nav">
+      <a href="#" data-section="chatSection">💬 Chat</a>
+      <a href="#" data-section="notebookSection">📓 Notebook</a>
+      <a href="#" data-section="accountSection">👤 Account</a>
+    </nav>
+  </aside>
+
+  <!-- Main Content -->
+  <div class="main-content">
+    <!-- Chat Section -->
+    <section id="chatSection" class="chat-container">
+      <div class="chat-messages" id="chatMessages">
+        <!-- Example chat messages -->
+        <div class="chat-message message-bot">Hi there! Ask me anything about Biology.</div>
+        <div class="chat-message message-user">What is photosynthesis?</div>
+        <div class="chat-message message-bot">Photosynthesis is how green plants convert sunlight into chemical energy.</div>
+      </div>
+      <div class="chat-input-area">
+        <input type="text" id="chatInput" placeholder="Ask a Biology question...">
+        <button id="sendBtn">Send</button>
+      </div>
+    </section>
+
+    <!-- Notebook Section (hidden by default) -->
+    <section id="notebookSection" class="section-content hidden">
+      <h2>Notebook</h2>
+      <p>Saved chatbot responses will appear here.</p>
+      <ul id="savedResponses" style="list-style: disc; margin-left: 1.5rem;"></ul>
+    </section>
+
+    <!-- Account Section (hidden by default) -->
+    <section id="accountSection" class="section-content hidden">
+      <h2>Your Account</h2>
+      <p>Log in or view account details here.</p>
+      <!-- You can add a login form or account info here later -->
+    </section>
+  </div>
+
+  <!-- Link to external JS -->
+  <script src="script.js"></script>
+</body>
+</html>
