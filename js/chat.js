@@ -55,7 +55,7 @@ async function queryAimlApi(question) {
 
   // The body for the POST request
   const payload = {
-    model: "mistralai/gemini-2.0-flash-exp", // Example model from aimlapi
+    model: "mistralai/Mistral-7B-Instruct-v0.2", // Example model from aimlapi
     messages: messages,
     temperature: 0.7,
     max_tokens: 256,
