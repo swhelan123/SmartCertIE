@@ -46,35 +46,35 @@
             </div>
         </aside>
 
-        <!--Button for selecting topic-->
-        <section id="chatSection" class="chat-container">
-            <!-- Topic Selector (Centered and round) -->
-            <div class="topic-selector" id="topicSelector">
-                <!-- Unit Buttons Container (initially visible) -->
-                <div id="unitContainer" class="unit-container">
-                  <button class="unit-button unit-green" data-unit="A">Unit 1: The Study of Life</button>
-                  <button class="unit-button unit-purple" data-unit="B">Unit 2: The Cell</button>
-                  <button class="unit-button unit-red" data-unit="C">Unit 3: The Organism</button>
-                </div>
-                
-                <!-- Chapter Buttons Container (initially hidden) -->
-                <div id="chapterContainer" class="chapter-container hidden"></div>
-                
-                <!-- Selected Topic Display (initially hidden) -->
-                <div id="selectedTopicContainer" class="selected-topic-container hidden">
-                  <span id="selectedTopicLabel" class="selected-topic-label"></span>
-                  <button id="changeTopicBtn" class="change-topic-button">Change Topic</button>
-                </div>
-              </div>
-
-
         <!-- Main Content -->
         <div class="main-content">
-            <!-- Chat Section -->
+            <!-- Chat Section (single container) -->
             <section id="chatSection" class="chat-container">
+                <!-- Topic Selector (Group -> Chapter -> Selected Topic) -->
+                <div class="topic-selector" id="topicSelector">
+                    <!-- Unit Buttons Container (initially visible) -->
+                    <div id="unitContainer" class="unit-container">
+                        <button class="unit-button unit-green" data-unit="A">Unit 1: The Study of Life</button>
+                        <button class="unit-button unit-purple" data-unit="B">Unit 2: The Cell</button>
+                        <button class="unit-button unit-red" data-unit="C">Unit 3: The Organism</button>
+                    </div>
+
+                    <!-- Chapter Buttons Container (initially hidden) -->
+                    <div id="chapterContainer" class="chapter-container hidden"></div>
+
+                    <!-- Selected Topic Display (initially hidden) -->
+                    <div id="selectedTopicContainer" class="selected-topic-container hidden">
+                        <span id="selectedTopicLabel" class="selected-topic-label"></span>
+                        <button id="changeTopicBtn" class="change-topic-button">Change Topic</button>
+                    </div>
+                </div>
+
+                <!-- Chat Window -->
                 <div class="chat-messages" id="chatMessages">
                     <div class="chat-message message-bot">Hi there! Ask me anything about Biology.</div>
                 </div>
+
+                <!-- Chat Input -->
                 <div class="chat-input-area">
                     <input type="text" id="chatInput" placeholder="Ask a Biology question..." />
                     <button id="sendBtn">Send</button>
