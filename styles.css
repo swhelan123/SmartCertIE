@@ -328,7 +328,7 @@ body.dark-mode .section-content {
 
 /* Standalone pages (about, login, account) */
 .standalone-page {
-    max-width: 600px;
+    max-width: 1200px;
     margin: 4rem auto;
     background-color: #fff;
     border-radius: var(--border-radius);
@@ -345,6 +345,7 @@ body.dark-mode .standalone-page {
     flex-direction: column;
     gap: 1rem;
     margin: 1rem 0;
+    min-width: 550px;
 }
 .login-form input {
     padding: 0.8rem;
@@ -456,7 +457,6 @@ body.dark-mode .account-welcome-text {
  * Topic Selector Styling
  *******************************************************/
 
-
 /* Topic Selector Container */
 /* ----- Topic Selector Styling ----- */
 
@@ -468,20 +468,19 @@ body.dark-mode .account-welcome-text {
     margin: 1.5rem auto;
     width: 90%;
     max-width: 400px;
-  }
-  
-  /* Unit Container: lays out the three unit buttons in a row (wrap if needed) */
-  .unit-container {
+}
+
+/* Unit Container: lays out the three unit buttons in a row (wrap if needed) */
+.unit-container {
     display: flex;
     flex-direction: row; /* Ensure a row layout */
     justify-content: center;
     gap: 1rem;
     flex-wrap: nowrap; /* Prevent wrapping */
-  }
-  
-  
-  /* Unit Buttons (round and colored) */
-  .unit-button {
+}
+
+/* Unit Buttons (round and colored) */
+.unit-button {
     border: none;
     border-radius: 9999px; /* fully round */
     padding: 0.8rem 1.2rem;
@@ -489,38 +488,37 @@ body.dark-mode .account-welcome-text {
     cursor: pointer;
     box-shadow: var(--shadow-blue);
     transition: background-color 0.3s;
-  }
-  
-  /* Specific unit colors */
-  .unit-green {
+}
+
+/* Specific unit colors */
+.unit-green {
     background-color: #a8e6a3; /* pale green */
     color: #1f1f1f;
-  }
-  .unit-purple {
+}
+.unit-purple {
     background-color: #d3b3e5; /* pale purple */
     color: #1f1f1f;
-  }
-  .unit-red {
+}
+.unit-red {
     background-color: #f7a1a1; /* pale red */
     color: #1f1f1f;
-  }
-  
-  /* Hover effect for unit buttons */
-  .unit-button:hover {
+}
+
+/* Hover effect for unit buttons */
+.unit-button:hover {
     opacity: 0.9;
-  }
-  
-  /* Chapter Container: Grid layout with columns of 4 rows */
-  .chapter-container {
+}
+
+/* Chapter Container: Grid layout with columns of 4 rows */
+.chapter-container {
     display: grid;
     grid-template-columns: repeat(4, minmax(150px, auto));
     gap: 1rem;
     justify-content: center;
-  }
-  
-  
-  /* Chapter Buttons: Full width within each grid cell */
-  .chapter-button {
+}
+
+/* Chapter Buttons: Full width within each grid cell */
+.chapter-button {
     width: 100%;
     border: none;
     border-radius: 9999px;
@@ -529,29 +527,28 @@ body.dark-mode .account-welcome-text {
     cursor: pointer;
     box-shadow: var(--shadow-blue);
     transition: background-color 0.3s;
-  }
-  
-  /* For smaller screens: force a single column layout */
-  @media (max-width: 600px) {
+}
+
+/* For smaller screens: force a single column layout */
+@media (max-width: 600px) {
     .chapter-container {
-      grid-auto-flow: row;
-      grid-template-columns: 1fr;
-      grid-template-rows: none;
+        grid-auto-flow: row;
+        grid-template-columns: 1fr;
+        grid-template-rows: none;
     }
-  }
-  
-  
-  /* Selected Topic Container */
-  .selected-topic-container {
+}
+
+/* Selected Topic Container */
+.selected-topic-container {
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 0.5rem;
     margin-top: 1rem;
-  }
-  
-  /* Change Topic Button */
-  .change-topic-button {
+}
+
+/* Change Topic Button */
+.change-topic-button {
     background-color: var(--primary-color);
     color: #fff;
     border: none;
@@ -561,68 +558,188 @@ body.dark-mode .account-welcome-text {
     cursor: pointer;
     box-shadow: var(--shadow-blue);
     transition: background-color 0.3s;
-  }
-  
-  .change-topic-button:hover {
+}
+
+.change-topic-button:hover {
     background-color: #2563eb;
-  }
-  
-  /* Make pfp button cursor style */
-  .profile-pic {
+}
+
+/* Make pfp button cursor style */
+.profile-pic {
     cursor: pointer;
-  }
+}
 
-  /*Founders Pictures and description style*/
-  
-/* Update Founders Pictures and Description Styles */
+/* ================================
+   Founder Section (Unified)
+   ================================ */
 
-/* Change the founder box to match the standalone-page/card style */
+.team-section {
+    flex: 2; /* or 1 if you prefer equal columns */
+    background-color: #f9f9f9;
+    border-radius: var(--border-radius);
+    padding: 2rem;
+    box-shadow: var(--shadow-blue); /* Light mode → has shadow */
+}
+
+body.dark-mode .team-section {
+    background-color: var(--dark-bg);
+    color: var(--dark-text);
+    box-shadow: none; /* No shadow in dark mode */
+}
+
 .founder-box {
     display: flex;
     align-items: flex-start;
-    padding: 2rem;
-    margin-bottom: 2rem;
+    background-color: #fff; /* Light mode background */
     border-radius: var(--border-radius);
-    background-color: #fff;
-    box-shadow: var(--shadow-blue);
-    border: none;
+    padding: 1.5rem;
+    margin: 1rem 0;
+    box-shadow: none; /* Light mode → NO shadow */
 }
 
-/* Updated founder-photo styling for extra spacing */
+/* Dark mode override → add shadow */
+body.dark-mode .founder-box {
+    background-color: #2b2b2b; /* Dark mode background */
+    box-shadow: var(--shadow-blue); /* Now we add the shadow in dark mode */
+}
+
+/* Photo container */
 .founder-photo {
-    flex: 0 0 250px;
-    margin-right: 2.5rem; /* Increased space between photo and text */
-    overflow: hidden; /* Ensure images stay within the container */
+    flex-shrink: 0;
+    margin-right: 1.5rem;
 }
-
-/* Updated image settings to ensure a uniform square shape */
 .founder-photo img {
-    width: 250px;
-    height: 250px;
+    display: block;
+    width: 200px;
+    height: 200px;
     object-fit: cover;
     object-position: center;
     border-radius: var(--border-radius);
 }
 
-/* Update text colors for consistency with the site */
+/* Text info */
 .founder-info h3 {
-    margin: 0 0 0.3rem;
-    font-size: 1.5rem;
-    color: var(--light-text);
+    margin: 0 0 0.5rem;
+    font-size: 1.25rem;
+    color: #333;
+}
+body.dark-mode .founder-info h3 {
+    color: #eee;
 }
 
 .founder-info h4 {
     margin: 0 0 1rem;
-    font-weight: 400;
-    color: #888;
+    font-size: 1rem;
+    color: #555;
+}
+body.dark-mode .founder-info h4 {
+    color: #bbb;
 }
 
 .founder-info p {
     line-height: 1.5;
-    color: var(--light-text);
+    margin-bottom: 1rem;
+    color: #333;
+}
+body.dark-mode .founder-info p {
+    color: #ddd;
 }
 
-/* Optional: Adjust dark mode for the founders section */
-body.dark-mode .founder-box {
+.founder-info a {
+    margin-right: 1rem;
+    color: var(--primary-color);
+    text-decoration: none;
+}
+.founder-info a:hover {
+    text-decoration: underline;
+}
+
+/* Then your override (below) */
+.standalone-page.two-column-layout {
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background-color: #fff;
+    display: flex;
+    gap: 2rem;
+    align-items: flex-start;
+    border-radius: var(--border-radius);
+}
+
+/* On smaller screens, stack them vertically */
+@media (max-width: 800px) {
+    .two-column-layout {
+        flex-direction: column;
+    }
+}
+
+.about-column ul {
+    margin: 1rem 0;
+    padding-left: 1.5rem;
+    list-style-type: disc; /* or none, then use a custom icon */
+}
+
+.about-column li {
+    margin-bottom: 0.5rem;
+}
+
+.highlight-box {
+    background-color: #f9f9f9; /* or #2b2b2b in dark mode override */
+    border-left: 4px solid var(--primary-color);
+    padding: 1rem 1.2rem;
+    margin-bottom: 1.5rem;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-blue);
+}
+
+.highlight-box h3 {
+    margin-bottom: 0.5rem;
+    font-size: 1.2rem; /* a bit bigger than normal text */
+    color: var(--primary-color); /* optional to highlight “Need Help?” */
+}
+
+/* Dark mode override if needed */
+body.dark-mode .highlight-box {
     background-color: #2b2b2b;
+    border-left: 4px solid #2563eb;
+}
+
+.about-column {
+    flex: 1;
+    min-width: 300px; /* optional, so it doesn’t get too narrow */
+    background-color: #f9f9f9;
+    padding: 2rem;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-blue); /* Light mode → has shadow */
+}
+
+/* Dark mode override → remove shadow */
+body.dark-mode .about-column {
+    background-color: var(--dark-bg);
+    box-shadow: none; /* No shadow in dark mode */
+}
+
+.login-form,
+.signup-form {
+    width: 100%;
+}
+
+/* Highlight the active link in the sidebar */
+.sidebar-nav a.active {
+    background-color: #edf2fe;
+    color: #000;
+}
+
+/* Highlight the active link in the sidebar */
+body.dark-mode .sidebar-nav a.active {
+    background-color: #3b3f44;
+    color: #fff;
+    box-shadow: none;
+}
+
+/* Make all h1 the same size across the site */
+h1 {
+    font-size: 2rem; /* or 1.8rem, etc. */
+    line-height: 1.2;
+    margin-bottom: 1rem;
 }

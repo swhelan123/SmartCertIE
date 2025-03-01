@@ -115,14 +115,39 @@ if (sidebarLinks && chatSection && notebookSection) {
     link.addEventListener("click", (e) => {
       e.preventDefault();
       const target = link.getAttribute("data-section");
-      // Hide both sections
+
+      // 1) Hide both sections
       chatSection.classList.add("hidden");
       notebookSection.classList.add("hidden");
-      // Show the chosen section
-      if (target === "chatSection") chatSection.classList.remove("hidden");
-      if (target === "notebookSection") notebookSection.classList.remove("hidden");
+
+      // 2) Show the chosen section
+      if (target === "chatSection") {
+        chatSection.classList.remove("hidden");
+      }
+      if (target === "notebookSection") {
+        notebookSection.classList.remove("hidden");
+      }
+
+      // 3) Remove 'active' from all sidebar links
+      sidebarLinks.forEach((lnk) => {
+        lnk.classList.remove("active");
+      });
+
+      // 4) Add 'active' to the clicked link
+      link.classList.add("active");
     });
   });
+
+  // MAKE CHAT ACTIVE BY DEFAULT:
+  // (1) Show chat, hide notebook
+  chatSection.classList.remove("hidden");
+  notebookSection.classList.add("hidden");
+
+  // (2) Add "active" to the chat link
+  const chatLink = document.querySelector(".sidebar-nav a[data-section='chatSection']");
+  if (chatLink) {
+    chatLink.classList.add("active");
+  }
 }
 
 /*******************************************************
@@ -341,6 +366,7 @@ if (setupForm) {
       await setDoc(
         doc(db, "users", user.uid),
         {
+          email: user.email,
           firstName,
           lastName,
           phone: phoneNumber,
@@ -366,16 +392,18 @@ if (googleSignupBtn) {
   googleSignupBtn.addEventListener("click", async () => {
     try {
       const result = await signInWithPopup(auth, googleProvider);
-      // If it's the user's first time, additionalUserInfo.isNewUser == true
-      const isNewUser = result && result.additionalUserInfo?.isNewUser;
-      if (isNewUser) {
-        // brand-new user, direct them to setup
+      const user = result.user;
+
+      // 1) Check if there's a user doc in Firestore
+      const userRef = doc(db, "users", user.uid);
+      const userSnap = await getDoc(userRef);
+
+      if (!userSnap.exists()) {
+        // No doc => definitely new user => redirect to setup
         alert("Google account created successfully!");
         window.location.href = "setup.html";
       } else {
-        // existing user logs in with Google
-        // if you want them to do setup anyway, do the same redirect
-        // or skip if they already have a profile
+        // Existing user => go to home (or skip if you want them to do setup anyway)
         window.location.href = "index.html";
       }
     } catch (err) {
@@ -499,3 +527,33 @@ if (updateAccountForm) {
     }
   });
 }
+
+// Grab references to the chat elements
+const chatContainer = document.getElementById("chatSection");
+const chatInput = document.getElementById("chatInput");
+const sendBtn = document.getElementById("sendBtn");
+const chatMessages = document.getElementById("chatMessages");
+
+// Listen for auth changes
+onAuthStateChanged(auth, (user) => {
+  if (!chatContainer || !chatInput || !sendBtn || !chatMessages) {
+    return; // not on index.html or chat elements don't exist
+  }
+
+  if (user) {
+    // If user is logged in, enable the chat
+    chatInput.disabled = false;
+    sendBtn.disabled = false;
+  } else {
+    // If user is not logged in, disable (or hide) the chat
+    chatInput.disabled = true;
+    sendBtn.disabled = true;
+
+    // Optionally show a message so user knows why it’s disabled
+    chatMessages.innerHTML = `
+      <div class="chat-message message-bot" style="color:red;">
+        You must be logged in to use the chat.
+        <a href="login.html">Log in here</a>.
+      </div>`;
+  }
+});
