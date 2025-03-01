@@ -92,4 +92,14 @@ if (sendBtn && chatInput && chatMessages) {
 
     chatMessages.scrollTop = chatMessages.scrollHeight;
   });
+
+  if (chatInput) {
+    chatInput.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") {
+        event.preventDefault(); // Prevent default form submission, if any.
+        sendBtn.click();
+      }
+    });
+  }
+  
 }
