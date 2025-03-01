@@ -12,8 +12,6 @@ import {
   onAuthStateChanged,
   signInWithEmailAndPassword,
   signOut,
-  // ADD THIS for sign-up:
-  createUserWithEmailAndPassword,
 } from "https://www.gstatic.com/firebasejs/9.17.2/firebase-auth.js";
 import { getFirestore } from "https://www.gstatic.com/firebasejs/9.17.2/firebase-firestore.js";
 import { doc, getDoc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.17.2/firebase-firestore.js";
