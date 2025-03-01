@@ -101,4 +101,14 @@ if (sendBtn && chatInput && chatMessages) {
     // Ensure chat window stays scrolled to bottom
     chatMessages.scrollTop = chatMessages.scrollHeight;
   });
+
+  if (chatInput) {
+    chatInput.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") {
+        event.preventDefault(); // Prevent default form submission, if any.
+        sendBtn.click();
+      }
+    });
+  }
+  
 }
