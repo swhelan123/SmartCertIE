@@ -19,16 +19,35 @@
         <div class="standalone-page">
             <h1>Your Account</h1>
 
-            <!-- Account Info Container -->
+            <!-- Account Card (Profile Pic + Basic Info) -->
             <div class="account-card">
                 <img id="accountProfilePic" class="account-profile-pic" src="assets/img/pfp.avif" alt="Profile" />
                 <div class="account-details">
+                    <!-- We’ll fill these from Firestore & Auth in script.js -->
                     <p id="accountInfo" class="account-welcome-text"></p>
-                    <!-- If you want to show more user info (like displayName, creation time),
-               you could add placeholders here and fill them in script.js. -->
+                    <p id="accountEmail" style="margin: 0.5rem 0; color: #666"></p>
+                    <p id="accountPhone" style="margin: 0.5rem 0; color: #666"></p>
                 </div>
             </div>
 
+            <!-- Form to update user info (name, phone, photo) -->
+            <form id="updateAccountForm" class="login-form">
+                <label for="updateFirstName">First Name</label>
+                <input type="text" id="updateFirstName" placeholder="John" />
+
+                <label for="updateLastName">Last Name</label>
+                <input type="text" id="updateLastName" placeholder="Doe" />
+
+                <label for="updatePhone">Phone Number</label>
+                <input type="tel" id="updatePhone" placeholder="+353 87 1234567" />
+
+                <label for="newProfilePic">Change Profile Picture</label>
+                <input type="file" id="newProfilePic" accept="image/*" style="padding: 0.3rem" />
+
+                <button type="submit">Save Changes</button>
+            </form>
+
+            <!-- Red Logout Button -->
             <button id="logoutBtn" class="logout-button">Log Out</button>
 
             <p style="margin-top: 1rem">
@@ -36,7 +55,7 @@
             </p>
         </div>
 
-        <!-- Link to your main script, which handles Firebase auth & logout -->
+        <!-- Link to your main script (handles fetching/updating user data, logout, etc.) -->
         <script type="module" src="script.js"></script>
     </body>
 </html>

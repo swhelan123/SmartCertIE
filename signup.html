@@ -19,6 +19,7 @@
         <div class="standalone-page">
             <h1>Create Your SmartCert Account</h1>
 
+            <!-- Email/Password Sign-Up Form -->
             <form id="signupForm" class="login-form">
                 <input type="email" id="emailInput" placeholder="Email" required />
                 <input type="password" id="passwordInput" placeholder="Password" required />
@@ -26,7 +27,15 @@
                 <button type="submit">Sign Up</button>
             </form>
 
-            <p class="note">
+            <p class="note">— or sign up with —</p>
+
+            <!-- Google Sign-Up Button -->
+            <button id="googleSignupBtn" class="login-button" style="margin-top: 0.5rem">
+                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google Logo" style="width: 18px; height: 18px; margin-right: 0.5rem" />
+                Sign Up with Google
+            </button>
+
+            <p class="note" style="margin-top: 1rem">
                 Already have an account?
                 <a href="login.html">Log in here</a>.
             </p>
@@ -35,7 +44,7 @@
             </p>
         </div>
 
-        <!-- Script with Firebase logic -->
+        <!-- Main Script with Firebase logic -->
         <script type="module" src="script.js"></script>
     </body>
 </html>

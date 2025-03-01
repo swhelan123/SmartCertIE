@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>SmartCert - Complete Profile</title>
+
+        <!-- Google Font -->
+        <link rel="preconnect" href="https://fonts.gstatic.com" />
+        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet" />
+
+        <!-- Shared CSS -->
+        <link rel="stylesheet" href="styles.css" />
+
+        <!-- Tab Icon -->
+        <link rel="icon" type="image/png" href="assets/img/tab_icon.png" />
+    </head>
+    <body>
+        <div class="standalone-page">
+            <h1>Complete Your Profile</h1>
+
+            <!--
+        After sign-up, new users land here to fill in personal details
+        before accessing the main app
+      -->
+            <form id="setupForm" class="login-form">
+                <label for="firstName">First Name</label>
+                <input type="text" id="firstName" placeholder="John" required />
+
+                <label for="lastName">Last Name</label>
+                <input type="text" id="lastName" placeholder="Doe" required />
+
+                <label for="phoneNumber">Phone Number</label>
+                <input type="tel" id="phoneNumber" placeholder="+353 87 1234567" required />
+
+                <label for="profilePicInput">Profile Picture</label>
+                <input type="file" id="profilePicInput" accept="image/*" style="padding: 0.3rem" />
+
+                <button type="submit">Save & Continue</button>
+            </form>
+
+            <!--
+        If you want to force setup, omit the skip link.
+        Otherwise, a skip link can let them do it later.
+      -->
+            <p style="margin-top: 1rem">
+                <a href="index.html" class="back-link">Skip for now →</a>
+            </p>
+        </div>
+
+        <!-- Script that handles Firebase logic and form submission -->
+        <script type="module" src="script.js"></script>
+    </body>
+</html>
