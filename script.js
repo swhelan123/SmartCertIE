@@ -188,4 +188,56 @@ if (loginForm) {
  * ACCOUNT PAGE (account.html)
  *******************************************************/
 const accountInfo = document.getElementById("accountInfo");
-const logoutBtn = document.g
+const logoutBtn = document.getElementById("logoutBtn");
+
+// We'll check auth state to see if user is logged in
+onAuthStateChanged(auth, (user) => {
+  if (accountInfo && logoutBtn) {
+    if (!user) {
+      accountInfo.textContent = "You are not logged in. Redirecting to login...";
+      setTimeout(() => {
+        window.location.href = "login.html";
+      }, 2000);
+    } else {
+      accountInfo.textContent = "Welcome to your account page! (Firebase user: " + user.email + ")";
+      logoutBtn.addEventListener("click", async () => {
+        await signOut(auth);
+        alert("Logged out!");
+        window.location.href = "index.html";
+      });
+    }
+  }
+});
+
+/*******************************************************
+ * SIGN-UP LOGIC (signup.html)
+ *******************************************************/
+// If you have a signup page with <form id="signupForm">, plus
+// <input id="emailInput">, <input id="passwordInput">, <input id="confirmPasswordInput">
+const signupForm = document.getElementById("signupForm");
+if (signupForm) {
+  signupForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const emailVal = document.getElementById("emailInput")?.value.trim();
+    const passVal = document.getElementById("passwordInput")?.value.trim();
+    const confirmVal = document.getElementById("confirmPasswordInput")?.value.trim();
+
+    if (!emailVal || !passVal || !confirmVal) {
+      alert("Please fill in all fields.");
+      return;
+    }
+    if (passVal !== confirmVal) {
+      alert("Passwords do not match.");
+      return;
+    }
+
+    try {
+      // Create user with Firebase
+      await createUserWithEmailAndPassword(auth, emailVal, passVal);
+      alert("Account created successfully!");
+      window.location.href = "index.html";
+    } catch (err) {
+      alert("Sign-up error: " + err.message);
+    }
+  });
+}
