@@ -4,7 +4,14 @@
 // 1) Import only what you need from the CDN
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.17.2/firebase-app.js";
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.17.2/firebase-analytics.js";
-import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/9.17.2/firebase-auth.js";
+import {
+  getAuth,
+  onAuthStateChanged,
+  signInWithEmailAndPassword,
+  signOut,
+  // ADD THIS for sign-up:
+  createUserWithEmailAndPassword,
+} from "https://www.gstatic.com/firebasejs/9.17.2/firebase-auth.js";
 import { getFirestore } from "https://www.gstatic.com/firebasejs/9.17.2/firebase-firestore.js";
 
 // 2) Your Firebase configuration (replace with your real config)
@@ -36,19 +43,16 @@ if (modeIcon) {
   // On page load, see if theme is 'dark'
   if (localStorage.getItem("theme") === "dark") {
     body.classList.add("dark-mode");
-    // If currently dark, show sun icon (light.png)
-    modeIcon.src = "assets/img/light.png";
+    modeIcon.src = "assets/img/light.png"; // show sun
   } else {
-    // If currently light, show moon icon (dark.png)
-    modeIcon.src = "assets/img/dark.png";
+    modeIcon.src = "assets/img/dark.png"; // show moon
   }
 
-  // When the icon is clicked
+  // When icon is clicked
   modeIcon.addEventListener("click", () => {
     body.classList.toggle("dark-mode");
     const isDark = body.classList.contains("dark-mode");
     localStorage.setItem("theme", isDark ? "dark" : "light");
-    // Switch icon accordingly
     modeIcon.src = isDark ? "assets/img/light.png" : "assets/img/dark.png";
   });
 }
@@ -65,12 +69,12 @@ const accountLink = document.getElementById("accountLink");
 onAuthStateChanged(auth, (user) => {
   if (loginBtn && profilePic && accountLink) {
     if (user) {
-      // User is logged in
+      // Logged in
       loginBtn.classList.add("hidden");
       profilePic.classList.remove("hidden");
       accountLink.setAttribute("href", "account.html");
     } else {
-      // User is logged out
+      // Logged out
       loginBtn.classList.remove("hidden");
       profilePic.classList.add("hidden");
       accountLink.setAttribute("href", "login.html");
@@ -128,7 +132,7 @@ if (sendBtn && chatInput && chatMessages) {
       botMsg.className = "chat-message message-bot";
       botMsg.textContent = "This is a placeholder answer about: " + question;
 
-      // Add a "Save" button to the bot response
+      // "Save to Notebook" button
       const saveBtn = document.createElement("button");
       saveBtn.textContent = "Save to Notebook";
       saveBtn.style.marginLeft = "10px";
@@ -140,8 +144,8 @@ if (sendBtn && chatInput && chatMessages) {
       saveBtn.style.backgroundColor = "var(--primary-color)";
       saveBtn.style.color = "#fff";
       saveBtn.addEventListener("click", () => {
-        // Save this response to the notebook
-        // In a real app, you'd store it in Firestore if you want persistence
+        // Save to local list
+        // (In real app, store in Firestore if you want persistence)
         const li = document.createElement("li");
         li.textContent = botMsg.textContent;
         savedResponses.appendChild(li);
@@ -158,7 +162,6 @@ if (sendBtn && chatInput && chatMessages) {
 /*******************************************************
  * LOGIN PAGE (login.html) - Real Firebase Login
  *******************************************************/
-// We expect an <form id="loginForm"> with <input id="emailInput">, <input id="passwordInput">
 const loginForm = document.getElementById("loginForm");
 if (loginForm) {
   loginForm.addEventListener("submit", async (e) => {
@@ -184,57 +187,5 @@ if (loginForm) {
 /*******************************************************
  * ACCOUNT PAGE (account.html)
  *******************************************************/
-// We expect <p id="accountInfo"> and <button id="logoutBtn">
 const accountInfo = document.getElementById("accountInfo");
-const logoutBtn = document.getElementById("logoutBtn");
-
-// We'll check auth state to see if user is logged in
-onAuthStateChanged(auth, (user) => {
-  if (accountInfo && logoutBtn) {
-    if (!user) {
-      accountInfo.textContent = "You are not logged in. Redirecting to login...";
-      setTimeout(() => {
-        window.location.href = "login.html";
-      }, 2000);
-    } else {
-      accountInfo.textContent = "Welcome to your account page! (Firebase user: " + user.email + ")";
-      logoutBtn.addEventListener("click", async () => {
-        await signOut(auth);
-        alert("Logged out!");
-        window.location.href = "index.html";
-      });
-    }
-  }
-});
-
-/*******************************************************
- * SIGN-UP PAGE (signup.html)
- *******************************************************/
-
-const signupForm = document.getElementById("signupForm");
-if (signupForm) {
-  signupForm.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const emailVal = document.getElementById("emailInput")?.value.trim();
-    const passVal = document.getElementById("passwordInput")?.value.trim();
-    const confirmVal = document.getElementById("confirmPasswordInput")?.value.trim();
-
-    if (!emailVal || !passVal || !confirmVal) {
-      alert("Please fill in all fields.");
-      return;
-    }
-    if (passVal !== confirmVal) {
-      alert("Passwords do not match.");
-      return;
-    }
-
-    try {
-      // Create the user with Firebase Auth
-      await createUserWithEmailAndPassword(auth, emailVal, passVal);
-      alert("Account created successfully!");
-      window.location.href = "index.html"; // go to main page
-    } catch (err) {
-      alert("Sign-up error: " + err.message);
-    }
-  });
-}
+const logoutBtn = document.g
