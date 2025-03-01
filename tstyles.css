@@ -736,3 +736,10 @@ body.dark-mode .sidebar-nav a.active {
     color: #fff;
     box-shadow: none;
 }
+
+/* Make all h1 the same size across the site */
+h1 {
+    font-size: 2rem; /* or 1.8rem, etc. */
+    line-height: 1.2;
+    margin-bottom: 1rem;
+}
