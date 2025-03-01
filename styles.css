@@ -571,27 +571,35 @@ body.dark-mode .account-welcome-text {
 /* ================================
    Founder Section (Unified)
    ================================ */
+
 .team-section {
+    flex: 2; /* or 1 if you prefer equal columns */
+    background-color: #f9f9f9;
+    border-radius: var(--border-radius);
     padding: 2rem;
-    background-color: transpart; /*#f9f9f9;*/
-    padding: 0;
+    box-shadow: var(--shadow-blue); /* Light mode → has shadow */
 }
 
-/* Single, unified .founder-box style */
+body.dark-mode .team-section {
+    background-color: var(--dark-bg);
+    color: var(--dark-text);
+    box-shadow: none; /* No shadow in dark mode */
+}
+
 .founder-box {
     display: flex;
     align-items: flex-start;
-    background-color: #fff;
+    background-color: #fff; /* Light mode background */
     border-radius: var(--border-radius);
-    box-shadow: var(--shadow-blue);
     padding: 1.5rem;
     margin: 1rem 0;
+    box-shadow: none; /* Light mode → NO shadow */
 }
 
-/* Dark mode override */
+/* Dark mode override → add shadow */
 body.dark-mode .founder-box {
-    background-color: #2b2b2b;
-    border: 1px solid #444;
+    background-color: #2b2b2b; /* Dark mode background */
+    box-shadow: var(--shadow-blue); /* Now we add the shadow in dark mode */
 }
 
 /* Photo container */
@@ -655,20 +663,6 @@ body.dark-mode .founder-info p {
     gap: 2rem;
     align-items: flex-start;
     border-radius: var(--border-radius);
-    box-shadow: var(--shadow-blue);
-}
-
-.about-column {
-    flex: 1;
-    min-width: 300px; /* optional, so it doesn’t get too narrow */
-}
-
-/* The team-section can also flex:1, or flex:1.2 if you want it bigger */
-.team-section {
-    flex: 1;
-    background-color: #f9f9f9; /* If you still want a distinct background */
-    border-radius: var(--border-radius);
-    padding: 2rem;
 }
 
 /* On smaller screens, stack them vertically */
@@ -676,4 +670,50 @@ body.dark-mode .founder-info p {
     .two-column-layout {
         flex-direction: column;
     }
+}
+
+.about-column ul {
+    margin: 1rem 0;
+    padding-left: 1.5rem;
+    list-style-type: disc; /* or none, then use a custom icon */
+}
+
+.about-column li {
+    margin-bottom: 0.5rem;
+}
+
+.highlight-box {
+    background-color: #f9f9f9; /* or #2b2b2b in dark mode override */
+    border-left: 4px solid var(--primary-color);
+    padding: 1rem 1.2rem;
+    margin-bottom: 1.5rem;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-blue);
+}
+
+.highlight-box h3 {
+    margin-bottom: 0.5rem;
+    font-size: 1.2rem; /* a bit bigger than normal text */
+    color: var(--primary-color); /* optional to highlight “Need Help?” */
+}
+
+/* Dark mode override if needed */
+body.dark-mode .highlight-box {
+    background-color: #2b2b2b;
+    border-left: 4px solid #2563eb;
+}
+
+.about-column {
+    flex: 1;
+    min-width: 300px; /* optional, so it doesn’t get too narrow */
+    background-color: #f9f9f9;
+    padding: 2rem;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-blue); /* Light mode → has shadow */
+}
+
+/* Dark mode override → remove shadow */
+body.dark-mode .about-column {
+    background-color: var(--dark-bg);
+    box-shadow: none; /* No shadow in dark mode */
 }
