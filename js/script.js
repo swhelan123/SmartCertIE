@@ -389,16 +389,18 @@ if (googleSignupBtn) {
   googleSignupBtn.addEventListener("click", async () => {
     try {
       const result = await signInWithPopup(auth, googleProvider);
-      // If it's the user's first time, additionalUserInfo.isNewUser == true
-      const isNewUser = result && result.additionalUserInfo?.isNewUser;
-      if (isNewUser) {
-        // brand-new user, direct them to setup
+      const user = result.user;
+
+      // 1) Check if there's a user doc in Firestore
+      const userRef = doc(db, "users", user.uid);
+      const userSnap = await getDoc(userRef);
+
+      if (!userSnap.exists()) {
+        // No doc => definitely new user => redirect to setup
         alert("Google account created successfully!");
         window.location.href = "setup.html";
       } else {
-        // existing user logs in with Google
-        // if you want them to do setup anyway, do the same redirect
-        // or skip if they already have a profile
+        // Existing user => go to home (or skip if you want them to do setup anyway)
         window.location.href = "index.html";
       }
     } catch (err) {
