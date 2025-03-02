@@ -123,7 +123,7 @@ onAuthStateChanged(auth, async (user) => {
           
           subscribeBtn.addEventListener("click", () => {
             // Redirect to your Stripe checkout page (placeholder for now)
-            window.location.href = "stripe-checkout-placeholder.html";
+            window.location.href = "https://createcheckoutsession-63mubklboq-uc.a.run.app";
           });
         } else {
           subscribeBtn.classList.remove("hidden");
