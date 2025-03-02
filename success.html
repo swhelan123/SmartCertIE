@@ -8,6 +8,8 @@
     <link rel="stylesheet" href="styles.css" />
     <!-- Tab Icon -->
     <link rel="icon" type="image/png" href="assets/img/tab_icon.png" />
+
+    <!-- Confetti library (must load BEFORE success.js) -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
 
     <style>
@@ -46,10 +48,8 @@
         margin-bottom: 2rem;
       }
 
-      /* Button container */
-      .explode-button {
-        position: relative;  /* needed for shards */
-        display: inline-block;
+      /* Button styling */
+      .confetti-button {
         background-color: var(--primary-color);
         color: #fff;
         border: none;
@@ -58,92 +58,12 @@
         font-size: 1rem;
         cursor: pointer;
         box-shadow: var(--shadow-blue);
-        overflow: hidden; /* so shards can appear within or fly out */
+        transition: background-color 0.2s;
       }
-      .explode-button:hover {
+      .confetti-button:hover {
         background-color: #2563eb;
       }
 
-      /* Text on the button */
-      .button-text {
-        position: relative;
-        z-index: 2; /* on top of shards */
-      }
-
-      /* Shards (all absolutely positioned on top of the button) */
-      .shard {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: inherit; /* same color as the button */
-        border-radius: var(--border-radius);
-        z-index: 1; /* behind the text */
-        opacity: 0; /* invisible until animation starts */
-      }
-
-      /* We'll define 4 shards with different animations */
-      .explode-button.exploded .shard1 {
-        animation: shard1Anim 0.8s forwards;
-      }
-      .explode-button.exploded .shard2 {
-        animation: shard2Anim 0.8s forwards;
-      }
-      .explode-button.exploded .shard3 {
-        animation: shard3Anim 0.8s forwards;
-      }
-      .explode-button.exploded .shard4 {
-        animation: shard4Anim 0.8s forwards;
-      }
-      /* Also hide the main text once it "explodes" */
-      .explode-button.exploded .button-text {
-        visibility: hidden;
-      }
-
-      /* Keyframes: each shard flies off in a different direction */
-      @keyframes shard1Anim {
-        0% {
-          transform: translate(0, 0) rotate(0deg);
-          opacity: 1;
-        }
-        100% {
-          transform: translate(-60px, -80px) rotate(-45deg) scale(0.8);
-          opacity: 0;
-        }
-      }
-      @keyframes shard2Anim {
-        0% {
-          transform: translate(0, 0) rotate(0deg);
-          opacity: 1;
-        }
-        100% {
-          transform: translate(60px, -80px) rotate(30deg) scale(0.8);
-          opacity: 0;
-        }
-      }
-      @keyframes shard3Anim {
-        0% {
-          transform: translate(0, 0) rotate(0deg);
-          opacity: 1;
-        }
-        100% {
-          transform: translate(-70px, 60px) rotate(-30deg) scale(0.8);
-          opacity: 0;
-        }
-      }
-      @keyframes shard4Anim {
-        0% {
-          transform: translate(0, 0) rotate(0deg);
-          opacity: 1;
-        }
-        100% {
-          transform: translate(80px, 80px) rotate(45deg) scale(0.8);
-          opacity: 0;
-        }
-      }
-
-      /* Footer (optional) */
       .success-footer {
         margin-top: 3rem;
         font-size: 0.9rem;
@@ -164,14 +84,9 @@
         class="success-image"
       />
 
-      <!-- Exploding button -->
-      <button id="explodeButton" class="explode-button">
-        <span class="button-text">Biology Time!</span>
-        <!-- 4 shards -->
-        <span class="shard shard1"></span>
-        <span class="shard shard2"></span>
-        <span class="shard shard3"></span>
-        <span class="shard shard4"></span>
+      <!-- Confetti button -->
+      <button id="confettiButton" class="confetti-button">
+        Biology Time!
       </button>
 
       <div class="success-footer">
@@ -179,7 +94,7 @@
       </div>
     </div>
 
-    <!-- Your custom JS for explosion + redirect -->
+    <!-- Your custom JS for confetti + redirect -->
     <script src="js/success.js"></script>
   </body>
 </html>
