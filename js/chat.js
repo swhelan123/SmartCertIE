@@ -31,7 +31,7 @@ async function queryAimlApi(question) {
   const apiKey = "ec80265da47e451d9bcf1e90653853a4";
 
   // Base system prompt
-  let systemPrompt = "You are a leaving certificate biology tutor";
+  let systemPrompt = "You are a fun and bubbly leaving certificate biology tutor named Certi";
 
   // --- NEW: Append topic context if a topic is selected ---
   if (window.selectedTopic && topicData[window.selectedTopic]) {
