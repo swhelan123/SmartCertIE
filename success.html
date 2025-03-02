@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SmartCert - Subscription Success</title>
+    <!-- Link to your existing CSS -->
+    <link rel="stylesheet" href="styles.css" />
+    <!-- Tab Icon -->
+    <link rel="icon" type="image/png" href="assets/img/tab_icon.png" />
+
+    <!-- Optional inline style for the dust animation -->
+    <style>
+      /* Center the main container */
+      .success-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        text-align: center;
+        background-color: #ffffff; /* Light mode background */
+        padding: 2rem;
+      }
+
+      /* Header text (mimicking index.html style) */
+      .success-title {
+        font-size: 2rem;
+        color: var(--primary-color);
+        margin-bottom: 0.3rem;
+      }
+      .success-subtitle {
+        font-size: 1.2rem;
+        color: #666;
+        margin-bottom: 2rem;
+      }
+
+      /* Congratulatory message */
+      .congrats-message {
+        font-size: 1.3rem;
+        color: #333;
+        margin-bottom: 2rem;
+      }
+
+      /* Placeholder image styling (adjust as needed) */
+      .success-image {
+        width: 200px; /* Adjust size as desired */
+        height: auto;
+        margin-bottom: 2rem;
+      }
+
+      /* "Biology Time!" button */
+      .dust-button {
+        background-color: var(--primary-color);
+        color: #fff;
+        border: none;
+        border-radius: var(--border-radius);
+        padding: 0.8rem 1.6rem;
+        font-size: 1rem;
+        cursor: pointer;
+        box-shadow: var(--shadow-blue);
+        transition: background-color 0.2s;
+      }
+      .dust-button:hover {
+        background-color: #2563eb;
+      }
+
+      /* Keyframes for dust animation */
+      @keyframes dust {
+        0% {
+          opacity: 1;
+          transform: scale(1);
+        }
+        60% {
+          opacity: 0.3;
+          transform: scale(1.3) rotate(10deg);
+        }
+        100% {
+          opacity: 0;
+          transform: scale(1.6) rotate(30deg);
+        }
+      }
+      /* Applying the dust animation */
+      .dust {
+        animation: dust 1s forwards; /* 1s duration, forwards to keep final state */
+      }
+
+      /* Footer (optional) */
+      .success-footer {
+        margin-top: 3rem;
+        font-size: 0.9rem;
+        color: #999;
+      }
+    </style>
+  </head>
+  <body class="standalone-mode">
+    <div class="success-container">
+      <!-- Top header (logo text) -->
+      <h1 class="success-title">SmartCert</h1>
+      <p class="success-subtitle">Leaving Cert Biology</p>
+
+      <!-- Congratulatory message -->
+      <p class="congrats-message">
+        Thank you for subscribing! Your access to premium features is now active.
+      </p>
+
+      <!-- Example success image (replace src as needed) -->
+      <img
+        src="assets/img/certi.png"
+        alt="Success Graphic"
+        class="success-image"
+      />
+
+      <!-- Button that disappears in a dust animation -->
+      <button id="dustButton" class="dust-button">Biology Time!</button>
+
+      <!-- Optional Footer -->
+      <div class="success-footer">
+        © 2025 SmartCert. All rights reserved.
+      </div>
+    </div>
+
+    <!-- Link to your separate JS for the dust animation & redirect -->
+    <script src="success.js"></script>
+  </body>
+</html>

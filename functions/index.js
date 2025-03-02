@@ -48,7 +48,7 @@ exports.createCheckoutSession = onRequest(
             price: "price_1Qy1kzGsigejaHFWZKqC600v", // Replace with
             quantity: 1,
           }],
-          success_url: "https://smartcert.ie",
+          success_url: "https://smartcert.ie/success.html",
           cancel_url: "https://smartcert.ie",
           metadata: {firebaseUserId: firebaseUserId},
         });
