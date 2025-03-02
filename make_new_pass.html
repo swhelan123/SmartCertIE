@@ -5,32 +5,76 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Reset Your Password</title>
 
-        <!-- Google Font, CSS, etc. -->
+        <!-- Shared CSS (styles.css) -->
         <link rel="stylesheet" href="styles.css" />
+
+        <!-- Tab Icon (optional) -->
+        <link rel="icon" type="image/png" href="assets/img/tab_icon.png" />
     </head>
     <body>
         <div class="standalone-page">
             <h1>Create a New Password</h1>
 
-            <!-- We’ll parse the oobCode from the URL in script.js -->
+            <!-- We’ll parse the oobCode from the URL in script.js to verify the user, etc. -->
             <form id="newPassForm" class="login-form">
+                <!-- New Password -->
                 <label for="newPassword">New Password</label>
-                <div style="position: relative">
-                    <input type="password" id="newPassword" placeholder="New password" required />
-                    <button type="button" class="toggle-pass-btn" data-target="newPassword" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%)">Show</button>
+                <div style="position: relative; width: 100%">
+                    <input type="password" id="newPassword" placeholder="New password" required style="width: 100%" />
+                    <img
+                        class="toggle-pass-eye"
+                        data-target="newPassword"
+                        src="assets/img/eye_closed.png"
+                        alt="Toggle visibility"
+                        style="position: absolute; right: 10px; top: 50%; width: 24px; height: 24px; cursor: pointer; transform: translateY(-50%)"
+                    />
                 </div>
 
+                <!-- Confirm Password -->
                 <label for="confirmPassword">Confirm Password</label>
-                <div style="position: relative">
-                    <input type="password" id="confirmPassword" placeholder="Confirm password" required />
-                    <button type="button" class="toggle-pass-btn" data-target="confirmPassword" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%)">Show</button>
+                <div style="position: relative; width: 100%">
+                    <input type="password" id="confirmPassword" placeholder="Confirm password" required style="width: 100%" />
+                    <img
+                        class="toggle-pass-eye"
+                        data-target="confirmPassword"
+                        src="assets/img/eye_closed.png"
+                        alt="Toggle visibility"
+                        style="position: absolute; right: 10px; top: 50%; width: 24px; height: 24px; cursor: pointer; transform: translateY(-50%)"
+                    />
                 </div>
 
                 <button type="submit">Reset Password</button>
             </form>
         </div>
 
-        <!-- Load your main script (Firebase logic) -->
+        <!-- Your main JS (Firebase logic, plus the snippet to handle toggling) -->
         <script type="module" src="js/script.js"></script>
+
+        <script>
+            // This snippet handles toggling the password fields from "password" to "text"
+            document.addEventListener("DOMContentLoaded", () => {
+                const eyeIcons = document.querySelectorAll(".toggle-pass-eye");
+
+                eyeIcons.forEach((icon) => {
+                    icon.addEventListener("click", () => {
+                        const targetId = icon.getAttribute("data-target");
+                        const targetInput = document.getElementById(targetId);
+
+                        if (!targetInput) return;
+
+                        // Toggle the type
+                        if (targetInput.type === "password") {
+                            targetInput.type = "text";
+                            // Swap to eye_open.png
+                            icon.src = "assets/img/eye_open.png";
+                        } else {
+                            targetInput.type = "password";
+                            // Swap to eye_closed.png
+                            icon.src = "assets/img/eye_closed.png";
+                        }
+                    });
+                });
+            });
+        </script>
     </body>
 </html>
