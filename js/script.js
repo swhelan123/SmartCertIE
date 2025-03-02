@@ -43,38 +43,6 @@ const db = getFirestore(app);
 const googleProvider = new GoogleAuthProvider();
 
 /*******************************************************
- * PFP js
- *******************************************************/
-
-async function uploadProfilePicture(user, file) {
-  if (!file) {
-      alert("Please select a file to upload.");
-      return;
-  }
-
-  try {
-      const storage = getStorage();
-      const storageRef = ref(storage, `profilePics/${user.uid}/${file.name}`);
-      await uploadBytes(storageRef, file);
-      const downloadURL = await getDownloadURL(storageRef);
-
-      // Update Firestore with the new photo URL
-      const userRef = doc(db, "users", user.uid);
-      await setDoc(userRef, { photoURL: downloadURL }, { merge: true });
-
-      // Update UI with new profile picture
-      const profilePicElements = document.querySelectorAll("#profilePic, #accountProfilePic");
-      profilePicElements.forEach((img) => img.src = downloadURL);
-
-      alert("Profile picture uploaded successfully!");
-  } catch (error) {
-      console.error("Error uploading profile picture:", error);
-      alert("Failed to upload profile picture.");
-  }
-}
-
-
-/*******************************************************
  * DARK MODE ICON (SUN/MOON)
  *******************************************************/
 const body = document.body;
@@ -110,28 +78,28 @@ const accountLink = document.getElementById("accountLink");
 onAuthStateChanged(auth, async (user) => {
   // Ensure the chat UI elements exist
   if (!chatContainer || !chatInput || !sendBtn || !chatMessages) return;
-  
+
   if (user) {
     // Hide the login/signup button and show profile pic/account link
     loginBtn.classList.add("hidden");
     profilePic.classList.remove("hidden");
     accountLink.setAttribute("href", "account.html");
-    
+
     // Retrieve the user's Firestore document
     const userDocRef = doc(db, "users", user.uid);
     const userSnap = await getDoc(userDocRef);
-    
+
     if (userSnap.exists()) {
       const userData = userSnap.data();
       // Default to "not-subscribed" if subscriptionStatus is missing
       const subscriptionStatus = userData.subscriptionStatus || "not-subscribed";
-      
+
       if (subscriptionStatus === "active") {
         // User is subscribed: enable chat
         chatInput.disabled = false;
         sendBtn.disabled = false;
         chatMessages.innerHTML = ""; // Optionally, add a welcome message
-        
+
         // Hide the subscribe button if it exists
         const subscribeBtn = document.getElementById("subscribeBtn");
         if (subscribeBtn) subscribeBtn.classList.add("hidden");
@@ -143,7 +111,7 @@ onAuthStateChanged(auth, async (user) => {
           <div class="chat-message message-bot">
             Click subscribe to use SmartCert chat.
           </div>`;
-          
+
         // Create or show the subscribe button in the top-right container
         let subscribeBtn = document.getElementById("subscribeBtn");
         if (!subscribeBtn) {
@@ -152,7 +120,10 @@ onAuthStateChanged(auth, async (user) => {
           subscribeBtn.className = "login-button"; // Reuse existing styling or change as needed
           subscribeBtn.textContent = "Subscribe";
           document.getElementById("topRightContainer").appendChild(subscribeBtn);
-          
+
+
+
+
 
         } else {
           subscribeBtn.classList.remove("hidden");
@@ -171,9 +142,9 @@ onAuthStateChanged(auth, async (user) => {
         You must be logged in to use the chat.
         <a class="click-link" href="login.html">Log in here</a>.
       </div>`;
-      
+
     loginBtn.classList.remove("hidden");
-    
+
     // Hide the subscribe button if it exists
     const subscribeBtn = document.getElementById("subscribeBtn");
     if (subscribeBtn) subscribeBtn.classList.add("hidden");
@@ -417,53 +388,71 @@ if (signupForm) {
 /*******************************************************
  * SETUP PAGE (setup.html) - Collect Name, Phone, Photo
  *******************************************************/
-
-
-
 const setupForm = document.getElementById("setupForm");
 if (setupForm) {
-    setupForm.addEventListener("submit", async (e) => {
-        e.preventDefault();
+  setupForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
 
-        const user = auth.currentUser;
-        if (!user) {
-            alert("You must be logged in to complete setup.");
-            window.location.href = "login.html";
-            return;
-        }
+    // 1) Ensure user is logged in
+    const user = auth.currentUser;
+    if (!user) {
+      alert("You must be logged in to complete setup.");
+      window.location.href = "login.html";
+      return;
+    }
 
-        try {
-            const firstName = document.getElementById("firstName").value.trim();
-            const lastName = document.getElementById("lastName").value.trim();
-            const phoneNumber = document.getElementById("phoneNumber").value.trim();
-            const file = document.getElementById("profilePicInput").files[0];
+    try {
+      // 2) Gather form inputs
+      const firstName = document.getElementById("firstName").value.trim();
+      const lastName = document.getElementById("lastName").value.trim();
+      const phoneNumber = document.getElementById("phoneNumber").value.trim();
+      const file = document.getElementById("profilePicInput").files[0];
 
-            if (!firstName || !lastName || !phoneNumber) {
-                alert("Please fill in all required fields.");
-                return;
-            }
+      // Basic validation
+      if (!firstName || !lastName || !phoneNumber) {
+        alert("Please fill in all required fields.");
+        return;
+      }
 
-            let photoURL = "";
-            if (file) {
-                photoURL = await uploadProfilePicture(user, file);
-            }
+      // 3) Upload profile picture to Firebase Storage (if provided)
+      let photoURL = "";
+      if (file) {
+        const storage = getStorage(app);
+        // Path: profilePics/{uid}/{filename}
+        const storageRef = ref(storage, `profilePics/${user.uid}/${file.name}`);
+        // Upload file
+        await uploadBytes(storageRef, file);
+        // Get download URL
+        photoURL = await getDownloadURL(storageRef);
+      }
 
-            await setDoc(doc(db, "users", user.uid), {
-                email: user.email,
-                firstName,
-                lastName,
-                phone: phoneNumber,
-                photoURL: photoURL,
-                updatedAt: serverTimestamp(),
-            }, { merge: true });
+      // 4) Save user profile data to Firestore
+      // We'll merge so we don't overwrite if doc already exists
+      await setDoc(
+        doc(db, "users", user.uid),
+        {
+          email: user.email,
+          firstName,
+          lastName,
+          phone: phoneNumber,
+          photoURL,
+          updatedAt: serverTimestamp(),
 
-            alert("Profile setup complete!");
-            window.location.href = "index.html";
-        } catch (err) {
-            console.error("Setup error:", err);
-            alert("Error completing setup: " + err.message);
-        }
-    });
+          //new fields for stripe integration
+          subscriptionStatus: "not-subscribed",
+          firebaseUserId: user.uid,
+        },
+        { merge: true },
+      );
+
+      // 5) Redirect to main page
+      alert("Profile setup complete!");
+      window.location.href = "index.html";
+    } catch (err) {
+      console.error("Setup error:", err);
+      alert("Error completing setup: " + err.message);
+    }
+  });
 }
 
 // GOOGLE SIGN-UP
@@ -496,117 +485,117 @@ if (googleSignupBtn) {
 /*******************************************************
  * ACCOUNT PAGE - Display & Update Profile
  *******************************************************/
-/*******************************************************
- * ACCOUNT PAGE - Display & Update Profile
- *******************************************************/
 const accountProfilePic = document.getElementById("accountProfilePic");
 const accountEmail = document.getElementById("accountEmail");
 const accountPhone = document.getElementById("accountPhone");
 const updateAccountForm = document.getElementById("updateAccountForm");
 
-// Function to upload and store profile picture in Firebase Storage
-async function uploadProfilePicture(user, file) {
-    if (!file) {
-        alert("Please select a file to upload.");
-        return null;
-    }
-
-    try {
-        const storage = getStorage();
-        const storageRef = ref(storage, `profilePics/${user.uid}/${file.name}`);
-        await uploadBytes(storageRef, file);
-        const downloadURL = await getDownloadURL(storageRef);
-        return downloadURL;
-    } catch (error) {
-        console.error("Error uploading profile picture:", error);
-        alert("Failed to upload profile picture.");
-        return null;
-    }
-}
-
-// Fetch user data and populate the account page
 onAuthStateChanged(auth, async (user) => {
+  // If we're on account.html, we have updateAccountForm
+  if (updateAccountForm) {
     if (!user) {
+      // Not logged in → redirect to login
+      if (accountInfo) {
         accountInfo.textContent = "You are not logged in. Redirecting to login...";
-        setTimeout(() => {
-            window.location.href = "login.html";
-        }, 2000);
-        return;
-    }
+      }
+      setTimeout(() => {
+        window.location.href = "login.html";
+      }, 2000);
+    } else {
+      // Logged in → fetch user doc from Firestore
+      const userRef = doc(db, "users", user.uid);
+      const userSnap = await getDoc(userRef);
 
-    const userRef = doc(db, "users", user.uid);
-    const userSnap = await getDoc(userRef);
-
-    if (userSnap.exists()) {
+      // If doc exists, populate the page
+      if (userSnap.exists()) {
         const data = userSnap.data();
 
-        // 1) Display user's name
+        // 1) Display greeting in #accountInfo
         const displayName = (data.firstName || "") + " " + (data.lastName || "");
         accountInfo.textContent = `Hello, ${displayName.trim()}!`;
 
-        // 2) Display email and phone number
+        // 2) Show email from Firestore if stored, else from auth
         accountEmail.textContent = data.email || user.email || "";
+        // 3) Show phone
         accountPhone.textContent = data.phone || "";
 
-        // 3) Display profile picture if available
+        // 4) Show profile pic if we have a photoURL
         if (data.photoURL) {
-            accountProfilePic.src = data.photoURL;
+          accountProfilePic.src = data.photoURL;
         }
 
-        // 4) Pre-fill form fields with current data
+        // 5) Also fill the update form with current data
         document.getElementById("updateFirstName").value = data.firstName || "";
         document.getElementById("updateLastName").value = data.lastName || "";
         document.getElementById("updatePhone").value = data.phone || "";
-    } else {
+      } else {
+        // If doc doesn't exist, show minimal info
         accountInfo.textContent = `Hello, ${user.email} (no profile data found).`;
+        // Optionally direct them to setup.html
+      }
     }
+  }
 });
 
 // Handle "Save Changes" form submission
 if (updateAccountForm) {
-    updateAccountForm.addEventListener("submit", async (e) => {
-        e.preventDefault();
+  updateAccountForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
 
-        const user = auth.currentUser;
-        if (!user) {
-            alert("Not logged in.");
-            return;
-        }
+    // Ensure user is logged in
+    const user = auth.currentUser;
+    if (!user) {
+      alert("Not logged in.");
+      return;
+    }
 
-        try {
-            // Gather updated form data
-            const newFirstName = document.getElementById("updateFirstName").value.trim();
-            const newLastName = document.getElementById("updateLastName").value.trim();
-            const newPhone = document.getElementById("updatePhone").value.trim();
-            const file = document.getElementById("newProfilePic").files[0];
+    try {
+      // Gather new values from the form
+      const newFirstName = document.getElementById("updateFirstName").value.trim();
+      const newLastName = document.getElementById("updateLastName").value.trim();
+      const newPhone = document.getElementById("updatePhone").value.trim();
+      const file = document.getElementById("newProfilePic").files[0];
 
-            let newPhotoURL = accountProfilePic.src; // Keep existing picture if no new one is chosen
-            if (file) {
-                newPhotoURL = await uploadProfilePicture(user, file) || newPhotoURL;
-            }
+      // (Optional) basic validation
+      if (!newFirstName || !newLastName || !newPhone) {
+        alert("Please fill in all fields before saving.");
+        return;
+      }
 
-            // Update Firestore with new user data
-            await setDoc(doc(db, "users", user.uid), {
-                firstName: newFirstName,
-                lastName: newLastName,
-                phone: newPhone,
-                photoURL: newPhotoURL,
-                updatedAt: serverTimestamp(),
-            }, { merge: true });
+      // If user chose a new profile pic, upload it to Firebase Storage
+      let newPhotoURL = accountProfilePic.src; // fallback to existing pic
+      if (file) {
+        const storage = getStorage(app);
+        const storageRef = ref(storage, `profilePics/${user.uid}/${file.name}`);
+        await uploadBytes(storageRef, file);
+        newPhotoURL = await getDownloadURL(storageRef);
+      }
 
-            // Update UI in real-time
-            accountInfo.textContent = `Hello, ${newFirstName} ${newLastName}!`;
-            accountPhone.textContent = newPhone;
-            accountProfilePic.src = newPhotoURL;
+      // Merge new data into Firestore doc
+      await setDoc(
+        doc(db, "users", user.uid),
+        {
+          firstName: newFirstName,
+          lastName: newLastName,
+          phone: newPhone,
+          photoURL: newPhotoURL,
+          updatedAt: serverTimestamp(),
+        },
+        { merge: true },
+      );
 
-            alert("Profile updated successfully!");
-        } catch (err) {
-            console.error("Error updating profile:", err);
-            alert("Error updating profile: " + err.message);
-        }
-    });
+      // Update UI in real-time
+      accountInfo.textContent = `Hello, ${newFirstName} ${newLastName}!`;
+      accountPhone.textContent = newPhone;
+      accountProfilePic.src = newPhotoURL;
+
+      alert("Profile updated successfully!");
+    } catch (err) {
+      console.error("Update profile error:", err);
+      alert("Error updating profile: " + err.message);
+    }
+  });
 }
-
 
 // Grab references to the chat elements
 const chatContainer = document.getElementById("chatSection");
@@ -714,7 +703,7 @@ onAuthStateChanged(auth, async (user) => {
     if (userSnap.exists()) {
       const userData = userSnap.data();
       const subscriptionStatus = userData.subscriptionStatus || "not-subscribed";
-      
+
       if (subscriptionStatus !== "active") { // Only create/show button if not subscribed
         let subscribeBtn = document.getElementById("subscribeBtn");
         if (!subscribeBtn) {
@@ -726,7 +715,7 @@ onAuthStateChanged(auth, async (user) => {
         } else {
           subscribeBtn.classList.remove("hidden");
         }
-        
+
         // Only attach the event listener once
         if (!subscribeBtn.dataset.listenerAttached) {
           subscribeBtn.addEventListener("click", async () => {
@@ -735,7 +724,7 @@ onAuthStateChanged(auth, async (user) => {
               alert("You must be logged in to subscribe.");
               return;
             }
-            
+
             try {
               const endpointURL = "https://createcheckoutsession-63mubklboq-uc.a.run.app";
               const response = await fetch(endpointURL, {
@@ -745,9 +734,9 @@ onAuthStateChanged(auth, async (user) => {
                 },
                 body: JSON.stringify({ firebaseUserId: currentUser.uid })
               });
-              
+
               const data = await response.json();
-              
+
               if (data.url) {
                 window.location.href = data.url;
               } else {
@@ -769,6 +758,3 @@ onAuthStateChanged(auth, async (user) => {
     }
   }
 });
-
-  
-  
