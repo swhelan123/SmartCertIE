@@ -7,7 +7,7 @@
  * See a full list of supported triggers at https://firebase.google.com/docs/functions
  */
 
-const {onRequest} = require("firebase-functions/v2/https");
+//const {onRequest} = require("firebase-functions/v2/https");
 //commented the below line out for the moment as it was causing issues because it wasnt being used
 //const logger = require("firebase-functions/logger");
 
