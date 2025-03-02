@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>SmartCert - Forgot Password</title>
+
+        <!-- Google Font -->
+        <link rel="preconnect" href="https://fonts.gstatic.com" />
+        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet" />
+
+        <!-- Shared CSS -->
+        <link rel="stylesheet" href="styles.css" />
+
+        <!-- Tab Icon -->
+        <link rel="icon" type="image/png" href="assets/img/tab_icon.png" />
+    </head>
+    <body>
+        <div class="standalone-page">
+            <h1>Reset Your Password</h1>
+            <p>Please enter the email address you used to create your account. <br />We will email you a link to reset your password.</p>
+
+            <!-- Forgot Password Form -->
+            <form id="forgotPassForm" class="login-form">
+                <input type="email" id="resetEmailInput" placeholder="Email" required />
+                <button type="submit">Send Reset Email</button>
+            </form>
+
+            <p class="note" style="margin-top: 1rem">
+                Remembered your password?
+                <a href="login.html" class="click-link">Back to Login</a>
+            </p>
+        </div>
+
+        <!-- Load your main script (Firebase logic) -->
+        <script type="module" src="js/script.js"></script>
+    </body>
+</html>

@@ -346,6 +346,7 @@ body.dark-mode .standalone-page {
     gap: 1rem;
     margin: 1rem 0;
     min-width: 550px;
+    max-width: 550px;
 }
 .login-form input {
     padding: 0.8rem;

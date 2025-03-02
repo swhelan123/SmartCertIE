@@ -14,6 +14,7 @@ import {
   onAuthStateChanged,
   signInWithEmailAndPassword,
   signOut,
+  sendPasswordResetEmail,
 } from "https://www.gstatic.com/firebasejs/9.17.2/firebase-auth.js";
 import { getFirestore } from "https://www.gstatic.com/firebasejs/9.17.2/firebase-firestore.js";
 import { doc, getDoc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.17.2/firebase-firestore.js";
@@ -558,3 +559,30 @@ onAuthStateChanged(auth, (user) => {
       </div>`;
   }
 });
+
+// FORGOT PASSWORD PAGE
+const forgotPassForm = document.getElementById("forgotPassForm");
+if (forgotPassForm) {
+  forgotPassForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    // 1) Grab the email from the resetEmailInput field
+    const resetEmailVal = document.getElementById("resetEmailInput")?.value.trim();
+    if (!resetEmailVal) {
+      alert("Please enter your email address.");
+      return;
+    }
+
+    try {
+      // 2) Use Firebase to send the password reset email
+      await sendPasswordResetEmail(auth, resetEmailVal);
+      alert(`Password reset email sent to: ${resetEmailVal}`);
+
+      // Optionally, redirect them to login or show a success message
+      window.location.href = "login.html";
+    } catch (err) {
+      console.error("Password reset error:", err);
+      alert("Error sending reset email: " + err.message);
+    }
+  });
+}
