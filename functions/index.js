@@ -7,8 +7,10 @@
  * See a full list of supported triggers at https://firebase.google.com/docs/functions
  */
 
-const functions = require("firebase-functions");
-const stripe = require("stripe")(functions.config().stripe.secret_key);
+// const functions
+// = require("firebase-functions");
+// const stripe =
+// require("stripe")(functions.config().stripe.secret_key);
 
 
 // const {onRequest} =
@@ -29,6 +31,14 @@ const stripe = require("stripe")(functions.config().stripe.secret_key);
 //   response.send("Hello from Firebase!");
 // });
 
+const functions = require('firebase-functions');
+
+// Minimal function for testing
+exports.helloWorld = functions.https.onRequest((req, res) => {
+  res.send("Hello, world!");
+});
+
+/* 
 exports.createCheckoutSession = functions.https.onRequest(
     async (req, res) => {
       // Optionally, you can add a check for the HTTP method here.
@@ -56,3 +66,4 @@ exports.createCheckoutSession = functions.https.onRequest(
         res.status(500).json({error: error.message});
       }
     });
+*/
