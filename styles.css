@@ -367,12 +367,13 @@ body.dark-mode .standalone-page {
     background-color: #2563eb;
 }
 
-.back-link {
+.click-link {
     color: var(--primary-color);
     text-decoration: none;
     font-weight: 500;
 }
-.back-link:hover {
+
+.click-link:hover {
     text-decoration: underline;
 }
 

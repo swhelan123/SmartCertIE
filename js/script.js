@@ -552,9 +552,9 @@ onAuthStateChanged(auth, (user) => {
 
     // Optionally show a message so user knows why it’s disabled
     chatMessages.innerHTML = `
-      <div class="chat-message message-bot" style="color:red;">
+      <div class="chat-message message-bot">
         You must be logged in to use the chat.
-        <a href="login.html">Log in here</a>.
+        <a class="click-link" href="login.html">Log in here</a>.
       </div>`;
   }
 });
