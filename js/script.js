@@ -75,21 +75,81 @@ const profilePic = document.getElementById("profilePic");
 const accountLink = document.getElementById("accountLink");
 
 // Listen for Firebase auth changes (logged in/out)
-onAuthStateChanged(auth, (user) => {
-  if (loginBtn && profilePic && accountLink) {
-    if (user) {
-      // Logged in
-      loginBtn.classList.add("hidden");
-      profilePic.classList.remove("hidden");
-      accountLink.setAttribute("href", "account.html");
+onAuthStateChanged(auth, async (user) => {
+  // Ensure the chat UI elements exist
+  if (!chatContainer || !chatInput || !sendBtn || !chatMessages) return;
+  
+  if (user) {
+    // Hide the login/signup button and show profile pic/account link
+    loginBtn.classList.add("hidden");
+    profilePic.classList.remove("hidden");
+    accountLink.setAttribute("href", "account.html");
+    
+    // Retrieve the user's Firestore document
+    const userDocRef = doc(db, "users", user.uid);
+    const userSnap = await getDoc(userDocRef);
+    
+    if (userSnap.exists()) {
+      const userData = userSnap.data();
+      
+      if (userData.subscriptionStatus === "active") {
+        // User is subscribed: enable chat
+        chatInput.disabled = false;
+        sendBtn.disabled = false;
+        chatMessages.innerHTML = ""; // Optionally, add a welcome message
+        
+        // Hide the subscribe button if it exists
+        const subscribeBtn = document.getElementById("subscribeBtn");
+        if (subscribeBtn) subscribeBtn.classList.add("hidden");
+      } else {
+        // User is logged in but not subscribed: disable chat and show subscribe prompt
+        chatInput.disabled = true;
+        sendBtn.disabled = true;
+        chatMessages.innerHTML = `
+          <div class="chat-message message-bot">
+            Click subscribe to use SmartCert chat.
+          </div>`;
+          
+        // Create or show the subscribe button in the top-right container
+        let subscribeBtn = document.getElementById("subscribeBtn");
+        if (!subscribeBtn) {
+          subscribeBtn = document.createElement("button");
+          subscribeBtn.id = "subscribeBtn";
+          subscribeBtn.className = "login-button"; // Or another class for subscribe styling
+          subscribeBtn.textContent = "Subscribe";
+          document.getElementById("topRightContainer").appendChild(subscribeBtn);
+          
+          subscribeBtn.addEventListener("click", () => {
+            // Redirect to your Stripe checkout page (placeholder for now)
+            window.location.href = "stripe-checkout-placeholder.html";
+          });
+        } else {
+          subscribeBtn.classList.remove("hidden");
+        }
+      }
     } else {
-      // Logged out
-      loginBtn.classList.remove("hidden");
-      profilePic.classList.add("hidden");
-      accountLink.setAttribute("href", "login.html");
+      // If no Firestore document exists for this user, redirect to setup
+      window.location.href = "setup.html";
     }
+  } else {
+    // User is not logged in: disable chat and show login/signup message
+    chatInput.disabled = true;
+    sendBtn.disabled = true;
+    chatMessages.innerHTML = `
+      <div class="chat-message message-bot">
+        You must be logged in to use the chat.
+        <a class="click-link" href="login.html">Log in here</a>.
+      </div>`;
+      
+    loginBtn.classList.remove("hidden");
+    
+    // Hide the subscribe button if it exists
+    const subscribeBtn = document.getElementById("subscribeBtn");
+    if (subscribeBtn) subscribeBtn.classList.add("hidden");
   }
 });
+
+
 
 //Event listener for pfp -> account
 if (profilePic) {
@@ -270,7 +330,6 @@ if (loginForm) {
  *******************************************************/
 const accountInfo = document.getElementById("accountInfo");
 const logoutBtn = document.getElementById("logoutBtn");
-
 // We'll check auth state to see if user is logged in
 onAuthStateChanged(auth, (user) => {
   if (accountInfo && logoutBtn) {
@@ -375,6 +434,10 @@ if (setupForm) {
           phone: phoneNumber,
           photoURL,
           updatedAt: serverTimestamp(),
+
+          //new fields for stripe integration
+          subscriptionStatus: "not-subscribed",
+          firebaseUserId: user.uid,
         },
         { merge: true },
       );
@@ -537,29 +600,7 @@ const chatInput = document.getElementById("chatInput");
 const sendBtn = document.getElementById("sendBtn");
 const chatMessages = document.getElementById("chatMessages");
 
-// Listen for auth changes
-onAuthStateChanged(auth, (user) => {
-  if (!chatContainer || !chatInput || !sendBtn || !chatMessages) {
-    return; // not on index.html or chat elements don't exist
-  }
 
-  if (user) {
-    // If user is logged in, enable the chat
-    chatInput.disabled = false;
-    sendBtn.disabled = false;
-  } else {
-    // If user is not logged in, disable (or hide) the chat
-    chatInput.disabled = true;
-    sendBtn.disabled = true;
-
-    // Optionally show a message so user knows why it’s disabled
-    chatMessages.innerHTML = `
-      <div class="chat-message message-bot">
-        You must be logged in to use the chat.
-        <a class="click-link" href="login.html">Log in here</a>.
-      </div>`;
-  }
-});
 
 // FORGOT PASSWORD PAGE
 const forgotPassForm = document.getElementById("forgotPassForm");
