@@ -30,7 +30,7 @@ async function queryAimlApi(question) {
   const apiUrl = "https://api.aimlapi.com/v1/chat/completions";
 
   // Insert your AIMLAPI key here
-  const apiKey = "22c47683998944ef8ee37f799a1b679e";
+  const apiKey = "ec80265da47e451d9bcf1e90653853a4";
 
   // Base system prompt
   let systemPrompt = "You are an expert Biology tutor for 18-19 year old 5th and 6th year Leaving Cert students";
