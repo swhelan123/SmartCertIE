@@ -15,6 +15,7 @@ import {
   signInWithEmailAndPassword,
   signOut,
   sendPasswordResetEmail,
+  confirmPasswordReset,
 } from "https://www.gstatic.com/firebasejs/9.17.2/firebase-auth.js";
 import { getFirestore } from "https://www.gstatic.com/firebasejs/9.17.2/firebase-firestore.js";
 import { doc, getDoc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.17.2/firebase-firestore.js";
@@ -584,5 +585,64 @@ if (forgotPassForm) {
       console.error("Password reset error:", err);
       alert("Error sending reset email: " + err.message);
     }
+  });
+}
+
+// On make_new_pass.html
+const newPassForm = document.getElementById("newPassForm");
+if (newPassForm) {
+  // 1) Parse the 'oobCode' from the URL
+  const queryParams = new URLSearchParams(window.location.search);
+  const oobCode = queryParams.get("oobCode"); // e.g. ?oobCode=abc123
+
+  if (!oobCode) {
+    alert("Invalid or missing reset code in URL.");
+    // optionally redirect them somewhere
+  }
+
+  // 2) Add event listener to the form
+  newPassForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const newPassword = document.getElementById("newPassword").value.trim();
+    const confirmPassword = document.getElementById("confirmPassword").value.trim();
+
+    // Basic checks
+    if (!newPassword || !confirmPassword) {
+      alert("Please fill out both fields.");
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      alert("Passwords do not match.");
+      return;
+    }
+
+    try {
+      // 3) Confirm the password reset using Firebase
+      await confirmPasswordReset(auth, oobCode, newPassword);
+      alert("Your password has been reset successfully!");
+
+      // Optionally redirect to login or auto-login
+      window.location.href = "login.html";
+    } catch (error) {
+      console.error("confirmPasswordReset error:", error);
+      alert("Error resetting password: " + error.message);
+    }
+  });
+
+  // 3) Optional: Toggle password visibility
+  const toggleButtons = document.querySelectorAll(".toggle-pass-btn");
+  toggleButtons.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const targetId = btn.getAttribute("data-target");
+      const targetInput = document.getElementById(targetId);
+      if (targetInput.type === "password") {
+        targetInput.type = "text";
+        btn.textContent = "Hide";
+      } else {
+        targetInput.type = "password";
+        btn.textContent = "Show";
+      }
+    });
   });
 }

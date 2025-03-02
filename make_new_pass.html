@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Reset Your Password</title>
+
+        <!-- Google Font, CSS, etc. -->
+        <link rel="stylesheet" href="styles.css" />
+    </head>
+    <body>
+        <div class="standalone-page">
+            <h1>Create a New Password</h1>
+
+            <!-- We’ll parse the oobCode from the URL in script.js -->
+            <form id="newPassForm" class="login-form">
+                <label for="newPassword">New Password</label>
+                <div style="position: relative">
+                    <input type="password" id="newPassword" placeholder="New password" required />
+                    <button type="button" class="toggle-pass-btn" data-target="newPassword" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%)">Show</button>
+                </div>
+
+                <label for="confirmPassword">Confirm Password</label>
+                <div style="position: relative">
+                    <input type="password" id="confirmPassword" placeholder="Confirm password" required />
+                    <button type="button" class="toggle-pass-btn" data-target="confirmPassword" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%)">Show</button>
+                </div>
+
+                <button type="submit">Reset Password</button>
+            </form>
+        </div>
+
+        <!-- Load your main script (Firebase logic) -->
+        <script type="module" src="js/script.js"></script>
+    </body>
+</html>
