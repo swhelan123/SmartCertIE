@@ -12,7 +12,6 @@ const webhook = require("./webHook.js");
 exports.stripeWebhook = webhook.stripeWebhook;
 
 
-
 exports.createCheckoutSession = onRequest(
     {secrets: ["STRIPE_SECRET_KEY"]},
     async (req, res) => {
@@ -23,10 +22,10 @@ exports.createCheckoutSession = onRequest(
         return res.status(405).send("Method Not Allowed");
       }
 
-      //Parse firebase userID from request body
-      const { firebaseUserId } = req.body;
+      // Parse firebase userID from request body
+      const {firebaseUserId} = req.body;
       if (!firebaseUserId) {
-        return res.status(400).json({ error: "Missing firebaseUserId" });
+        return res.status(400).json({error: "Missing firebaseUserId"});
       }
 
       try {
@@ -39,7 +38,7 @@ exports.createCheckoutSession = onRequest(
           }],
           success_url: "https://smartcert.ie",
           cancel_url: "https://smartcert.ie",
-          metadata: { firebaseUserId: firebaseUserId },
+          metadata: {firebaseUserId: firebaseUserId},
         });
         res.status(200).json({sessionId: session.id, url: session.url});
       } catch (error) {
