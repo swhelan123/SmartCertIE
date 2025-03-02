@@ -15,8 +15,8 @@ exports.stripeWebhook = webhook.stripeWebhook;
 exports.createCheckoutSession = onRequest(
     {secrets: ["STRIPE_SECRET_KEY"]},
     async (req, res) => {
-        // Handle CORS preflight request
-        if (req.method === "OPTIONS") {
+      // Handle CORS preflight request
+      if (req.method === "OPTIONS") {
         res.set("Access-Control-Allow-Origin", "*");
         res.set("Access-Control-Allow-Methods", "POST");
         res.set("Access-Control-Allow-Headers", "Content-Type");
