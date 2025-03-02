@@ -807,40 +807,41 @@ body.dark-mode .message-user .chat-bubble {
     background-color: #344b37;
 }
 
-/* Hide or style the scrollbar track & thumb (WebKit browsers) */
-.chat-messages::-webkit-scrollbar {
+/* For all scrollable elements in WebKit browsers */
+*::-webkit-scrollbar {
     width: 8px; /* scrollbar width */
 }
 
-.chat-messages::-webkit-scrollbar-track {
+*::-webkit-scrollbar-track {
     background: transparent; /* or a color, if you want a visible track */
     margin: 0.5rem; /* optional to space it away from edges */
 }
 
-.chat-messages::-webkit-scrollbar-thumb {
+*::-webkit-scrollbar-thumb {
     background-color: #999; /* color of the scrollbar thumb */
     border-radius: 4px; /* roundness of the thumb */
 }
 
-.chat-messages::-webkit-scrollbar-thumb:hover {
-    background-color: #424242; /* color of the scrollbar thumb */
+*::-webkit-scrollbar-thumb:hover {
+    background-color: #424242;
 }
 
-/* (Optional) For dark mode, override the scrollbar thumb color or track color */
-body.dark-mode .chat-messages::-webkit-scrollbar-thumb {
+/* Dark mode overrides (optional) */
+body.dark-mode *::-webkit-scrollbar-thumb {
     background-color: #666;
     border-color: #2b2b2b;
 }
-
-/* (Optional) For dark mode, override the scrollbar thumb color or track color */
-body.dark-mode .chat-messages::-webkit-scrollbar-thumb:hover {
+body.dark-mode *::-webkit-scrollbar-thumb:hover {
     background-color: #999;
 }
 
-/* For Firefox, you can partially style scrollbars with scrollbar-width & scrollbar-color */
+/* For Firefox (partial styling) */
 @supports (scrollbar-width: thin) {
-    .chat-messages {
+    * {
         scrollbar-width: thin; /* "auto" or "thin" */
         scrollbar-color: #999 transparent; /* thumb color, track color */
+    }
+    body.dark-mode * {
+        scrollbar-color: #666 transparent;
     }
 }
