@@ -36,9 +36,11 @@ exports.createCheckoutSession = functions.https.onRequest(
         // Create a new checkout session with Stripe
         const session = await stripe.checkout.sessions.create({
           payment_method_types: ["card"],
-          mode: "subscription", // Set the mode to subscription for recurring payments.
+          mode: "subscription", 
+          // Set the mode to subscription for recurring payments.
           line_items: [{
-            price: "price_1Qy1kzGsigejaHFWZKqC600v", // Replace with your actual Price ID from Stripe.
+            price: "price_1Qy1kzGsigejaHFWZKqC600v", 
+            // Replace with your actual Price ID from Stripe.
             quantity: 1,
           }],
           // Replace these URLs with your actual success and cancel pages.
