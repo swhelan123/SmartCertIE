@@ -1,16 +1,13 @@
 document.addEventListener("DOMContentLoaded", () => {
-    const explodeButton = document.getElementById("explodeButton");
+    const confettiButton = document.getElementById("confettiButton");
   
-    explodeButton.addEventListener("click", () => {
+    confettiButton.addEventListener("click", () => {
       // 1) Confetti
       confetti({
-        particleCount: 100,
-        spread: 70,
-        origin: { y: 0.6 },
+        particleCount: 1000,
+        spread: 360,
+        origin: { y: 0.5 },
       });
-  
-      // 2) Trigger shard animation by adding the 'exploded' class
-      explodeButton.classList.add("exploded");
   
       // 3) Redirect after 1.5 seconds
       setTimeout(() => {
