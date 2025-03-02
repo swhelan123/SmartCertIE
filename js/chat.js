@@ -156,4 +156,31 @@ if (sendBtn && chatInput && chatMessages) {
     const saveBtn = document.createElement("button");
     saveBtn.textContent = "Save to Notebook";
     saveBtn.style.marginLeft = "10px";
-    saveBtn.style.paddin
+    saveBtn.style.padding = "2px 6px";
+    saveBtn.style.fontSize = "0.8rem";
+    saveBtn.style.cursor = "pointer";
+    saveBtn.style.borderRadius = "6px";
+    saveBtn.style.border = "none";
+    saveBtn.style.backgroundColor = "var(--primary-color)";
+    saveBtn.style.color = "#fff";
+
+    saveBtn.addEventListener("click", () => {
+      const li = document.createElement("li");
+      li.textContent = answer; // store the final text
+      savedResponses.appendChild(li);
+      alert("Response saved to notebook!");
+    });
+    botBubble.appendChild(saveBtn);
+
+    // Ensure the chat stays scrolled to bottom
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+  });
+
+  // Press Enter to send
+  chatInput.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      sendBtn.click();
+    }
+  });
+}
