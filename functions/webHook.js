@@ -1,7 +1,8 @@
 // Import necessary modules
-const { onRequest } = require("firebase-functions/v2/https");
+const {onRequest} = require("firebase-functions/v2/https");
 const admin = require("firebase-admin");
-const express = require("express"); // Make sure express is installed (npm install express)
+const express = require("express");
+// Make sure express is installed (npm install express)
 
 admin.initializeApp();
 
@@ -9,8 +10,8 @@ admin.initializeApp();
 const app = express();
 
 // Use the express.raw() middleware to capture the raw request body
-// This tells Express not to parse the body, so we can verify Stripe's signature.
-app.use(express.raw({ type: "*/*" }));
+// Express dont parse the body -> we can verify Stripe's signature.
+app.use(express.raw({type: "*/*"}));
 
 // Define a POST route at the root path, where the webhook events will be sent.
 app.post("/", async (req, res) => {
@@ -18,14 +19,14 @@ app.post("/", async (req, res) => {
   // This key is provided via Firebase Secrets.
   const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
-  
-  // Retrieve the 'stripe-signature' header which Stripe uses to sign the request.
+
+  // Retrieve the 'stripe-signature' header which Stripe uses to sign the reque
   const sig = req.headers["stripe-signature"];
   let event;
 
   // Construct the event using Stripe's webhook utility.
   try {
-    // req.body here is a Buffer containing the raw request body, which is required for verification.
+    // req.body =Buffer containing the raw request bodyrequired for verificatio
     event = stripe.webhooks.constructEvent(req.body, sig, webhookSecret);
   } catch (err) {
     console.error("Webhook signature verification failed:", err.message);
@@ -64,7 +65,7 @@ app.post("/", async (req, res) => {
   }
 
   // Send a JSON response to acknowledge receipt of the event.
-  res.json({ received: true });
+  res.json({received: true});
 });
 
 // Export the Express app as a Cloud Function using onRequest.
