@@ -2,13 +2,15 @@ const {onRequest} = require("firebase-functions/v2/https");
 const admin = require("firebase-admin");
 admin.initializeApp();
 
-const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
+const stripeLib = require("stripe");
+
 // Ensure STRIPE_WEBHOOK_SECRET is set in your Firebase environment
 
 exports.stripeWebhook = onRequest(
     {secrets: ["STRIPE_SECRET_KEY", "STRIPE_WEBHOOK_SECRET"],
       runtimeOptions: {memory: "256MB", timeoutSeconds: 60}},
     async (req, res) => {
+        const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
     // IMPORTANT: Ensure you have access to the raw body
     // If using Firebase Functions v2 with express,
     // you might need to disable body parsing.
