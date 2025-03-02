@@ -12,10 +12,6 @@ const {onRequest} = require("firebase-functions/v2/https");
 //const logger = require("firebase-functions/logger");
 
 //added this instead and checking if it works
-exports.myFunction = functions.https.onRequest((req, res) => {
-    // your code here
-  });
-  
 
 // Create and deploy your first functions
 // https://firebase.google.com/docs/functions/get-started
