@@ -83,7 +83,7 @@ async function queryAimlApi(question) {
     }
   } catch (error) {
     console.error("aimlapi error:", error);
-    return "Error connecting to AIMLAPI.";
+    return "Daily credits are all gone!";
   }
 }
 
