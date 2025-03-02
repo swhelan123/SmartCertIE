@@ -7,7 +7,7 @@
  * See a full list of supported triggers at https://firebase.google.com/docs/functions
  */
 const functions = require("firebase-functions");
-const stripe = require("stripe")(functions.config().stripe.secret_key);
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
 
 // const {onRequest} =
