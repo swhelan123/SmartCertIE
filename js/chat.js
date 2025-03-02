@@ -22,8 +22,7 @@ const topicData = {
   "Reproduction and Growth": "Context: Discuss sexual and asexual reproduction, developmental biology, and growth processes.",
 };
 
-// --- NEW: Global variable to keep track of the selected topic ---
-let selectedTopic = "";
+
 
 // 1) The function to query the AIML API with OpenAI-compatible parameters
 async function queryAimlApi(question) {
@@ -37,8 +36,8 @@ async function queryAimlApi(question) {
   let systemPrompt = "You are an expert Biology tutor for 18-19 year old 5th and 6th year Leaving Cert students";
 
   // --- NEW: Append topic context if a topic is selected ---
-  if (selectedTopic && topicData[selectedTopic]) {
-    systemPrompt += "\n\n" + topicData[selectedTopic];
+  if (window.selectedTopic && topicData[window.selectedTopic]) {
+    systemPrompt += "\n\n" + topicData[window.selectedTopic];
   }
 
   // Construct the chat history with system & user messages

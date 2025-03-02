@@ -207,6 +207,7 @@ unitButtons.forEach((button) => {
           selectedTopicLabel.textContent = chapter;
           //New - set global selected topicd variable
           selectedTopic = chapter;
+          window.selectedTopic = chapter;
           // Show the container that holds the "Change Topic" button
           selectedTopicContainer.classList.remove("hidden");
         });
