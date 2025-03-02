@@ -27,7 +27,7 @@ exports.stripeWebhook = onRequest(
 
       // Handle the event
       switch (event.type) {
-        case "checkout.session.completed":
+        case "checkout.session.completed": {
           const session = event.data.object;
           // Extract metadata (Firebase user ID)
           const firebaseUserId = session.metadata.firebaseUserId;
@@ -54,7 +54,7 @@ exports.stripeWebhook = onRequest(
           //   // Update Firestore accordingly,
           // for example, set subscriptionStatus to "canceled"
           //   break;
-
+        }
         default:
           console.log(`Unhandled event type: ${event.type}`);
       }
