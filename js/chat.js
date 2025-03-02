@@ -24,38 +24,23 @@ const topicData = {
 
 // 1) The function to query the AIML API with OpenAI-compatible parameters
 async function queryAimlApi(question) {
-  // Endpoint for AIMLAPI's chat completions (check docs if different)
   const apiUrl = "https://api.aimlapi.com/v1/chat/completions";
+  const apiKey = "6f38c7556ee5413694304b0be2c3fa33";
 
-  // Insert your AIMLAPI key here
-  const apiKey = "ec80265da47e451d9bcf1e90653853a4";
-
-  // Base system prompt
   let systemPrompt = "You are a fun and bubbly leaving certificate biology tutor named Certi";
 
-  // --- NEW: Append topic context if a topic is selected ---
+  // If a topic is selected, append that context
   if (window.selectedTopic && topicData[window.selectedTopic]) {
     systemPrompt += "\n\n" + topicData[window.selectedTopic];
   }
 
-  // Construct the chat history with system & user messages
   const messages = [
-    {
-      role: "system",
-      content: systemPrompt,
-    },
-    {
-      role: "user",
-      content: question,
-    },
+    { role: "system", content: systemPrompt },
+    { role: "user", content: question },
   ];
 
-  console.log("Full prompt being sent to AIML API:", systemPrompt);
-  console.log("Full messages payload:", messages);
-
-  // The body for the POST request
   const payload = {
-    model: "mistralai/Mistral-7B-Instruct-v0.2", // Example model from aimlapi
+    model: "mistralai/Mistral-7B-Instruct-v0.2",
     messages: messages,
     temperature: 0.7,
     max_tokens: 256,
@@ -88,6 +73,21 @@ async function queryAimlApi(question) {
   }
 }
 
+// --- Typed text helper function ---
+function typeText(element, text, speed = 30) {
+  let index = 0;
+  return new Promise((resolve) => {
+    const timer = setInterval(() => {
+      element.textContent += text.charAt(index);
+      index++;
+      if (index >= text.length) {
+        clearInterval(timer);
+        resolve();
+      }
+    }, speed);
+  });
+}
+
 // 2) Grab DOM elements from your chat interface
 const sendBtn = document.getElementById("sendBtn");
 const chatInput = document.getElementById("chatInput");
@@ -100,28 +100,59 @@ if (sendBtn && chatInput && chatMessages) {
     const question = chatInput.value.trim();
     if (!question) return;
 
-    // Display the user's message
-    const userMsg = document.createElement("div");
-    userMsg.className = "chat-message message-user";
-    userMsg.textContent = question;
-    chatMessages.appendChild(userMsg);
+    // === CREATE USER MESSAGE ROW ===
+    const userRow = document.createElement("div");
+    userRow.classList.add("chat-message", "message-user", "chat-row");
 
-    // Clear the input and scroll to bottom
+    // user avatar
+    const userAvatar = document.createElement("img");
+    userAvatar.classList.add("chat-avatar");
+    userAvatar.src = "assets/img/pfp.avif"; // user avatar
+    userAvatar.alt = "User Avatar";
+
+    // user bubble
+    const userBubble = document.createElement("div");
+    userBubble.classList.add("chat-bubble");
+    userBubble.textContent = question;
+
+    // place them in row (remember row-reverse for user in CSS)
+    userRow.appendChild(userBubble);
+    userRow.appendChild(userAvatar);
+
+    chatMessages.appendChild(userRow);
+
+    // Clear input
     chatInput.value = "";
     chatMessages.scrollTop = chatMessages.scrollHeight;
 
-    // Insert a temporary bot message
-    const botMsg = document.createElement("div");
-    botMsg.className = "chat-message message-bot";
-    botMsg.textContent = "Thinking...";
-    chatMessages.appendChild(botMsg);
+    // === CREATE BOT MESSAGE ROW ===
+    const botRow = document.createElement("div");
+    botRow.classList.add("chat-message", "message-bot", "chat-row");
+
+    // bot avatar
+    const botAvatar = document.createElement("img");
+    botAvatar.classList.add("chat-avatar");
+    botAvatar.src = "assets/img/certi.png"; // bot avatar
+    botAvatar.alt = "Bot Avatar";
+
+    // bubble for typed text
+    const botBubble = document.createElement("div");
+    botBubble.classList.add("chat-bubble");
+    botBubble.textContent = ""; // we’ll fill this with typed text
+
+    botRow.appendChild(botAvatar);
+    botRow.appendChild(botBubble);
+    chatMessages.appendChild(botRow);
+
     chatMessages.scrollTop = chatMessages.scrollHeight;
 
-    // Call AIMLAPI with the user’s question. The system prompt now includes topic context if available.
+    // === Query the AIML API ===
     const answer = await queryAimlApi(question);
-    botMsg.textContent = answer;
 
-    // Add a "Save to Notebook" button to the bot message
+    // === Use typed effect for the bot's reply ===
+    await typeText(botBubble, answer, 2);
+
+    // === Add the "Save to Notebook" button after typed text finishes ===
     const saveBtn = document.createElement("button");
     saveBtn.textContent = "Save to Notebook";
     saveBtn.style.marginLeft = "10px";
@@ -135,23 +166,21 @@ if (sendBtn && chatInput && chatMessages) {
 
     saveBtn.addEventListener("click", () => {
       const li = document.createElement("li");
-      li.textContent = botMsg.textContent;
+      li.textContent = answer; // store the final text
       savedResponses.appendChild(li);
       alert("Response saved to notebook!");
     });
-    botMsg.appendChild(saveBtn);
+    botBubble.appendChild(saveBtn);
 
     // Ensure the chat stays scrolled to bottom
     chatMessages.scrollTop = chatMessages.scrollHeight;
   });
 
-  // Allow pressing Enter to send the message
-  if (chatInput) {
-    chatInput.addEventListener("keydown", (event) => {
-      if (event.key === "Enter") {
-        event.preventDefault();
-        sendBtn.click();
-      }
-    });
-  }
+  // Press Enter to send
+  chatInput.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      sendBtn.click();
+    }
+  });
 }
