@@ -33,9 +33,6 @@ exports.helloWorld = functions.https.onRequest((req, res) => {
   res.send("Hello, world!");
 });
 
-const functions = require('firebase-functions');
-const stripe = require('stripe')(functions.config().stripe.secret_key);
-
 // Checkout Session Creator Function
 exports.createCheckoutSession = functions.https.onRequest(async (req, res) => {
   // (Optional) You can enforce that only POST requests are accepted:
