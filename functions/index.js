@@ -7,7 +7,6 @@
  * See a full list of supported triggers at https://firebase.google.com/docs/functions
  */
 const functions = require("firebase-functions");
-const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 
 
 // const {onRequest} =
@@ -34,30 +33,30 @@ exports.helloWorld = functions.https.onRequest((req, res) => {
 });
 
 exports.createCheckoutSession = functions
-  .runWith({ secrets: ['STRIPE_SECRET_KEY'] })
-  .https.onRequest(async (req, res) => {
-    if (req.method !== 'POST') {
-      return res.status(405).send('Method Not Allowed');
-    }
-    try {
-      const session = await stripe.checkout.sessions.create({
-        payment_method_types: ['card'],
-        mode: 'subscription',
-        line_items: [{
-          price: 'price_1Qy1kzGsigejaHFWZKqC600v',
-          // Replace with your actual Price ID from Stripe
-          quantity: 1,
-        }],
-        success_url: "https://smartcert.ie",
-        cancel_url: "https://smartcert.ie",
-      });
-      res.status(200).json({ sessionId: session.id, url: session.url });
-    } catch (error) {
-      console.error('Error creating checkout session:', error);
-      res.status(500).json({ error: error.message });
-    }
-  });
-
+    .runWith({secrets: ["STRIPE_SECRET_KEY"]})
+    .https.onRequest(async (req, res) => {
+        const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
+      if (req.method !== "POST") {
+        return res.status(405).send("Method Not Allowed");
+      }
+      try {
+        const session = await stripe.checkout.sessions.create({
+          payment_method_types: ["card"],
+          mode: "subscription",
+          line_items: [{
+            price: "price_1Qy1kzGsigejaHFWZKqC600v",
+            // Replace with your actual Price ID from Stripe
+            quantity: 1,
+          }],
+          success_url: "https://smartcert.ie",
+          cancel_url: "https://smartcert.ie",
+        });
+        res.status(200).json({sessionId: session.id, url: session.url});
+      } catch (error) {
+        console.error("Error creating checkout session:", error);
+        res.status(500).json({error: error.message});
+      }
+    });
 
 
 /*
