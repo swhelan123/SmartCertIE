@@ -19,17 +19,23 @@ exports.createCheckoutSession = onRequest(
         return res.status(405).send("Method Not Allowed");
       }
 
+      //Parse firebase userID from request body
+      const { firebaseUserId } = req.body;
+      if (!firebaseUserId) {
+        return res.status(400).json({ error: "Missing firebaseUserId" });
+      }
+
       try {
         const session = await stripe.checkout.sessions.create({
           payment_method_types: ["card"],
           mode: "subscription", // Recurring payment mode.
           line_items: [{
             price: "price_1Qy1kzGsigejaHFWZKqC600v",
-            // Replace with your actual Price ID.
             quantity: 1,
           }],
           success_url: "https://smartcert.ie",
           cancel_url: "https://smartcert.ie",
+          metadata: { firebaseUserId: firebaseUserId },
         });
         res.status(200).json({sessionId: session.id, url: session.url});
       } catch (error) {
