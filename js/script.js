@@ -697,41 +697,52 @@ if (newPassForm) {
  *******************************************************/
 
 // Subscribe button click event handler
+// Create or show the subscribe button in the top-right container
 let subscribeBtn = document.getElementById("subscribeBtn");
-if (subscribeBtn) {
-  subscribeBtn.addEventListener("click", async () => {
-    // Ensure the user is logged in
-    const user = auth.currentUser;
-    if (!user) {
-      alert("You must be logged in to subscribe.");
-      return;
-    }
-    
-    try {
-      // Replace the URL below with your actual Cloud Function endpoint for creating checkout sessions.
-      const endpointURL = "https://createcheckoutsession-63mubklboq-uc.a.run.app";
-      
-      const response = await fetch(endpointURL, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        // Send the Firebase user ID so that it can be added to metadata
-        body: JSON.stringify({ firebaseUserId: user.uid })
-      });
-      
-      const data = await response.json();
-      
-      if (data.url) {
-        // Redirect the user to Stripe's checkout page
-        window.location.href = data.url;
-      } else {
-        console.error("No checkout URL returned:", data);
-        alert("An error occurred while creating the checkout session.");
-      }
-    } catch (err) {
-      console.error("Error creating checkout session:", err);
-      alert("An error occurred while processing your subscription.");
-    }
-  });
+if (!subscribeBtn) {
+  subscribeBtn = document.createElement("button");
+  subscribeBtn.id = "subscribeBtn";
+  subscribeBtn.className = "login-button"; // Use your desired styling class
+  subscribeBtn.textContent = "Subscribe";
+  document.getElementById("topRightContainer").appendChild(subscribeBtn);
+} else {
+  subscribeBtn.classList.remove("hidden");
 }
+
+// Attach the proper event listener to the subscribe button
+subscribeBtn.addEventListener("click", async () => {
+  // Ensure the user is logged in
+  const user = auth.currentUser;
+  if (!user) {
+    alert("You must be logged in to subscribe.");
+    return;
+  }
+  
+  try {
+    // Replace with your actual Cloud Function endpoint URL for creating checkout sessions:
+    const endpointURL = "https://createcheckoutsession-63mubklboq-uc.a.run.app";
+    
+    const response = await fetch(endpointURL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      // Send the Firebase user ID in the request body
+      body: JSON.stringify({ firebaseUserId: user.uid })
+    });
+    
+    const data = await response.json();
+    
+    if (data.url) {
+      // Redirect to Stripe's checkout page
+      window.location.href = data.url;
+    } else {
+      console.error("No checkout URL returned:", data);
+      alert("An error occurred while creating the checkout session.");
+    }
+  } catch (err) {
+    console.error("Error creating checkout session:", err);
+    alert("An error occurred while processing your subscription.");
+  }
+});
+
