@@ -121,10 +121,7 @@ onAuthStateChanged(auth, async (user) => {
           subscribeBtn.textContent = "Subscribe";
           document.getElementById("topRightContainer").appendChild(subscribeBtn);
           
-          subscribeBtn.addEventListener("click", () => {
-            // Redirect to your Stripe checkout page (placeholder for now)
-            window.location.href = "https://createcheckoutsession-63mubklboq-uc.a.run.app";
-          });
+
         } else {
           subscribeBtn.classList.remove("hidden");
         }
