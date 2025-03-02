@@ -8,12 +8,12 @@
  */
 
 // const {onRequest} = require("firebase-functions/v2/https");
-// commented the below line out for the moment as it was causing 
+// commented the below line out for the moment as it was causing
 // issues because it wasnt being used
-/* const logger = 
+/* const logger =
 require("firebase-functions/logger");*/
 
-// added this instead and 
+// added this instead and
 // checking if it works
 
 // Create and deploy your first functions
