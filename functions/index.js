@@ -7,6 +7,10 @@
  * See a full list of supported triggers at https://firebase.google.com/docs/functions
  */
 
+const functions = require('firebase-functions');
+const stripe = require('stripe')(functions.config().stripe.secret_key);
+
+
 // const {onRequest} =
 // require("firebase-functions/v2/https");
 // commented the below line out for the moment as it was causing
@@ -25,7 +29,8 @@
 //   response.send("Hello from Firebase!");
 // });
 
-exports.createCheckoutSession = functions.https.onRequest(async (req, res) => {
+exports.createCheckoutSession = functions.https.onRequest(
+    async (req, res) => {
   // Optionally, you can add a check for the HTTP method here.
   try {
     // Create a new checkout session with Stripe
