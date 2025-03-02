@@ -690,3 +690,48 @@ if (newPassForm) {
     });
   });
 }
+
+
+/*******************************************************
+ * Subscribe button
+ *******************************************************/
+
+// Subscribe button click event handler
+let subscribeBtn = document.getElementById("subscribeBtn");
+if (subscribeBtn) {
+  subscribeBtn.addEventListener("click", async () => {
+    // Ensure the user is logged in
+    const user = auth.currentUser;
+    if (!user) {
+      alert("You must be logged in to subscribe.");
+      return;
+    }
+    
+    try {
+      // Replace the URL below with your actual Cloud Function endpoint for creating checkout sessions.
+      const endpointURL = "https://createcheckoutsession-63mubklboq-uc.a.run.app";
+      
+      const response = await fetch(endpointURL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        // Send the Firebase user ID so that it can be added to metadata
+        body: JSON.stringify({ firebaseUserId: user.uid })
+      });
+      
+      const data = await response.json();
+      
+      if (data.url) {
+        // Redirect the user to Stripe's checkout page
+        window.location.href = data.url;
+      } else {
+        console.error("No checkout URL returned:", data);
+        alert("An error occurred while creating the checkout session.");
+      }
+    } catch (err) {
+      console.error("Error creating checkout session:", err);
+      alert("An error occurred while processing your subscription.");
+    }
+  });
+}
