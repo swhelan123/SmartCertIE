@@ -1,4 +1,4 @@
-const { onRequest } = require("firebase-functions/v2/https");
+const {onRequest} = require("firebase-functions/v2/https");
 const admin = require("firebase-admin");
 admin.initializeApp();
 
@@ -48,5 +48,5 @@ exports.stripeWebhook = onRequest({
       console.log(`Unhandled event type: ${event.type}`);
   }
 
-  res.json({ received: true });
+  res.json({received: true});
 });
