@@ -22,8 +22,6 @@ const topicData = {
   "Reproduction and Growth": "Context: Discuss sexual and asexual reproduction, developmental biology, and growth processes.",
 };
 
-
-
 // 1) The function to query the AIML API with OpenAI-compatible parameters
 async function queryAimlApi(question) {
   // Endpoint for AIMLAPI's chat completions (check docs if different)
