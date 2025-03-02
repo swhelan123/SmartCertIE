@@ -33,7 +33,7 @@ async function queryAimlApi(question) {
   const apiKey = "ec80265da47e451d9bcf1e90653853a4";
 
   // Base system prompt
-  let systemPrompt = "You are an expert Biology tutor for 18-19 year old 5th and 6th year Leaving Cert students";
+  let systemPrompt = "";
 
   // --- NEW: Append topic context if a topic is selected ---
   if (window.selectedTopic && topicData[window.selectedTopic]) {
