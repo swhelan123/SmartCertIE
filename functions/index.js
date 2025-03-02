@@ -36,17 +36,17 @@ exports.helloWorld = functions.https.onRequest((req, res) => {
 // Checkout Session Creator Function
 exports.createCheckoutSession = functions.https.onRequest(async (req, res) => {
   // (Optional) You can enforce that only POST requests are accepted:
-  if (req.method !== 'POST') {
-    return res.status(405).send('Method Not Allowed');
+  if (req.method !== "POST") {
+    return res.status(405).send("Method Not Allowed");
   }
 
   try {
     // Create a new checkout session with Stripe
     const session = await stripe.checkout.sessions.create({
-      payment_method_types: ['card'],
-      mode: 'subscription', // Use subscription mode for recurring payments.
+      payment_method_types: ["card"],
+      mode: "subscription", // Use subscription mode for recurring payments.
       line_items: [{
-        price: 'price_1Qy1kzGsigejaHFWZKqC600v',
+        price: "price_1Qy1kzGsigejaHFWZKqC600v",
         // Replace with your actual Price ID from Stripe.
         quantity: 1,
       }],
@@ -56,10 +56,10 @@ exports.createCheckoutSession = functions.https.onRequest(async (req, res) => {
     });
 
     // Return the session details as JSON
-    res.status(200).json({ sessionId: session.id, url: session.url });
+    res.status(200).json({sessionId: session.id, url: session.url});
   } catch (error) {
-    console.error('Error creating checkout session:', error);
-    res.status(500).json({ error: error.message });
+    console.error("Error creating checkout session:", error);
+    res.status(500).json({error: error.message});
   }
 });
 
