@@ -4,14 +4,14 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>SmartCert - Subscription Success</title>
-    <!-- Link to your existing CSS -->
+    <!-- Link to your existing styles -->
     <link rel="stylesheet" href="styles.css" />
     <!-- Tab Icon -->
     <link rel="icon" type="image/png" href="assets/img/tab_icon.png" />
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
 
-    <!-- Optional inline style for the dust animation -->
     <style>
-      /* Center the main container */
+      /* Center container */
       .success-container {
         display: flex;
         flex-direction: column;
@@ -19,11 +19,10 @@
         justify-content: center;
         min-height: 100vh;
         text-align: center;
-        background-color: #ffffff; /* Light mode background */
+        background-color: #ffffff;
         padding: 2rem;
       }
 
-      /* Header text (mimicking index.html style) */
       .success-title {
         font-size: 2rem;
         color: var(--primary-color);
@@ -34,23 +33,23 @@
         color: #666;
         margin-bottom: 2rem;
       }
-
-      /* Congratulatory message */
       .congrats-message {
         font-size: 1.3rem;
         color: #333;
         margin-bottom: 2rem;
       }
 
-      /* Placeholder image styling (adjust as needed) */
+      /* Example success image (optional) */
       .success-image {
-        width: 200px; /* Adjust size as desired */
+        width: 200px;
         height: auto;
         margin-bottom: 2rem;
       }
 
-      /* "Biology Time!" button */
-      .dust-button {
+      /* Button container */
+      .explode-button {
+        position: relative;  /* needed for shards */
+        display: inline-block;
         background-color: var(--primary-color);
         color: #fff;
         border: none;
@@ -59,30 +58,89 @@
         font-size: 1rem;
         cursor: pointer;
         box-shadow: var(--shadow-blue);
-        transition: background-color 0.2s;
+        overflow: hidden; /* so shards can appear within or fly out */
       }
-      .dust-button:hover {
+      .explode-button:hover {
         background-color: #2563eb;
       }
 
-      /* Keyframes for dust animation */
-      @keyframes dust {
+      /* Text on the button */
+      .button-text {
+        position: relative;
+        z-index: 2; /* on top of shards */
+      }
+
+      /* Shards (all absolutely positioned on top of the button) */
+      .shard {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: inherit; /* same color as the button */
+        border-radius: var(--border-radius);
+        z-index: 1; /* behind the text */
+        opacity: 0; /* invisible until animation starts */
+      }
+
+      /* We'll define 4 shards with different animations */
+      .explode-button.exploded .shard1 {
+        animation: shard1Anim 0.8s forwards;
+      }
+      .explode-button.exploded .shard2 {
+        animation: shard2Anim 0.8s forwards;
+      }
+      .explode-button.exploded .shard3 {
+        animation: shard3Anim 0.8s forwards;
+      }
+      .explode-button.exploded .shard4 {
+        animation: shard4Anim 0.8s forwards;
+      }
+      /* Also hide the main text once it "explodes" */
+      .explode-button.exploded .button-text {
+        visibility: hidden;
+      }
+
+      /* Keyframes: each shard flies off in a different direction */
+      @keyframes shard1Anim {
         0% {
+          transform: translate(0, 0) rotate(0deg);
           opacity: 1;
-          transform: scale(1);
-        }
-        60% {
-          opacity: 0.3;
-          transform: scale(1.3) rotate(10deg);
         }
         100% {
+          transform: translate(-60px, -80px) rotate(-45deg) scale(0.8);
           opacity: 0;
-          transform: scale(1.6) rotate(30deg);
         }
       }
-      /* Applying the dust animation */
-      .dust {
-        animation: dust 1s forwards; /* 1s duration, forwards to keep final state */
+      @keyframes shard2Anim {
+        0% {
+          transform: translate(0, 0) rotate(0deg);
+          opacity: 1;
+        }
+        100% {
+          transform: translate(60px, -80px) rotate(30deg) scale(0.8);
+          opacity: 0;
+        }
+      }
+      @keyframes shard3Anim {
+        0% {
+          transform: translate(0, 0) rotate(0deg);
+          opacity: 1;
+        }
+        100% {
+          transform: translate(-70px, 60px) rotate(-30deg) scale(0.8);
+          opacity: 0;
+        }
+      }
+      @keyframes shard4Anim {
+        0% {
+          transform: translate(0, 0) rotate(0deg);
+          opacity: 1;
+        }
+        100% {
+          transform: translate(80px, 80px) rotate(45deg) scale(0.8);
+          opacity: 0;
+        }
       }
 
       /* Footer (optional) */
@@ -95,32 +153,33 @@
   </head>
   <body class="standalone-mode">
     <div class="success-container">
-      <!-- Top header (logo text) -->
       <h1 class="success-title">SmartCert</h1>
       <p class="success-subtitle">Leaving Cert Biology</p>
-
-      <!-- Congratulatory message -->
       <p class="congrats-message">
         Thank you for subscribing! Your access to premium features is now active.
       </p>
-
-      <!-- Example success image (replace src as needed) -->
       <img
         src="assets/img/certi.png"
         alt="Success Graphic"
         class="success-image"
       />
 
-      <!-- Button that disappears in a dust animation -->
-      <button id="dustButton" class="dust-button">Biology Time!</button>
+      <!-- Exploding button -->
+      <button id="explodeButton" class="explode-button">
+        <span class="button-text">Biology Time!</span>
+        <!-- 4 shards -->
+        <span class="shard shard1"></span>
+        <span class="shard shard2"></span>
+        <span class="shard shard3"></span>
+        <span class="shard shard4"></span>
+      </button>
 
-      <!-- Optional Footer -->
       <div class="success-footer">
         © 2025 SmartCert. All rights reserved.
       </div>
     </div>
 
-    <!-- Link to your separate JS for the dust animation & redirect -->
-    <script src="success.js"></script>
+    <!-- Your custom JS for explosion + redirect -->
+    <script src="js/success.js"></script>
   </body>
 </html>
