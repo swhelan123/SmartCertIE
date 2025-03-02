@@ -91,8 +91,10 @@ onAuthStateChanged(auth, async (user) => {
     
     if (userSnap.exists()) {
       const userData = userSnap.data();
+      // Default to "not-subscribed" if subscriptionStatus is missing
+      const subscriptionStatus = userData.subscriptionStatus || "not-subscribed";
       
-      if (userData.subscriptionStatus === "active") {
+      if (subscriptionStatus === "active") {
         // User is subscribed: enable chat
         chatInput.disabled = false;
         sendBtn.disabled = false;
@@ -115,7 +117,7 @@ onAuthStateChanged(auth, async (user) => {
         if (!subscribeBtn) {
           subscribeBtn = document.createElement("button");
           subscribeBtn.id = "subscribeBtn";
-          subscribeBtn.className = "login-button"; // Or another class for subscribe styling
+          subscribeBtn.className = "login-button"; // Reuse existing styling or change as needed
           subscribeBtn.textContent = "Subscribe";
           document.getElementById("topRightContainer").appendChild(subscribeBtn);
           
@@ -148,6 +150,7 @@ onAuthStateChanged(auth, async (user) => {
     if (subscribeBtn) subscribeBtn.classList.add("hidden");
   }
 });
+
 
 
 
