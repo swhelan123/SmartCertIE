@@ -40,7 +40,7 @@ exports.createCheckoutSession = onRequest(
     {secrets: ["STRIPE_SECRET_KEY"]},
     async (req, res) => {
       // Initialize Stripe inside the function so that the secret is available.
-      const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
+      const stripe = require("stripe")(process.env.sk_test_51OcmVgGsigejaHFWSHlGAsnqILBQ3Pj5VBBtXaIThuQMQPL4OB5LIZY4K7G9KzSo4sfQZjbPGlkxcgzxJur4fccx00xXHWJEXq);
 
       if (req.method !== "POST") {
         return res.status(405).send("Method Not Allowed");
