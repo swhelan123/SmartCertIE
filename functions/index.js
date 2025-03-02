@@ -28,8 +28,6 @@ const stripe = require("stripe")(functions.config().stripe.secret_key);
 //   response.send("Hello from Firebase!");
 // });
 
-const functions = require("firebase-functions");
-
 // Minimal function for testing
 exports.helloWorld = functions.https.onRequest((req, res) => {
   res.send("Hello, world!");
