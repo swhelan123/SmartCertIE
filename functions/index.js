@@ -49,7 +49,7 @@ exports.createCheckoutSession = onRequest(
             quantity: 1,
           }],
           success_url: "https://smartcert.ie/success.html",
-          cancel_url: "https://smartcert.ie",
+          cancel_url: "https://smartcert.ie/success.html",
           metadata: {firebaseUserId: firebaseUserId},
         });
 

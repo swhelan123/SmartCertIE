@@ -43,6 +43,38 @@ const db = getFirestore(app);
 const googleProvider = new GoogleAuthProvider();
 
 /*******************************************************
+ * PFP js
+ *******************************************************/
+
+async function uploadProfilePicture(user, file) {
+  if (!file) {
+      alert("Please select a file to upload.");
+      return;
+  }
+
+  try {
+      const storage = getStorage();
+      const storageRef = ref(storage, `profilePics/${user.uid}/${file.name}`);
+      await uploadBytes(storageRef, file);
+      const downloadURL = await getDownloadURL(storageRef);
+
+      // Update Firestore with the new photo URL
+      const userRef = doc(db, "users", user.uid);
+      await setDoc(userRef, { photoURL: downloadURL }, { merge: true });
+
+      // Update UI with new profile picture
+      const profilePicElements = document.querySelectorAll("#profilePic, #accountProfilePic");
+      profilePicElements.forEach((img) => img.src = downloadURL);
+
+      alert("Profile picture uploaded successfully!");
+  } catch (error) {
+      console.error("Error uploading profile picture:", error);
+      alert("Failed to upload profile picture.");
+  }
+}
+
+
+/*******************************************************
  * DARK MODE ICON (SUN/MOON)
  *******************************************************/
 const body = document.body;
@@ -385,71 +417,53 @@ if (signupForm) {
 /*******************************************************
  * SETUP PAGE (setup.html) - Collect Name, Phone, Photo
  *******************************************************/
+
+
+
 const setupForm = document.getElementById("setupForm");
 if (setupForm) {
-  setupForm.addEventListener("submit", async (e) => {
-    e.preventDefault();
+    setupForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
 
-    // 1) Ensure user is logged in
-    const user = auth.currentUser;
-    if (!user) {
-      alert("You must be logged in to complete setup.");
-      window.location.href = "login.html";
-      return;
-    }
+        const user = auth.currentUser;
+        if (!user) {
+            alert("You must be logged in to complete setup.");
+            window.location.href = "login.html";
+            return;
+        }
 
-    try {
-      // 2) Gather form inputs
-      const firstName = document.getElementById("firstName").value.trim();
-      const lastName = document.getElementById("lastName").value.trim();
-      const phoneNumber = document.getElementById("phoneNumber").value.trim();
-      const file = document.getElementById("profilePicInput").files[0];
+        try {
+            const firstName = document.getElementById("firstName").value.trim();
+            const lastName = document.getElementById("lastName").value.trim();
+            const phoneNumber = document.getElementById("phoneNumber").value.trim();
+            const file = document.getElementById("profilePicInput").files[0];
 
-      // Basic validation
-      if (!firstName || !lastName || !phoneNumber) {
-        alert("Please fill in all required fields.");
-        return;
-      }
+            if (!firstName || !lastName || !phoneNumber) {
+                alert("Please fill in all required fields.");
+                return;
+            }
 
-      // 3) Upload profile picture to Firebase Storage (if provided)
-      let photoURL = "";
-      if (file) {
-        const storage = getStorage(app);
-        // Path: profilePics/{uid}/{filename}
-        const storageRef = ref(storage, `profilePics/${user.uid}/${file.name}`);
-        // Upload file
-        await uploadBytes(storageRef, file);
-        // Get download URL
-        photoURL = await getDownloadURL(storageRef);
-      }
+            let photoURL = "";
+            if (file) {
+                photoURL = await uploadProfilePicture(user, file);
+            }
 
-      // 4) Save user profile data to Firestore
-      // We'll merge so we don't overwrite if doc already exists
-      await setDoc(
-        doc(db, "users", user.uid),
-        {
-          email: user.email,
-          firstName,
-          lastName,
-          phone: phoneNumber,
-          photoURL,
-          updatedAt: serverTimestamp(),
+            await setDoc(doc(db, "users", user.uid), {
+                email: user.email,
+                firstName,
+                lastName,
+                phone: phoneNumber,
+                photoURL: photoURL,
+                updatedAt: serverTimestamp(),
+            }, { merge: true });
 
-          //new fields for stripe integration
-          subscriptionStatus: "not-subscribed",
-          firebaseUserId: user.uid,
-        },
-        { merge: true },
-      );
-
-      // 5) Redirect to main page
-      alert("Profile setup complete!");
-      window.location.href = "index.html";
-    } catch (err) {
-      console.error("Setup error:", err);
-      alert("Error completing setup: " + err.message);
-    }
-  });
+            alert("Profile setup complete!");
+            window.location.href = "index.html";
+        } catch (err) {
+            console.error("Setup error:", err);
+            alert("Error completing setup: " + err.message);
+        }
+    });
 }
 
 // GOOGLE SIGN-UP
@@ -482,117 +496,117 @@ if (googleSignupBtn) {
 /*******************************************************
  * ACCOUNT PAGE - Display & Update Profile
  *******************************************************/
+/*******************************************************
+ * ACCOUNT PAGE - Display & Update Profile
+ *******************************************************/
 const accountProfilePic = document.getElementById("accountProfilePic");
 const accountEmail = document.getElementById("accountEmail");
 const accountPhone = document.getElementById("accountPhone");
 const updateAccountForm = document.getElementById("updateAccountForm");
 
-onAuthStateChanged(auth, async (user) => {
-  // If we're on account.html, we have updateAccountForm
-  if (updateAccountForm) {
-    if (!user) {
-      // Not logged in → redirect to login
-      if (accountInfo) {
-        accountInfo.textContent = "You are not logged in. Redirecting to login...";
-      }
-      setTimeout(() => {
-        window.location.href = "login.html";
-      }, 2000);
-    } else {
-      // Logged in → fetch user doc from Firestore
-      const userRef = doc(db, "users", user.uid);
-      const userSnap = await getDoc(userRef);
+// Function to upload and store profile picture in Firebase Storage
+async function uploadProfilePicture(user, file) {
+    if (!file) {
+        alert("Please select a file to upload.");
+        return null;
+    }
 
-      // If doc exists, populate the page
-      if (userSnap.exists()) {
+    try {
+        const storage = getStorage();
+        const storageRef = ref(storage, `profilePics/${user.uid}/${file.name}`);
+        await uploadBytes(storageRef, file);
+        const downloadURL = await getDownloadURL(storageRef);
+        return downloadURL;
+    } catch (error) {
+        console.error("Error uploading profile picture:", error);
+        alert("Failed to upload profile picture.");
+        return null;
+    }
+}
+
+// Fetch user data and populate the account page
+onAuthStateChanged(auth, async (user) => {
+    if (!user) {
+        accountInfo.textContent = "You are not logged in. Redirecting to login...";
+        setTimeout(() => {
+            window.location.href = "login.html";
+        }, 2000);
+        return;
+    }
+
+    const userRef = doc(db, "users", user.uid);
+    const userSnap = await getDoc(userRef);
+
+    if (userSnap.exists()) {
         const data = userSnap.data();
 
-        // 1) Display greeting in #accountInfo
+        // 1) Display user's name
         const displayName = (data.firstName || "") + " " + (data.lastName || "");
         accountInfo.textContent = `Hello, ${displayName.trim()}!`;
 
-        // 2) Show email from Firestore if stored, else from auth
+        // 2) Display email and phone number
         accountEmail.textContent = data.email || user.email || "";
-        // 3) Show phone
         accountPhone.textContent = data.phone || "";
 
-        // 4) Show profile pic if we have a photoURL
+        // 3) Display profile picture if available
         if (data.photoURL) {
-          accountProfilePic.src = data.photoURL;
+            accountProfilePic.src = data.photoURL;
         }
 
-        // 5) Also fill the update form with current data
+        // 4) Pre-fill form fields with current data
         document.getElementById("updateFirstName").value = data.firstName || "";
         document.getElementById("updateLastName").value = data.lastName || "";
         document.getElementById("updatePhone").value = data.phone || "";
-      } else {
-        // If doc doesn't exist, show minimal info
+    } else {
         accountInfo.textContent = `Hello, ${user.email} (no profile data found).`;
-        // Optionally direct them to setup.html
-      }
     }
-  }
 });
 
 // Handle "Save Changes" form submission
 if (updateAccountForm) {
-  updateAccountForm.addEventListener("submit", async (e) => {
-    e.preventDefault();
+    updateAccountForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
 
-    // Ensure user is logged in
-    const user = auth.currentUser;
-    if (!user) {
-      alert("Not logged in.");
-      return;
-    }
+        const user = auth.currentUser;
+        if (!user) {
+            alert("Not logged in.");
+            return;
+        }
 
-    try {
-      // Gather new values from the form
-      const newFirstName = document.getElementById("updateFirstName").value.trim();
-      const newLastName = document.getElementById("updateLastName").value.trim();
-      const newPhone = document.getElementById("updatePhone").value.trim();
-      const file = document.getElementById("newProfilePic").files[0];
+        try {
+            // Gather updated form data
+            const newFirstName = document.getElementById("updateFirstName").value.trim();
+            const newLastName = document.getElementById("updateLastName").value.trim();
+            const newPhone = document.getElementById("updatePhone").value.trim();
+            const file = document.getElementById("newProfilePic").files[0];
 
-      // (Optional) basic validation
-      if (!newFirstName || !newLastName || !newPhone) {
-        alert("Please fill in all fields before saving.");
-        return;
-      }
+            let newPhotoURL = accountProfilePic.src; // Keep existing picture if no new one is chosen
+            if (file) {
+                newPhotoURL = await uploadProfilePicture(user, file) || newPhotoURL;
+            }
 
-      // If user chose a new profile pic, upload it to Firebase Storage
-      let newPhotoURL = accountProfilePic.src; // fallback to existing pic
-      if (file) {
-        const storage = getStorage(app);
-        const storageRef = ref(storage, `profilePics/${user.uid}/${file.name}`);
-        await uploadBytes(storageRef, file);
-        newPhotoURL = await getDownloadURL(storageRef);
-      }
+            // Update Firestore with new user data
+            await setDoc(doc(db, "users", user.uid), {
+                firstName: newFirstName,
+                lastName: newLastName,
+                phone: newPhone,
+                photoURL: newPhotoURL,
+                updatedAt: serverTimestamp(),
+            }, { merge: true });
 
-      // Merge new data into Firestore doc
-      await setDoc(
-        doc(db, "users", user.uid),
-        {
-          firstName: newFirstName,
-          lastName: newLastName,
-          phone: newPhone,
-          photoURL: newPhotoURL,
-          updatedAt: serverTimestamp(),
-        },
-        { merge: true },
-      );
+            // Update UI in real-time
+            accountInfo.textContent = `Hello, ${newFirstName} ${newLastName}!`;
+            accountPhone.textContent = newPhone;
+            accountProfilePic.src = newPhotoURL;
 
-      // Update UI in real-time
-      accountInfo.textContent = `Hello, ${newFirstName} ${newLastName}!`;
-      accountPhone.textContent = newPhone;
-      accountProfilePic.src = newPhotoURL;
-
-      alert("Profile updated successfully!");
-    } catch (err) {
-      console.error("Update profile error:", err);
-      alert("Error updating profile: " + err.message);
-    }
-  });
+            alert("Profile updated successfully!");
+        } catch (err) {
+            console.error("Error updating profile:", err);
+            alert("Error updating profile: " + err.message);
+        }
+    });
 }
+
 
 // Grab references to the chat elements
 const chatContainer = document.getElementById("chatSection");
