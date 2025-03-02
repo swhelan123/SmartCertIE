@@ -8,6 +8,10 @@
  */
 const {onRequest} = require("firebase-functions/v2/https");
 
+const webhook = require("./webHook.js");
+exports.stripeWebhook = webhook.stripeWebhook;
+
+
 
 exports.createCheckoutSession = onRequest(
     {secrets: ["STRIPE_SECRET_KEY"]},
