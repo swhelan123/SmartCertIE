@@ -33,7 +33,7 @@ async function queryAimlApi(question) {
   const apiKey = "ec80265da47e451d9bcf1e90653853a4";
 
   // Base system prompt
-  let systemPrompt = "";
+  let systemPrompt = "You are leaving cert biology tutor";
 
   // --- NEW: Append topic context if a topic is selected ---
   if (window.selectedTopic && topicData[window.selectedTopic]) {
@@ -51,6 +51,9 @@ async function queryAimlApi(question) {
       content: question,
     },
   ];
+
+  console.log("Full prompt being sent to AIML API:", systemPrompt);
+  console.log("Full messages payload:", messages);
 
   // The body for the POST request
   const payload = {
