@@ -1,17 +1,21 @@
 document.addEventListener("DOMContentLoaded", () => {
-const dustButton = document.getElementById("dustButton");
-
-dustButton.addEventListener("click", () => {
-    // Call the confetti function
-    confetti({
-    particleCount: 100,
-    spread: 70,
-    origin: { y: 0.6 }
+    const explodeButton = document.getElementById("explodeButton");
+  
+    explodeButton.addEventListener("click", () => {
+      // 1) Confetti
+      confetti({
+        particleCount: 100,
+        spread: 70,
+        origin: { y: 0.6 },
+      });
+  
+      // 2) Trigger shard animation by adding the 'exploded' class
+      explodeButton.classList.add("exploded");
+  
+      // 3) Redirect after 1.5 seconds
+      setTimeout(() => {
+        window.location.href = "index.html";
+      }, 1500);
     });
-    
-    // ... then do other stuff, like redirect ...
-    setTimeout(() => {
-    window.location.href = "index.html";
-    }, 1500);
-});
-});
+  });
+  
