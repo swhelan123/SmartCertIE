@@ -7,7 +7,7 @@
  * See a full list of supported triggers at https://firebase.google.com/docs/functions
  */
 const functions = require("firebase-functions");
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 
 
 // const {onRequest} =
@@ -33,35 +33,31 @@ exports.helloWorld = functions.https.onRequest((req, res) => {
   res.send("Hello, world!");
 });
 
-// Checkout Session Creator Function
-exports.createCheckoutSession = functions.https.onRequest(async (req, res) => {
-  // (Optional) You can enforce that only POST requests are accepted:
-  if (req.method !== "POST") {
-    return res.status(405).send("Method Not Allowed");
-  }
+exports.createCheckoutSession = functions
+  .runWith({ secrets: ['STRIPE_SECRET_KEY'] })
+  .https.onRequest(async (req, res) => {
+    if (req.method !== 'POST') {
+      return res.status(405).send('Method Not Allowed');
+    }
+    try {
+      const session = await stripe.checkout.sessions.create({
+        payment_method_types: ['card'],
+        mode: 'subscription',
+        line_items: [{
+          price: 'price_1Qy1kzGsigejaHFWZKqC600v',
+          // Replace with your actual Price ID from Stripe
+          quantity: 1,
+        }],
+        success_url: "https://smartcert.ie",
+        cancel_url: "https://smartcert.ie",
+      });
+      res.status(200).json({ sessionId: session.id, url: session.url });
+    } catch (error) {
+      console.error('Error creating checkout session:', error);
+      res.status(500).json({ error: error.message });
+    }
+  });
 
-  try {
-    // Create a new checkout session with Stripe
-    const session = await stripe.checkout.sessions.create({
-      payment_method_types: ["card"],
-      mode: "subscription", // Use subscription mode for recurring payments.
-      line_items: [{
-        price: "price_1Qy1kzGsigejaHFWZKqC600v",
-        // Replace with your actual Price ID from Stripe.
-        quantity: 1,
-      }],
-      // These URLs should be pages on your site to handle post-checkout.
-      success_url: "https://smartcert.ie",
-      cancel_url: "https://smartcert.ie",
-    });
-
-    // Return the session details as JSON
-    res.status(200).json({sessionId: session.id, url: session.url});
-  } catch (error) {
-    console.error("Error creating checkout session:", error);
-    res.status(500).json({error: error.message});
-  }
-});
 
 
 /*
