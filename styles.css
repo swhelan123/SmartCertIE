@@ -747,3 +747,9 @@ h1 {
     line-height: 1.2;
     margin-bottom: 1rem;
 }
+
+body.standalone-mode {
+    height: auto; /* no forced 100vh */
+    overflow: auto; /* or overflow-y: auto; */
+    display: block; /* or anything that doesn't force the flex layout to fill the screen */
+}
