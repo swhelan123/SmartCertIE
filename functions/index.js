@@ -15,6 +15,13 @@ exports.stripeWebhook = webhook.stripeWebhook;
 exports.createCheckoutSession = onRequest(
     {secrets: ["STRIPE_SECRET_KEY"]},
     async (req, res) => {
+        // Handle CORS preflight request
+        if (req.method === "OPTIONS") {
+        res.set("Access-Control-Allow-Origin", "*");
+        res.set("Access-Control-Allow-Methods", "POST");
+        res.set("Access-Control-Allow-Headers", "Content-Type");
+        return res.status(204).send("");
+      }
       // Initialize Stripe inside the function so that the secret is available.
       const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 
