@@ -22,8 +22,6 @@ const topicData = {
   "Reproduction and Growth": "Context: Discuss sexual and asexual reproduction, developmental biology, and growth processes.",
 };
 
-
-
 // 1) The function to query the AIML API with OpenAI-compatible parameters
 async function queryAimlApi(question) {
   // Endpoint for AIMLAPI's chat completions (check docs if different)
@@ -102,26 +100,58 @@ if (sendBtn && chatInput && chatMessages) {
     const question = chatInput.value.trim();
     if (!question) return;
 
-    // Display the user's message
-    const userMsg = document.createElement("div");
-    userMsg.className = "chat-message message-user";
-    userMsg.textContent = question;
-    chatMessages.appendChild(userMsg);
+    // For a USER message:
+    const userMsgContainer = document.createElement("div");
+    userMsgContainer.classList.add("chat-message", "message-user");
+
+    // Create the user avatar
+    const userAvatar = document.createElement("img");
+    userAvatar.src = "assets/img/pfp.avif"; // user avatar
+    userAvatar.alt = "User Avatar";
+    userAvatar.classList.add("chat-avatar", "user-avatar");
+
+    // Create a bubble to hold the text
+    const userBubble = document.createElement("div");
+    userBubble.classList.add("chat-bubble");
+    userBubble.textContent = question;
+
+    // Put them in the container
+    userMsgContainer.appendChild(userBubble);
+    userMsgContainer.appendChild(userAvatar);
+
+    // Finally, append to chatMessages
+    chatMessages.appendChild(userMsgContainer);
 
     // Clear the input and scroll to bottom
     chatInput.value = "";
     chatMessages.scrollTop = chatMessages.scrollHeight;
 
-    // Insert a temporary bot message
-    const botMsg = document.createElement("div");
-    botMsg.className = "chat-message message-bot";
-    botMsg.textContent = "Thinking...";
-    chatMessages.appendChild(botMsg);
+    // Create a container for the bot’s message
+    const botMsgContainer = document.createElement("div");
+    botMsgContainer.classList.add("chat-message", "message-bot");
+
+    // Create the bot’s avatar
+    const botAvatar = document.createElement("img");
+    botAvatar.src = "assets/img/certi.png"; // path to your bot avatar
+    botAvatar.alt = "Bot Avatar";
+    botAvatar.classList.add("chat-avatar", "bot-avatar");
+
+    // Create the bubble for the bot text
+    const botBubble = document.createElement("div");
+    botBubble.classList.add("chat-bubble");
+    botBubble.textContent = "Thinking..."; // temporary text
+
+    // Put them in the container: avatar first (left), then bubble
+    botMsgContainer.appendChild(botAvatar);
+    botMsgContainer.appendChild(botBubble);
+
+    // Finally, append to chatMessages
+    chatMessages.appendChild(botMsgContainer);
     chatMessages.scrollTop = chatMessages.scrollHeight;
 
     // Call AIMLAPI with the user’s question. The system prompt now includes topic context if available.
     const answer = await queryAimlApi(question);
-    botMsg.textContent = answer;
+    botBubble.textContent = answer;
 
     // Add a "Save to Notebook" button to the bot message
     const saveBtn = document.createElement("button");
@@ -141,7 +171,7 @@ if (sendBtn && chatInput && chatMessages) {
       savedResponses.appendChild(li);
       alert("Response saved to notebook!");
     });
-    botMsg.appendChild(saveBtn);
+    botBubble.appendChild(saveBtn);
 
     // Ensure the chat stays scrolled to bottom
     chatMessages.scrollTop = chatMessages.scrollHeight;
