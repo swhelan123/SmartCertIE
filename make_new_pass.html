@@ -33,48 +33,4 @@
                 <!-- Confirm Password -->
                 <label for="confirmPassword">Confirm Password</label>
                 <div style="position: relative; width: 100%">
-                    <input type="password" id="confirmPassword" placeholder="Confirm password" required style="width: 100%" />
-                    <img
-                        class="toggle-pass-eye"
-                        data-target="confirmPassword"
-                        src="assets/img/eye_closed.png"
-                        alt="Toggle visibility"
-                        style="position: absolute; right: 10px; top: 50%; width: 24px; height: 24px; cursor: pointer; transform: translateY(-50%)"
-                    />
-                </div>
-
-                <button type="submit">Reset Password</button>
-            </form>
-        </div>
-
-        <!-- Your main JS (Firebase logic, plus the snippet to handle toggling) -->
-        <script type="module" src="js/script.js"></script>
-
-        <script>
-            // This snippet handles toggling the password fields from "password" to "text"
-            document.addEventListener("DOMContentLoaded", () => {
-                const eyeIcons = document.querySelectorAll(".toggle-pass-eye");
-
-                eyeIcons.forEach((icon) => {
-                    icon.addEventListener("click", () => {
-                        const targetId = icon.getAttribute("data-target");
-                        const targetInput = document.getElementById(targetId);
-
-                        if (!targetInput) return;
-
-                        // Toggle the type
-                        if (targetInput.type === "password") {
-                            targetInput.type = "text";
-                            // Swap to eye_open.png
-                            icon.src = "assets/img/eye_open.png";
-                        } else {
-                            targetInput.type = "password";
-                            // Swap to eye_closed.png
-                            icon.src = "assets/img/eye_closed.png";
-                        }
-                    });
-                });
-            });
-        </script>
-    </body>
-</html>
+                    <input type="password" id="confirmPassword" placeholder

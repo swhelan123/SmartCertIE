@@ -24,13 +24,15 @@
 
 body {
     display: flex;
-    min-height: 100vh;
+    flex-direction: row;
+    height: 100vh;
     background: linear-gradient(120deg, #ffffff 0%, var(--light-bg) 100%);
     color: var(--light-text);
     transition:
         background-color 0.3s,
         color 0.3s,
         background 0.3s;
+    overflow: hidden;
 }
 
 body.dark-mode {
