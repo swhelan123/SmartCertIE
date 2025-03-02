@@ -1,13 +1,17 @@
 document.addEventListener("DOMContentLoaded", () => {
-    const dustButton = document.getElementById("dustButton");
-  
-    // On button click, trigger dust animation & redirect after 1s
-    dustButton.addEventListener("click", () => {
-      dustButton.classList.add("dust"); // add the animation class
-      setTimeout(() => {
-        // Redirect to the main page after 1 second
-        window.location.href = "index.html";
-      }, 1000);
+const dustButton = document.getElementById("dustButton");
+
+dustButton.addEventListener("click", () => {
+    // Call the confetti function
+    confetti({
+    particleCount: 100,
+    spread: 70,
+    origin: { y: 0.6 }
     });
-  });
-  
+    
+    // ... then do other stuff, like redirect ...
+    setTimeout(() => {
+    window.location.href = "index.html";
+    }, 1500);
+});
+});
