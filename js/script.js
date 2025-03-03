@@ -769,22 +769,6 @@ onAuthStateChanged(auth, async (user) => {
  * Subscribe button for pricing page
  *******************************************************/
 
-import {
-  getAuth,
-  onAuthStateChanged,
-  // ...
-} from "https://www.gstatic.com/firebasejs/9.17.2/firebase-auth.js";
-import {
-  doc,
-  getDoc,
-  // ...
-} from "https://www.gstatic.com/firebasejs/9.17.2/firebase-firestore.js";
-
-// ... your Firebase initialization code, etc. ...
-
-const auth = getAuth();
-const db = getFirestore(app);
-
 // Grab the “Get full access” button from pricing.html
 const subscribeCertiBtn = document.getElementById("subscribeCertiBtn");
 
