@@ -814,7 +814,6 @@ onAuthStateChanged(auth, async (user) => {
       if (subscriptionStatus === "active") {
         // 3) Already subscribed => Show “Current Plan” + disable
         finalBtn.textContent = "Current Plan";
-        finalBtn.disabled = true;
         // Optionally add a class that changes styling, e.g.
         // finalBtn.classList.add("disabled-button");
       } else {
