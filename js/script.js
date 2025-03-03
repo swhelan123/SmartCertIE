@@ -814,6 +814,7 @@ onAuthStateChanged(auth, async (user) => {
       if (subscriptionStatus === "active") {
         // 3) Already subscribed => Show “Current Plan” + disable
         finalBtn.textContent = "Current Plan";
+        finalBtn.disabled = true;
         // Optionally add a class that changes styling, e.g.
         // finalBtn.classList.add("disabled-button");
       } else {
@@ -846,23 +847,6 @@ onAuthStateChanged(auth, async (user) => {
     } catch (err) {
       console.error("Error fetching user data:", err);
       alert("An error occurred while checking your subscription status.");
-    }
-  }
-});
-
-onAuthStateChanged(auth, async (user) => {
-  if (user) {
-    const userDocRef = doc(db, "users", user.uid);
-    const userSnap = await getDoc(userDocRef);
-    if (userSnap.exists()) {
-      const userData = userSnap.data();
-      const subscriptionStatus = userData.subscriptionStatus || "not-subscribed";
-
-      // If user is already subscribed, hide the button
-      if (subscriptionStatus === "active") {
-        const btn = document.getElementById("subscribeCertiBtn");
-        if (btn) btn.classList.add("hidden"); // or disable it
-      }
     }
   }
 });
