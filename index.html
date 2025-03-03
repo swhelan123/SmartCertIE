@@ -15,17 +15,16 @@
         <!-- Tab Icon -->
         <link rel="icon" type="image/png" href="assets/img/tab_icon.png" />
 
-        <!-- Inline styles for landing page (excluding navbar styles) -->
+        <!-- Inline page-specific styles (optional) -->
         <style>
-            /* Example hero layout overrides */
             .landing-page-container {
                 display: flex;
                 flex-direction: column;
                 min-height: 100vh;
-                overflow-y: auto; /* Enable vertical scrolling */
+                overflow-y: auto;
             }
 
-            /* Hero section */
+            /* Hero Section */
             .landing-hero {
                 flex: 1;
                 display: flex;
@@ -91,7 +90,7 @@
                 box-shadow: var(--shadow-blue);
             }
 
-            /* Additional features or sections below the hero */
+            /* Features section */
             .features-section {
                 padding: 2rem;
                 text-align: center;
@@ -127,6 +126,7 @@
                 padding: 1rem 0;
                 font-size: 0.9rem;
                 color: #777;
+                margin-top: auto;
             }
         </style>
     </head>
@@ -136,14 +136,13 @@
         <nav class="navbar">
             <div class="brand">SmartCert</div>
             <div class="nav-links">
-                <a href="landing.html">Home</a>
+                <a href="index.html">Home</a>
                 <a href="pricing.html">Pricing</a>
                 <a href="about.html">About</a>
                 <a href="login.html">Log In</a>
                 <a href="signup.html">Sign Up</a>
             </div>
         </nav>
-        <br /><br />
 
         <!-- Hero Section -->
         <section class="landing-hero">
@@ -159,11 +158,12 @@
                 </div>
             </div>
             <div class="hero-image">
+                <!-- Use whichever hero image you want -->
                 <img src="assets/img/mockup.png" alt="SmartCert Preview" />
             </div>
         </section>
 
-        <!-- Extra features or "Why SmartCert?" section -->
+        <!-- Why SmartCert? -->
         <section class="features-section">
             <h2>Why SmartCert?</h2>
             <div class="features-grid">
@@ -185,6 +185,7 @@
         <!-- Footer -->
         <footer class="landing-footer">© 2025 SmartCert — All rights reserved</footer>
 
+        <!-- Your main script -->
         <script type="module" src="js/script.js"></script>
     </body>
 </html>
