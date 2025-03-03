@@ -43,7 +43,7 @@ const db = getFirestore(app);
 const googleProvider = new GoogleAuthProvider();
 
 // send user to landing if not logged in
-if (window.location.pathname.endsWith("index.html")) {
+if (window.location.pathname === "/" || window.location.pathname.endsWith("index.html")) {
   onAuthStateChanged(auth, (user) => {
     if (!user) {
       window.location.href = "landing.html";
