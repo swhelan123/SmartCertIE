@@ -42,15 +42,6 @@ const db = getFirestore(app);
 
 const googleProvider = new GoogleAuthProvider();
 
-// send user to landing if not logged in
-if (window.location.pathname.endsWith("index.html")) {
-  onAuthStateChanged(auth, (user) => {
-    if (!user) {
-      window.location.href = "landing.html";
-    }
-  });
-}
-
 /*******************************************************
  * DARK MODE ICON (SUN/MOON)
  *******************************************************/
@@ -130,6 +121,11 @@ onAuthStateChanged(auth, async (user) => {
           subscribeBtn.className = "login-button"; // Reuse existing styling or change as needed
           subscribeBtn.textContent = "Subscribe";
           document.getElementById("topRightContainer").appendChild(subscribeBtn);
+
+
+
+
+
         } else {
           subscribeBtn.classList.remove("hidden");
         }
@@ -155,6 +151,9 @@ onAuthStateChanged(auth, async (user) => {
     if (subscribeBtn) subscribeBtn.classList.add("hidden");
   }
 });
+
+
+
 
 //Event listener for pfp -> account
 if (profilePic) {
@@ -605,6 +604,8 @@ const chatInput = document.getElementById("chatInput");
 const sendBtn = document.getElementById("sendBtn");
 const chatMessages = document.getElementById("chatMessages");
 
+
+
 // FORGOT PASSWORD PAGE
 const forgotPassForm = document.getElementById("forgotPassForm");
 if (forgotPassForm) {
@@ -691,6 +692,7 @@ if (newPassForm) {
   });
 }
 
+
 /*******************************************************
  * Subscribe button
  *******************************************************/
@@ -703,12 +705,7 @@ onAuthStateChanged(auth, async (user) => {
       const userData = userSnap.data();
       const subscriptionStatus = userData.subscriptionStatus || "not-subscribed";
 
-<<<<<<< Updated upstream
       if (subscriptionStatus !== "active") { // Only create/show button if not subscribed
-=======
-      if (subscriptionStatus !== "active") {
-        // Only create/show button if not subscribed
->>>>>>> Stashed changes
         let subscribeBtn = document.getElementById("subscribeBtn");
         if (!subscribeBtn) {
           subscribeBtn = document.createElement("button");
@@ -734,9 +731,9 @@ onAuthStateChanged(auth, async (user) => {
               const response = await fetch(endpointURL, {
                 method: "POST",
                 headers: {
-                  "Content-Type": "application/json",
+                  "Content-Type": "application/json"
                 },
-                body: JSON.stringify({ firebaseUserId: currentUser.uid }),
+                body: JSON.stringify({ firebaseUserId: currentUser.uid })
               });
 
               const data = await response.json();
@@ -761,8 +758,4 @@ onAuthStateChanged(auth, async (user) => {
       }
     }
   }
-<<<<<<< Updated upstream
 });
-=======
-});
->>>>>>> Stashed changes
