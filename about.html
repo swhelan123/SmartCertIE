@@ -3,7 +3,7 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>SmartCert - About Our Team</title>
+        <title>SmartCert - About Us</title>
 
         <!-- Google Font -->
         <link rel="preconnect" href="https://fonts.gstatic.com" />
@@ -15,98 +15,117 @@
         <!-- Tab Icon -->
         <link rel="icon" type="image/png" href="assets/img/tab_icon.png" />
 
-        <script type="module" src="js/script.js"></script>
+        <!-- Additional inline styling (optional) -->
+        <style>
+            /* Main 'About Us' section spanning full width */
+            .about-section {
+                width: 100%;
+                margin-bottom: 2rem;
+            }
+            .about-section h1 {
+                margin-bottom: 1rem;
+            }
+
+            /* Founders section below */
+            .founders-section {
+                width: 100%;
+            }
+            .founders-section h2 {
+                text-align: center;
+                margin-bottom: 2rem;
+            }
+
+            /* Layout for the founder boxes side by side */
+            .founders-grid {
+                display: flex;
+                flex-wrap: wrap; /* allows them to wrap on smaller screens */
+                justify-content: center;
+                gap: 2rem;
+            }
+
+            /* Each individual founder box */
+            .founder-box {
+                background-color: #fff; /* or #f9f9f9 */
+                border-radius: var(--border-radius);
+                box-shadow: var(--shadow-blue);
+                width: 300px; /* or auto, up to you */
+                text-align: center;
+                padding: 1.5rem;
+            }
+            .founder-box img {
+                width: 100%;
+                height: auto;
+                object-fit: cover;
+                border-radius: var(--border-radius);
+                margin-bottom: 1rem;
+            }
+            .founder-box h3 {
+                margin-bottom: 0.5rem;
+                font-size: 1.2rem;
+                color: var(--primary-color);
+            }
+            .founder-box h4 {
+                margin-bottom: 1rem;
+                font-weight: 400;
+                color: #555;
+            }
+            .founder-box p {
+                line-height: 1.4;
+                font-size: 0.95rem;
+            }
+        </style>
     </head>
+
     <body class="standalone-mode">
+        <!-- Dark Mode Toggle Container (if you want to keep it) -->
+        <div id="topRightContainer" class="pill-container">
+            <img id="modeIcon" class="mode-icon" src="assets/img/dark.png" alt="Toggle Theme" />
+        </div>
 
-        <!-- TWO-COLUMN LAYOUT CONTAINER -->
-        <!-- Combined container -->
-        <div class="standalone-page two-column-layout">
-            <!-- LEFT COLUMN -->
-            <div class="about-column">
+        <!-- Main content container -->
+        <div class="standalone-page">
+            <!-- About Us (full-width) -->
+            <section class="about-section">
                 <h1>About SmartCert</h1>
-
-                <h3>What We Offer</h3>
-                <ul>
-                    <li>AI Chatbot for quick Biology Q&A</li>
-                    <li>Notebook feature to save responses</li>
-                    <li>Topic-based structure for easy revision</li>
-                </ul>
-                <br />
-                <h3>Why It Helps</h3>
-                <p>We aim to make studying simpler, more interactive, and fun! All of our advanced AI models are trained on Leaving Cert–specific context, ensuring exam-focused answers.</p>
-                <br /><br />
-                <div class="highlight-box">
-                    <h3>Need Help?</h3>
-                    <p>Contact us at <strong>contact@smartcert.ie</strong></p>
-                </div>
-
                 <p>
-                    <a href="index.html" class="click-link">← Back to Home</a>
+                    SmartCert is dedicated to helping Leaving Cert students study Biology more efficiently. Our AI-powered chatbot, user-friendly Notebook feature, and structured topics make revision
+                    a breeze.
                 </p>
-            </div>
-
-            <!-- RIGHT COLUMN -->
-            <section class="team-section">
-                <div class="team-intro">
-                    <h1>Meet Our Team</h1>
-                    <h3>Dedicated founders - here to help you succeed!</h3>
-                </div>
+                <p>Whether you’re aiming for top marks or just want to streamline your study routine, we’ve got the tools you need.</p>
             </section>
 
-                <!-- Founder 1 -->
-                <div class="founder-box">
-                    <div class="founder-photo">
-                        <img src="assets/img/founder1.png" alt="Shane Whelan" />
-                    </div>
-                    <div class="founder-info">
+            <!-- Meet Our Founders -->
+            <section class="founders-section">
+                <h2>Meet Our Founders</h2>
+                <div class="founders-grid">
+                    <!-- Founder 1 -->
+                    <div class="founder-box">
+                        <img src="assets/img/founder1.jpg" alt="Founder 1" />
                         <h3>Shane Whelan</h3>
-                        <h4>2nd Year Computer Science Student, UCD</h4>
-                        <p>
-                            Did I study biology? No. What did I study—enough to make a website with integrated AI Q&A features, helping you achieve that H1 in your upcoming exams. Take it from a 625
-                            student—you need this in your bio study!
-                        </p>
-                        <p>
-                            <a href="https://linkedin.com/in/shane-whelan-364988291" target="_blank">LinkedIn</a>
-                            <a href="https://www.shane-whelan.ie" target="_blank">Website</a>
-                        </p>
+                        <h4>Co-Founder & Developer</h4>
+                        <p>Shane built the AI integration and platform from the ground up. With a background in Computer Science at UCD, he’s the brain behind SmartCert’s user-friendly interface.</p>
                     </div>
-                </div>
 
-                <!-- Founder 2 -->
-                <div class="founder-box">
-                    <div class="founder-photo">
-                        <img src="assets/img/founder2.jpg" alt="Alex McConnell" />
-                    </div>
-                    <div class="founder-info">
+                    <!-- Founder 2 -->
+                    <div class="founder-box">
+                        <img src="assets/img/founder2.jpg" alt="Founder 2" />
                         <h3>Alex McConnell</h3>
-                        <h4>Engineering with Management, Trinity College Dublin</h4>
-                        <p>
-                            I HATED having to learn all the useless information that authors put in the biology books. I wish I had this website when I was preparing for exams. I had to grind out the
-                            H1 the hard way! Don't fear, you don't have to work hard anymore. Why would you when AI can do all the heavy lifting?
-                        </p>
-                        <p>
-                            <a href="https://www.linkedin.com/in/alexmcconnell1002" target="_blank">LinkedIn</a>
-                        </p>
+                        <h4>Co-Founder & Engineer</h4>
+                        <p>Alex is passionate about optimizing the learning process. He oversees the content structure and ensures SmartCert’s features remain exam-focused and efficient.</p>
                     </div>
-                </div>
 
-                <!-- Founder 3 -->
-                <div class="founder-box">
-                    <div class="founder-photo">
-                        <img src="assets/img/founder3.png" alt="Charlie McConnel" />
-                    </div>
-                    <div class="founder-info">
+                    <!-- Founder 3 -->
+                    <div class="founder-box">
+                        <img src="assets/img/founder3.png" alt="Founder 3" />
                         <h3>Charlie McConnell</h3>
-                        <h4>6th Year Student @ St. Michael's College</h4>
-                        <p>
-                            I'm in this with you—due to sit my LC this June. When I came up with the idea for this website, I knew I had to build it. Not only has it transformed my biology learning,
-                            it's given me more time to focus on my other subjects. With the features we offer, you can walk into that exam hall, demand the superintendent put the H1 in your backpack
-                            and walk out. You won't even need to sit the paper haha ;] test 5
-                        </p>
+                        <h4>Co-Founder & Student Advocate</h4>
+                        <p>Currently sitting the LC himself, Charlie tests each new feature to ensure it genuinely saves time and boosts results for fellow students.</p>
                     </div>
                 </div>
             </section>
         </div>
+
+        <!-- Your main script (dark mode, etc.) -->
+        <script type="module" src="js/script.js"></script>
     </body>
 </html>
