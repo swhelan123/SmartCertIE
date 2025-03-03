@@ -766,6 +766,125 @@ onAuthStateChanged(auth, async (user) => {
 });
 
 /*******************************************************
+ * Subscribe button for pricing page
+ *******************************************************/
+
+import {
+  getAuth,
+  onAuthStateChanged,
+  // ...
+} from "https://www.gstatic.com/firebasejs/9.17.2/firebase-auth.js";
+import {
+  doc,
+  getDoc,
+  // ...
+} from "https://www.gstatic.com/firebasejs/9.17.2/firebase-firestore.js";
+
+// ... your Firebase initialization code, etc. ...
+
+const auth = getAuth();
+const db = getFirestore(app);
+
+// Grab the “Get full access” button from pricing.html
+const subscribeCertiBtn = document.getElementById("subscribeCertiBtn");
+
+onAuthStateChanged(auth, async (user) => {
+  // If the button doesn’t exist on this page, do nothing
+  if (!subscribeCertiBtn) return;
+
+  // Remove any existing click listeners so we don't attach multiple
+  // (optional, only needed if user might sign in/out while on the page)
+  const newBtn = subscribeCertiBtn.cloneNode(true);
+  subscribeCertiBtn.parentNode.replaceChild(newBtn, subscribeCertiBtn);
+
+  // Reassign the new reference
+  const finalBtn = document.getElementById("subscribeCertiBtn");
+
+  if (!user) {
+    // 1) Not logged in => Clicking button sends them to login
+    finalBtn.textContent = "Get full access";
+    finalBtn.disabled = false;
+    finalBtn.addEventListener("click", () => {
+      alert("You must be logged in to subscribe.");
+      window.location.href = "login.html";
+    });
+  } else {
+    // 2) User is logged in => Check their subscription status
+    try {
+      const userDocRef = doc(db, "users", user.uid);
+      const userSnap = await getDoc(userDocRef);
+
+      if (!userSnap.exists()) {
+        // If no user doc, direct them to setup or handle accordingly
+        finalBtn.textContent = "Complete Setup";
+        finalBtn.disabled = false;
+        finalBtn.addEventListener("click", () => {
+          window.location.href = "setup.html";
+        });
+        return;
+      }
+
+      const userData = userSnap.data();
+      const subscriptionStatus = userData.subscriptionStatus || "not-subscribed";
+
+      if (subscriptionStatus === "active") {
+        // 3) Already subscribed => Show “Current Plan” + disable
+        finalBtn.textContent = "Current Plan";
+        finalBtn.disabled = true;
+        // Optionally add a class that changes styling, e.g.
+        // finalBtn.classList.add("disabled-button");
+      } else {
+        // 4) Not subscribed => Attach your Stripe checkout logic
+        finalBtn.textContent = "Get full access";
+        finalBtn.disabled = false;
+
+        finalBtn.addEventListener("click", async () => {
+          try {
+            const endpointURL = "https://createcheckoutsession-63mubklboq-uc.a.run.app";
+            const response = await fetch(endpointURL, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ firebaseUserId: user.uid }),
+            });
+
+            const data = await response.json();
+            if (data.url) {
+              window.location.href = data.url; // Stripe checkout
+            } else {
+              console.error("No checkout URL returned:", data);
+              alert("An error occurred while creating the checkout session.");
+            }
+          } catch (err) {
+            console.error("Error creating checkout session:", err);
+            alert("An error occurred while processing your subscription.");
+          }
+        });
+      }
+    } catch (err) {
+      console.error("Error fetching user data:", err);
+      alert("An error occurred while checking your subscription status.");
+    }
+  }
+});
+
+onAuthStateChanged(auth, async (user) => {
+  if (user) {
+    const userDocRef = doc(db, "users", user.uid);
+    const userSnap = await getDoc(userDocRef);
+    if (userSnap.exists()) {
+      const userData = userSnap.data();
+      const subscriptionStatus = userData.subscriptionStatus || "not-subscribed";
+
+      // If user is already subscribed, hide the button
+      if (subscriptionStatus === "active") {
+        const btn = document.getElementById("subscribeCertiBtn");
+        if (btn) btn.classList.add("hidden"); // or disable it
+      }
+    }
+  }
+});
+
+/*******************************************************
  * DYNAMIC ROUTING FROM LANDING
  *******************************************************/
 const log = getAuth();
