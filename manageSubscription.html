@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Manage Subscription - SmartCert</title>
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="manageSubscription.css" />
+  </head>
+  <body>
+    <div class="manage-subscription">
+      <h1>Manage Your Subscription</h1>
+      <div id="subscriptionDetails">
+        <p>Plan: <span id="planName">SmartCert Plan</span></p>
+        <p>Start Date: <span id="startDate"></span></p>
+        <p>Next Billing Date: <span id="nextBillingDate"></span></p>
+        <p>Payment Method: <span id="paymentMethod"></span></p>
+      </div>
+      <!-- Button to let the user change card details via Stripe's portal -->
+      <button id="updatePaymentBtn">Update Payment Details</button>
+      <!-- Cancel Subscription button (visible only if the subscription is active) -->
+      <button id="cancelSubscriptionBtn">Cancel Subscription</button>
+    </div>
+
+    <!-- Modal Confirmation for cancellation -->
+    <div id="cancelModal" class="modal hidden">
+      <div class="modal-content">
+        <h2>Confirm Cancellation</h2>
+        <p>Your subscription will be cancelled at the end of the current billing period. You have access until <span id="accessUntil"></span>.</p>
+        <p>Are you sure you want to cancel?</p>
+        <button id="confirmCancelBtn">Yes, Cancel</button>
+        <button id="closeModalBtn">No, Keep Subscription</button>
+      </div>
+    </div>
+
+    <script src="js/manageSubscription.js"></script>
+  </body>
+</html>
