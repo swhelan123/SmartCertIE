@@ -42,6 +42,15 @@ const db = getFirestore(app);
 
 const googleProvider = new GoogleAuthProvider();
 
+// send user to landing if not logged in
+if (window.location.pathname.endsWith("index.html")) {
+  onAuthStateChanged(auth, (user) => {
+    if (!user) {
+      window.location.href = "landing.html";
+    }
+  });
+}
+
 /*******************************************************
  * DARK MODE ICON (SUN/MOON)
  *******************************************************/
@@ -694,12 +703,9 @@ onAuthStateChanged(auth, async (user) => {
       const userData = userSnap.data();
       const subscriptionStatus = userData.subscriptionStatus || "not-subscribed";
 
-<<<<<<< Updated upstream
-      if (subscriptionStatus !== "active") { // Only create/show button if not subscribed
-=======
       if (subscriptionStatus !== "active") {
         // Only create/show button if not subscribed
->>>>>>> Stashed changes
+
         let subscribeBtn = document.getElementById("subscribeBtn");
         if (!subscribeBtn) {
           subscribeBtn = document.createElement("button");
@@ -752,8 +758,4 @@ onAuthStateChanged(auth, async (user) => {
       }
     }
   }
-<<<<<<< Updated upstream
 });
-=======
-});
->>>>>>> Stashed changes
