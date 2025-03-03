@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>SmartCert - Pricing</title>
+
+        <!-- Google Font -->
+        <link rel="preconnect" href="https://fonts.gstatic.com" />
+        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet" />
+
+        <!-- Shared CSS (styles.css) -->
+        <link rel="stylesheet" href="styles.css" />
+
+        <!-- Favicon -->
+        <link rel="icon" type="image/png" href="assets/img/tab_icon.png" />
+
+        <!-- Inline page-specific styles to emulate the "good" design -->
+        <style>
+            /* Basic container styling */
+            body.standalone-mode {
+                display: block !important;
+                height: auto !important;
+                overflow: auto !important;
+                background: #fff !important;
+                color: #1f1f1f !important;
+            }
+
+            /* A top-level section for the big heading + billing toggle */
+            .pricing-hero {
+                text-align: center;
+                padding: 3rem 1rem 2rem;
+            }
+            .pricing-hero h2 {
+                font-size: 2rem;
+                font-weight: 600;
+                margin-bottom: 1.5rem;
+            }
+
+            /* The monthly/yearly toggle container */
+            .billing-toggle {
+                display: inline-flex;
+                border-radius: 9999px;
+                overflow: hidden;
+                border: 1px solid #ddd;
+                margin-bottom: 2rem;
+            }
+            .billing-toggle button {
+                background: #fff;
+                border: none;
+                padding: 0.8rem 1.5rem;
+                font-weight: 500;
+                cursor: pointer;
+                transition: background-color 0.2s;
+                font-size: 1rem;
+            }
+            .billing-toggle button.active {
+                background-color: #3b82f6;
+                color: #fff;
+            }
+
+            /* Main pricing section */
+            .pricing-section {
+                max-width: 1200px;
+                margin: 0 auto;
+                padding: 0 1rem 3rem;
+                text-align: center;
+            }
+            .pricing-cards {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 2rem;
+                justify-content: center;
+            }
+
+            /* Individual pricing cards */
+            .pricing-card {
+                flex: 1 1 280px;
+                max-width: 340px;
+                background-color: #fff;
+                border: 1px solid #e5e7eb; /* light gray border */
+                border-radius: 1rem;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+                padding: 2rem 1.5rem;
+                text-align: left;
+                position: relative;
+                transition: transform 0.2s;
+            }
+            .pricing-card:hover {
+                transform: translateY(-3px);
+            }
+            .pricing-card.most-popular::before {
+                content: "Most Popular";
+                position: absolute;
+                top: 0;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background-color: #3b82f6;
+                color: #fff;
+                font-size: 0.8rem;
+                padding: 0.3rem 0.8rem;
+                border-radius: 9999px;
+            }
+            .pricing-card h3 {
+                font-size: 1.3rem;
+                margin-bottom: 0.5rem;
+                color: #3b82f6;
+                text-align: center;
+            }
+            .pricing-card .price {
+                display: block;
+                font-size: 2rem;
+                margin-bottom: 0.3rem;
+                font-weight: 600;
+                text-align: center;
+            }
+            .pricing-card .old-price {
+                display: block;
+                font-size: 0.9rem;
+                text-decoration: line-through;
+                color: #999;
+                margin-bottom: 1rem;
+                text-align: center;
+            }
+            .pricing-card ul {
+                margin: 1rem 0;
+                padding-left: 1.2rem;
+                list-style: disc;
+                color: #555;
+            }
+            .pricing-card ul li {
+                margin-bottom: 0.5rem;
+                font-size: 0.95rem;
+            }
+            .pricing-card button {
+                display: block;
+                width: 100%;
+                background-color: #3b82f6;
+                color: #fff;
+                border: none;
+                border-radius: 9999px;
+                padding: 0.8rem 1.2rem;
+                cursor: pointer;
+                font-weight: 500;
+                transition: background-color 0.2s;
+                font-size: 1rem;
+                margin-top: 1rem;
+                text-align: center;
+            }
+            .pricing-card button:hover {
+                background-color: #2563eb;
+            }
+
+            /* Footer */
+            .landing-footer {
+                text-align: center;
+                padding: 1rem 0;
+                font-size: 0.9rem;
+                color: #777;
+                margin-top: auto;
+            }
+        </style>
+    </head>
+
+    <body class="standalone-mode">
+        <!-- NAV BAR -->
+        <nav class="navbar">
+            <div class="brand">SmartCert</div>
+            <div class="nav-links">
+                <a href="index.html?showLanding">Home</a>
+                <a href="pricing.html">Pricing</a>
+                <a href="about.html">About</a>
+                <!-- <a href="login.html">Log In</a> -->
+                <!-- Removed Sign Up; replaced with a “Chat” button -->
+                <a href="#" id="navChatLink" class="chat-button">Chat</a>
+            </div>
+        </nav>
+
+        <!-- Pricing Hero Section (like the “good” example) -->
+        <section class="pricing-hero">
+            <h2>Better results, guaranteed</h2>
+            <p class="pricing-subtitle" style="margin-top: 0.5rem; font-size: 1rem; color: #666">
+                Join thousands of students achieving top marks with our proven study method. No risk, cancel anytime.
+            </p>
+        </section>
+
+        <!-- PRICING SECTION -->
+        <section class="pricing-section">
+            <div class="pricing-cards" id="pricingCards">
+                <!-- CERTI PLAN -->
+                <div class="pricing-card most-popular">
+                    <h3>Certi</h3>
+                    <span class="price" data-monthly="€2.99">€2.99</span>
+                    <span class="old-price" data-monthly="€4.99">Was €4.99</span>
+                    <ul>
+                        <li>Full AI Chatbot Access</li>
+                        <li>Notebook Feature</li>
+                        <li>Context From Topics / Chapters</li>
+                    </ul>
+                    <button>Get full access</button>
+                </div>
+
+                <!-- BENJI PLAN (Coming Soon) -->
+                <div class="pricing-card">
+                    <h3>Benji</h3>
+                    <em style="display: block; text-align: center; margin-top: 1rem"> Coming soon... </em>
+                </div>
+
+                <!-- ROGER PLAN (Coming Soon) -->
+                <div class="pricing-card">
+                    <h3>Roger</h3>
+                    <em style="display: block; text-align: center; margin-top: 1rem"> Coming soon... </em>
+                </div>
+            </div>
+        </section>
+
+        <!-- FOOTER -->
+        <footer class="landing-footer">© 2025 SmartCert – All rights reserved</footer>
+    </body>
+</html>

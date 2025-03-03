@@ -45,9 +45,11 @@ const googleProvider = new GoogleAuthProvider();
 /*******************************************************
  * REDIRECT IF LOGGED IN ALREADY
  *******************************************************/
-if (window.location.pathname === "/" || window.location.pathname.endsWith("index.html")) {
+// In script.js
+if ((window.location.pathname === "/" || window.location.pathname.endsWith("index.html")) && !window.location.search.includes("showLanding")) {
   onAuthStateChanged(auth, (user) => {
     if (user) {
+      // If logged in, redirect to chat.html
       window.location.href = "chat.html";
     }
   });
@@ -343,14 +345,14 @@ onAuthStateChanged(auth, (user) => {
     if (!user) {
       accountInfo.textContent = "You are not logged in. Redirecting to login...";
       setTimeout(() => {
-        window.location.href = "login.html";
+        window.location.href = "index.html";
       }, 2000);
     } else {
       accountInfo.textContent = "Welcome to your account page! (Firebase user: " + user.email + ")";
       logoutBtn.addEventListener("click", async () => {
         await signOut(auth);
         alert("Logged out!");
-        window.location.href = "chat.html";
+        window.location.href = "index.html";
       });
     }
   }
@@ -594,6 +596,7 @@ if (updateAccountForm) {
       accountProfilePic.src = newPhotoURL;
 
       alert("Profile updated successfully!");
+      window.location.href = "chat.html";
     } catch (err) {
       console.error("Update profile error:", err);
       alert("Error updating profile: " + err.message);
@@ -761,3 +764,22 @@ onAuthStateChanged(auth, async (user) => {
     }
   }
 });
+
+/*******************************************************
+ * DYNAMIC ROUTING FROM LANDING
+ *******************************************************/
+const log = getAuth();
+const navChatLink = document.getElementById("navChatLink");
+if (navChatLink) {
+  navChatLink.addEventListener("click", (e) => {
+    e.preventDefault();
+    const user = log.currentUser;
+    if (user) {
+      // If logged in, go straight to chat
+      window.location.href = "chat.html";
+    } else {
+      // If not logged in, go to login page
+      window.location.href = "login.html";
+    }
+  });
+}

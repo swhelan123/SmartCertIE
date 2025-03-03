@@ -31,11 +31,14 @@
         <!-- Sidebar -->
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-header">
-                <h1>SmartCert</h1>
+                <!-- Wrap SmartCert in an anchor so it's clickable, no style changed -->
+                <h1 style="margin: 0">
+                    <a href="index.html?showLanding" style="color: inherit; text-decoration: none"> SmartCert </a>
+                </h1>
                 <p>Leaving Cert Biology</p>
             </div>
             <nav class="sidebar-nav">
-                <a href="index.html">🏠 Home</a>
+                <!-- Removed the "Home" link; user can click the logo instead -->
                 <a href="#" data-section="chatSection">💬 Chat</a>
                 <a href="#" data-section="notebookSection">📓 Notebook</a>
             </nav>
@@ -100,11 +103,3 @@
                 </div>
 
                 <ul id="savedResponses" style="list-style: disc; margin-left: 1.5rem"></ul>
-            </section>
-        </div>
-
-        <!-- Link to our main JS (Firebase logic + chat + chatbot integration) -->
-        <script type="module" src="js/script.js"></script>
-        <script type="module" src="js/chat.js"></script>
-    </body>
-</html>

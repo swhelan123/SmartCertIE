@@ -889,3 +889,24 @@ body.dark-mode *::-webkit-scrollbar-thumb:hover {
         margin-top: 1rem;
     }
 }
+/* Footer */
+.landing-footer {
+    text-align: center;
+    padding: 1rem 0;
+    font-size: 0.9rem;
+    color: #777;
+    margin-top: auto;
+}
+.chat-button {
+    background-color: #3b82f6; /* your highlight color */
+    color: #fff !important;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 500;
+    margin-left: 1rem; /* space from the previous link */
+    transition: background-color 0.2s;
+}
+.chat-button:hover {
+    background-color: #2563eb;
+}
