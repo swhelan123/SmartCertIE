@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>SmartCert - Home</title>
+
+        <!-- Google Font -->
+        <link rel="preconnect" href="https://fonts.gstatic.com" />
+        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet" />
+
+        <!-- Shared CSS -->
+        <link rel="stylesheet" href="styles.css" />
+
+        <!-- Tab Icon -->
+        <link rel="icon" type="image/png" href="assets/img/tab_icon.png" />
+    </head>
+    <body>
+        <!-- PILL CONTAINER at top-right -->
+        <div id="topRightContainer" class="pill-container">
+            <!-- Login button (hidden if user is logged in) -->
+            <button id="loginBtn" class="login-button hidden">Login/Signup</button>
+
+            <!-- Profile pic (hidden if user is logged out) -->
+            <img id="profilePic" class="profile-pic hidden" src="assets/img/pfp.avif" alt="Profile" />
+
+            <!-- Theme toggle icon (sun/moon) -->
+            <img id="modeIcon" class="mode-icon" src="assets/img/dark.png" alt="Toggle Theme" />
+        </div>
+
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <h1>SmartCert</h1>
+                <p>Leaving Cert Biology</p>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="index.html">🏠 Home</a>
+                <a href="#" data-section="chatSection">💬 Chat</a>
+                <a href="#" data-section="notebookSection">📓 Notebook</a>
+            </nav>
+
+            <!-- Account link at bottom -->
+            <div class="sidebar-footer">
+                <a href="#" id="accountLink">👤 Account</a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Chat Section (single container) -->
+            <section id="chatSection" class="chat-container">
+                <!-- Topic Selector (Group -> Chapter -> Selected Topic) -->
+                <div class="topic-selector" id="topicSelector">
+                    <!-- Unit Buttons Container (initially visible) -->
+                    <div id="unitContainer" class="unit-container">
+                        <button class="unit-button unit-green" data-unit="A">Unit 1: The Study of Life</button>
+                        <button class="unit-button unit-purple" data-unit="B">Unit 2: The Cell</button>
+                        <button class="unit-button unit-red" data-unit="C">Unit 3: The Organism</button>
+                    </div>
+
+                    <!-- Chapter Buttons Container (initially hidden) -->
+                    <div id="chapterContainer" class="chapter-container hidden"></div>
+
+                    <!-- Selected Topic Display (initially hidden) -->
+                    <div id="selectedTopicContainer" class="selected-topic-container hidden">
+                        <span id="selectedTopicLabel" class="selected-topic-label"></span>
+                        <button id="changeTopicBtn" class="change-topic-button">Change Topic</button>
+                    </div>
+                </div>
+
+                <!-- Chat Window -->
+                <div class="chat-messages" id="chatMessages">
+                    <!-- Example initial bot message -->
+                    <div class="chat-message message-bot chat-row">
+                        <img class="chat-avatar" src="assets/img/certi.png" alt="Bot Avatar" />
+                        <div class="chat-bubble">Hi there, I'm Certi, your personal Leaving Cert biology tutor!</div>
+                    </div>
+                </div>
+
+                <!-- Chat Input -->
+                <div class="chat-input-area">
+                    <input type="text" id="chatInput" placeholder="Ask a Biology question..." />
+                    <button id="sendBtn">Send</button>
+                </div>
+            </section>
+
+            <!-- Notebook Section -->
+            <section id="notebookSection" class="section-content hidden">
+                <h2>Notebook</h2>
+                <p>Saved chatbot responses will appear here.</p>
+
+                <!-- Topic Selector -->
+                <div>
+                    <label for="notebookTopicSelect">Choose a topic:</label>
+                    <select id="notebookTopicSelect">
+                        <option value="all">All</option>
+                        <!-- We'll programmatically add other topics here -->
+                    </select>
+                </div>
+
+                <ul id="savedResponses" style="list-style: disc; margin-left: 1.5rem"></ul>
+            </section>
+        </div>
+
+        <!-- Link to our main JS (Firebase logic + chat + chatbot integration) -->
+        <script type="module" src="js/script.js"></script>
+        <script type="module" src="js/chat.js"></script>
+    </body>
+</html>

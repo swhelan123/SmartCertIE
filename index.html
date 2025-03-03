@@ -3,7 +3,7 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>SmartCert - Home</title>
+        <title>SmartCert - The Simpler Way to Study</title>
 
         <!-- Google Font -->
         <link rel="preconnect" href="https://fonts.gstatic.com" />
@@ -14,97 +14,178 @@
 
         <!-- Tab Icon -->
         <link rel="icon" type="image/png" href="assets/img/tab_icon.png" />
+
+        <!-- Inline page-specific styles (optional) -->
+        <style>
+            .landing-page-container {
+                display: flex;
+                flex-direction: column;
+                min-height: 100vh;
+                overflow-y: auto;
+            }
+
+            /* Hero Section */
+            .landing-hero {
+                flex: 1;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                padding: 2rem;
+                gap: 2rem;
+            }
+            .hero-text {
+                flex: 1;
+            }
+            .hero-text h1 {
+                font-size: 2.2rem;
+                line-height: 1.2;
+                margin-bottom: 1rem;
+                color: var(--light-text);
+            }
+            .hero-text p {
+                font-size: 1.1rem;
+                margin-bottom: 1.5rem;
+                max-width: 550px;
+            }
+            .cta-buttons {
+                display: flex;
+                gap: 1rem;
+            }
+            .cta-buttons a {
+                display: inline-block;
+                padding: 0.8rem 1.2rem;
+                border-radius: var(--border-radius);
+                font-weight: 500;
+                text-decoration: none;
+                transition: background-color 0.2s;
+            }
+            .btn-primary {
+                background-color: var(--primary-color);
+                color: #fff;
+            }
+            .btn-primary:hover {
+                background-color: #2563eb;
+            }
+            .btn-secondary {
+                background-color: transparent;
+                border: 2px solid var(--primary-color);
+                color: var(--primary-color);
+            }
+            .btn-secondary:hover {
+                background-color: var(--primary-color);
+                color: #fff;
+            }
+
+            /* Hero image */
+            .hero-image {
+                flex: 1;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+            .hero-image img {
+                max-width: 100%;
+                height: auto;
+                border-radius: var(--border-radius);
+                box-shadow: var(--shadow-blue);
+            }
+
+            /* Features section */
+            .features-section {
+                padding: 2rem;
+                text-align: center;
+            }
+            .features-grid {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 1.5rem;
+                justify-content: center;
+                margin-top: 2rem;
+            }
+            .feature-box {
+                max-width: 300px;
+                background-color: #fff;
+                border-radius: var(--border-radius);
+                box-shadow: var(--shadow-blue);
+                padding: 1.5rem;
+                text-align: left;
+            }
+            .feature-box h3 {
+                margin-bottom: 0.5rem;
+                font-size: 1.2rem;
+                color: var(--primary-color);
+            }
+            .feature-box p {
+                font-size: 0.95rem;
+                line-height: 1.4;
+            }
+
+            /* Footer */
+            .landing-footer {
+                text-align: center;
+                padding: 1rem 0;
+                font-size: 0.9rem;
+                color: #777;
+                margin-top: auto;
+            }
+        </style>
     </head>
-    <body>
-        <!-- PILL CONTAINER at top-right -->
-        <div id="topRightContainer" class="pill-container">
-            <!-- Login button (hidden if user is logged in) -->
-            <button id="loginBtn" class="login-button hidden">Login/Signup</button>
 
-            <!-- Profile pic (hidden if user is logged out) -->
-            <img id="profilePic" class="profile-pic hidden" src="assets/img/pfp.avif" alt="Profile" />
-
-            <!-- Theme toggle icon (sun/moon) -->
-            <img id="modeIcon" class="mode-icon" src="assets/img/dark.png" alt="Toggle Theme" />
-        </div>
-
-        <!-- Sidebar -->
-        <aside class="sidebar" id="sidebar">
-            <div class="sidebar-header">
-                <h1>SmartCert</h1>
-                <p>Leaving Cert Biology</p>
+    <body class="landing-page-container">
+        <!-- NAV BAR -->
+        <nav class="navbar">
+            <div class="brand">SmartCert</div>
+            <div class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="pricing.html">Pricing</a>
+                <a href="about.html">About</a>
+                <a href="login.html">Log In</a>
+                <a href="signup.html">Sign Up</a>
             </div>
-            <nav class="sidebar-nav">
-                <a href="#" data-section="chatSection">💬 Chat</a>
-                <a href="#" data-section="notebookSection">📓 Notebook</a>
-                <a href="about.html">🔍 About Us</a>
-            </nav>
+        </nav>
 
-            <!-- Account link at bottom -->
-            <div class="sidebar-footer">
-                <a href="#" id="accountLink">👤 Account</a>
+        <!-- Hero Section -->
+        <section class="landing-hero">
+            <div class="hero-text">
+                <h1>Less time studying.<br />Get better results.</h1>
+                <p>
+                    The fastest growing platform for Leaving Cert Biology.
+                    <strong>Study smarter, not harder.</strong> With exam-focused Q&A from our AI tutor, you’ll master biology in no time!
+                </p>
+                <div class="cta-buttons">
+                    <a href="signup.html" class="btn-primary">Sign Up for Free</a>
+                    <a href="about.html" class="btn-secondary">Learn More</a>
+                </div>
             </div>
-        </aside>
+            <div class="hero-image">
+                <!-- Use whichever hero image you want -->
+                <img src="assets/img/mockup.png" alt="SmartCert Preview" />
+            </div>
+        </section>
 
-        <!-- Main Content -->
-        <div class="main-content">
-            <!-- Chat Section (single container) -->
-            <section id="chatSection" class="chat-container">
-                <!-- Topic Selector (Group -> Chapter -> Selected Topic) -->
-                <div class="topic-selector" id="topicSelector">
-                    <!-- Unit Buttons Container (initially visible) -->
-                    <div id="unitContainer" class="unit-container">
-                        <button class="unit-button unit-green" data-unit="A">Unit 1: The Study of Life</button>
-                        <button class="unit-button unit-purple" data-unit="B">Unit 2: The Cell</button>
-                        <button class="unit-button unit-red" data-unit="C">Unit 3: The Organism</button>
-                    </div>
-
-                    <!-- Chapter Buttons Container (initially hidden) -->
-                    <div id="chapterContainer" class="chapter-container hidden"></div>
-
-                    <!-- Selected Topic Display (initially hidden) -->
-                    <div id="selectedTopicContainer" class="selected-topic-container hidden">
-                        <span id="selectedTopicLabel" class="selected-topic-label"></span>
-                        <button id="changeTopicBtn" class="change-topic-button">Change Topic</button>
-                    </div>
+        <!-- Why SmartCert? -->
+        <section class="features-section">
+            <h2>Why SmartCert?</h2>
+            <div class="features-grid">
+                <div class="feature-box">
+                    <h3>AI Chatbot</h3>
+                    <p>Get instant exam-focused answers from our advanced AI tutor, Certi. Ask questions anytime, from anywhere.</p>
                 </div>
-
-                <!-- Chat Window -->
-                <div class="chat-messages" id="chatMessages">
-                    <!-- Example initial bot message -->
-                    <div class="chat-message message-bot chat-row">
-                        <img class="chat-avatar" src="assets/img/certi.png" alt="Bot Avatar" />
-                        <div class="chat-bubble">Hi there, I'm Certi, your personal Leaving Cert biology tutor!</div>
-                    </div>
+                <div class="feature-box">
+                    <h3>Notebook</h3>
+                    <p>Save important answers and revisit them. Organize your study notes by topic for easy revision.</p>
                 </div>
-
-                <!-- Chat Input -->
-                <div class="chat-input-area">
-                    <input type="text" id="chatInput" placeholder="Ask a Biology question..." />
-                    <button id="sendBtn">Send</button>
+                <div class="feature-box">
+                    <h3>Topic-Based</h3>
+                    <p>Narrow down Unit 1 to Unit 3 with structured chapters. Dive deeper into exactly what you need.</p>
                 </div>
-            </section>
+            </div>
+        </section>
 
-            <!-- Notebook Section -->
-            <section id="notebookSection" class="section-content hidden">
-                <h2>Notebook</h2>
-                <p>Saved chatbot responses will appear here.</p>
+        <!-- Footer -->
+        <footer class="landing-footer">© 2025 SmartCert — All rights reserved</footer>
 
-                <!-- Topic Selector -->
-                <div>
-                    <label for="notebookTopicSelect">Choose a topic:</label>
-                    <select id="notebookTopicSelect">
-                        <option value="all">All</option>
-                        <!-- We'll programmatically add other topics here -->
-                    </select>
-                </div>
-
-                <ul id="savedResponses" style="list-style: disc; margin-left: 1.5rem"></ul>
-            </section>
-        </div>
-
-        <!-- Link to our main JS (Firebase logic + chat + chatbot integration) -->
+        <!-- Your main script -->
         <script type="module" src="js/script.js"></script>
-        <script type="module" src="js/chat.js"></script>
     </body>
 </html>

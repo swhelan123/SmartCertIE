@@ -43,6 +43,17 @@ const db = getFirestore(app);
 const googleProvider = new GoogleAuthProvider();
 
 /*******************************************************
+ * REDIRECT IF LOGGED IN ALREADY
+ *******************************************************/
+if (window.location.pathname === "/" || window.location.pathname.endsWith("index.html")) {
+  onAuthStateChanged(auth, (user) => {
+    if (user) {
+      window.location.href = "chat.html";
+    }
+  });
+}
+
+/*******************************************************
  * DARK MODE ICON (SUN/MOON)
  *******************************************************/
 const body = document.body;
@@ -121,11 +132,6 @@ onAuthStateChanged(auth, async (user) => {
           subscribeBtn.className = "login-button"; // Reuse existing styling or change as needed
           subscribeBtn.textContent = "Subscribe";
           document.getElementById("topRightContainer").appendChild(subscribeBtn);
-
-
-
-
-
         } else {
           subscribeBtn.classList.remove("hidden");
         }
@@ -152,9 +158,6 @@ onAuthStateChanged(auth, async (user) => {
   }
 });
 
-
-
-
 //Event listener for pfp -> account
 if (profilePic) {
   profilePic.addEventListener("click", () => {
@@ -170,7 +173,7 @@ if (loginBtn) {
 }
 
 /*******************************************************
- * SIDEBAR NAV ON index.html (Single-Page Sections)
+ * SIDEBAR NAV ON chat.html (Single-Page Sections)
  *******************************************************/
 const sidebarLinks = document.querySelectorAll(".sidebar-nav a[data-section]");
 const chatSection = document.getElementById("chatSection");
@@ -322,7 +325,7 @@ if (loginForm) {
       // Attempt to sign in with Firebase
       await signInWithEmailAndPassword(auth, emailVal, passVal);
       alert("Logged in successfully!");
-      window.location.href = "index.html"; // go back to home
+      window.location.href = "chat.html"; // go back to home
     } catch (err) {
       alert("Login error: " + err.message);
     }
@@ -347,7 +350,7 @@ onAuthStateChanged(auth, (user) => {
       logoutBtn.addEventListener("click", async () => {
         await signOut(auth);
         alert("Logged out!");
-        window.location.href = "index.html";
+        window.location.href = "chat.html";
       });
     }
   }
@@ -448,7 +451,7 @@ if (setupForm) {
 
       // 5) Redirect to main page
       alert("Profile setup complete!");
-      window.location.href = "index.html";
+      window.location.href = "chat.html";
     } catch (err) {
       console.error("Setup error:", err);
       alert("Error completing setup: " + err.message);
@@ -474,7 +477,7 @@ if (googleSignupBtn) {
         window.location.href = "setup.html";
       } else {
         // Existing user => go to home (or skip if you want them to do setup anyway)
-        window.location.href = "index.html";
+        window.location.href = "chat.html";
       }
     } catch (err) {
       console.error("Google sign-up error:", err);
@@ -604,8 +607,6 @@ const chatInput = document.getElementById("chatInput");
 const sendBtn = document.getElementById("sendBtn");
 const chatMessages = document.getElementById("chatMessages");
 
-
-
 // FORGOT PASSWORD PAGE
 const forgotPassForm = document.getElementById("forgotPassForm");
 if (forgotPassForm) {
@@ -692,7 +693,6 @@ if (newPassForm) {
   });
 }
 
-
 /*******************************************************
  * Subscribe button
  *******************************************************/
@@ -705,7 +705,9 @@ onAuthStateChanged(auth, async (user) => {
       const userData = userSnap.data();
       const subscriptionStatus = userData.subscriptionStatus || "not-subscribed";
 
-      if (subscriptionStatus !== "active") { // Only create/show button if not subscribed
+      if (subscriptionStatus !== "active") {
+        // Only create/show button if not subscribed
+
         let subscribeBtn = document.getElementById("subscribeBtn");
         if (!subscribeBtn) {
           subscribeBtn = document.createElement("button");
@@ -731,9 +733,9 @@ onAuthStateChanged(auth, async (user) => {
               const response = await fetch(endpointURL, {
                 method: "POST",
                 headers: {
-                  "Content-Type": "application/json"
+                  "Content-Type": "application/json",
                 },
-                body: JSON.stringify({ firebaseUserId: currentUser.uid })
+                body: JSON.stringify({ firebaseUserId: currentUser.uid }),
               });
 
               const data = await response.json();
