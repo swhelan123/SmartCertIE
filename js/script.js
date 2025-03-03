@@ -98,7 +98,8 @@ onAuthStateChanged(auth, async (user) => {
         // User is subscribed: enable chat
         chatInput.disabled = false;
         sendBtn.disabled = false;
-        chatMessages.innerHTML = ""; // Optionally, add a welcome message
+        //edited out trying to fix the dissapearing message problem
+        //chatMessages.innerHTML = ""; // Optionally, add a welcome message
 
         // Hide the subscribe button if it exists
         const subscribeBtn = document.getElementById("subscribeBtn");
