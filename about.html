@@ -19,23 +19,39 @@
 
         <!-- Additional styles for the about page layout -->
         <style>
-            /* Grid for team members */
+            /* Ensure the main container is vertical */
+            .standalone-page {
+                padding: 2rem;
+                margin: 2rem auto;
+            }
+            /* About section takes full width */
+            .about-section {
+                margin-bottom: 2rem;
+            }
+            /* Grid for team members with three equal columns */
             .team-grid {
                 display: grid;
                 grid-template-columns: repeat(3, 1fr);
                 gap: 2rem;
-                margin-top: 2rem;
             }
             @media screen and (max-width: 768px) {
                 .team-grid {
                     grid-template-columns: 1fr;
                 }
             }
-            /* Spacing for each section */
-            .about-section,
-            .team-section {
-                padding: 2rem;
-                margin-bottom: 2rem;
+            /* Founder boxes: stack image above text and centre content */
+            .founder-box {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+                padding: 1rem;
+                background-color: #fff;
+                border-radius: var(--border-radius);
+                box-shadow: var(--shadow-blue);
+            }
+            .founder-box .founder-photo {
+                margin-bottom: 1rem;
             }
         </style>
     </head>
@@ -44,7 +60,7 @@
         <nav class="navbar">
             <div class="brand">SmartCert</div>
             <div class="nav-links">
-                <a href="index.html">Home</a>
+                <a href="landing.html">Home</a>
                 <a href="pricing.html">Pricing</a>
                 <a href="about.html">About</a>
                 <a href="login.html">Log In</a>
@@ -58,7 +74,7 @@
 
         <!-- Main container with vertical layout -->
         <div class="standalone-page">
-            <!-- About SmartCert Section -->
+            <!-- About SmartCert Section (full-width) -->
             <section class="about-section">
                 <h1>About SmartCert</h1>
 
@@ -77,7 +93,7 @@
                     <p>Contact us at <strong>contact@smartcert.ie</strong></p>
                 </div>
                 <p>
-                    <a href="index.html" class="click-link">← Back to Home</a>
+                    <a href="landing.html" class="click-link">← Back to Home</a>
                 </p>
             </section>
 
@@ -128,7 +144,7 @@
                     <!-- Founder 3 -->
                     <div class="founder-box">
                         <div class="founder-photo">
-                            <img src="assets/img/founder3.jpg" alt="Charlie McConnell" />
+                            <img src="assets/img/founder3.png" alt="Charlie McConnell" />
                         </div>
                         <div class="founder-info">
                             <h3>Charlie McConnell</h3>
