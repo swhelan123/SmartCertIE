@@ -910,3 +910,17 @@ body.dark-mode *::-webkit-scrollbar-thumb:hover {
 .chat-button:hover {
     background-color: #2563eb;
 }
+/* Make text italic and remove hover effects */
+.current-plan {
+    font-style: italic; /* italic text */
+    cursor: default; /* normal (non-click) cursor */
+    pointer-events: none; /* completely disables hover/click */
+}
+
+/* If you want the same background color on hover,
+   override the default :hover styling for this class. */
+.current-plan:hover {
+    background-color: inherit; /* or match your normal background */
+    color: inherit; /* keep the same text color */
+    text-decoration: none; /* no underline or highlight */
+}
