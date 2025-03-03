@@ -815,8 +815,7 @@ onAuthStateChanged(auth, async (user) => {
         // 3) Already subscribed => Show “Current Plan” + disable
         finalBtn.textContent = "Current Plan";
         finalBtn.disabled = true;
-        // Optionally add a class that changes styling, e.g.
-        // finalBtn.classList.add("disabled-button");
+        finalBtn.classList.add("current-plan");
       } else {
         // 4) Not subscribed => Attach your Stripe checkout logic
         finalBtn.textContent = "Get full access";
