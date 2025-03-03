@@ -43,6 +43,17 @@ const db = getFirestore(app);
 const googleProvider = new GoogleAuthProvider();
 
 /*******************************************************
+ * REDIRECT IF LOGGED IN ALREADY
+ *******************************************************/
+if (window.location.pathname === "/" || window.location.pathname.endsWith("index.html")) {
+  onAuthStateChanged(auth, (user) => {
+    if (user) {
+      window.location.href = "chat.html";
+    }
+  });
+}
+
+/*******************************************************
  * DARK MODE ICON (SUN/MOON)
  *******************************************************/
 const body = document.body;
