@@ -70,51 +70,51 @@ const admin = require("firebase-admin");
 admin.initializeApp();
 
 exports.getSubscriptionDetails = onRequest(
-  { secrets: ["STRIPE_SECRET_KEY"] }, // This makes process.env.STRIPE_SECRET_KEY available
-  async (req, res) => {
+    {secrets: ["STRIPE_SECRET_KEY"]}, // This makes process.env.STRIPE_SECRET_KEY available
+    async (req, res) => {
     // Optional: If you need Stripe in this function, instantiate it here.
     // If you’re only reading from Firestore, you can skip this.
-    const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
+      const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 
-    // Get the uid from the query parameter
-    const uid = req.query.uid;
-    if (!uid) {
-      return res.status(400).json({ error: "Missing uid parameter" });
-    }
+      // Get the uid from the query parameter
+      const uid = req.query.uid;
+      if (!uid) {
+        return res.status(400).json({error: "Missing uid parameter"});
+      }
 
-    try {
+      try {
       // Retrieve user document from Firestore
-      const userDoc = await admin.firestore().collection("users").doc(uid).get();
-      if (!userDoc.exists) {
-        return res.status(404).json({ error: "User not found" });
+        const userDoc = await admin.firestore().collection("users").doc(uid).get();
+        if (!userDoc.exists) {
+          return res.status(404).json({error: "User not found"});
+        }
+        const userData = userDoc.data();
+
+        // Retrieve subscription data from Firestore (ensure you store this when a user subscribes)
+        const subscription = userData.subscription;
+        if (!subscription) {
+          return res.status(404).json({error: "Subscription data not found"});
+        }
+
+        // Format dates assuming they are stored as Firestore Timestamps
+        const startDate = subscription.startDate.toDate().toISOString().split("T")[0];
+        const nextBillingDate = subscription.nextBillingDate.toDate().toISOString().split("T")[0];
+
+        // Payment method info (for example, "Visa ending in 4242")
+        const paymentMethod = subscription.paymentMethod || "Card info unavailable";
+
+        // Determine if the subscription is active
+        const isActive = subscription.isActive === true;
+
+        return res.json({
+          startDate,
+          nextBillingDate,
+          paymentMethod,
+          isActive,
+        });
+      } catch (error) {
+        console.error("Error fetching subscription details:", error);
+        return res.status(500).json({error: "Internal Server Error"});
       }
-      const userData = userDoc.data();
-
-      // Retrieve subscription data from Firestore (ensure you store this when a user subscribes)
-      const subscription = userData.subscription;
-      if (!subscription) {
-        return res.status(404).json({ error: "Subscription data not found" });
-      }
-
-      // Format dates assuming they are stored as Firestore Timestamps
-      const startDate = subscription.startDate.toDate().toISOString().split("T")[0];
-      const nextBillingDate = subscription.nextBillingDate.toDate().toISOString().split("T")[0];
-
-      // Payment method info (for example, "Visa ending in 4242")
-      const paymentMethod = subscription.paymentMethod || "Card info unavailable";
-
-      // Determine if the subscription is active
-      const isActive = subscription.isActive === true;
-
-      return res.json({
-        startDate,
-        nextBillingDate,
-        paymentMethod,
-        isActive,
-      });
-    } catch (error) {
-      console.error("Error fetching subscription details:", error);
-      return res.status(500).json({ error: "Internal Server Error" });
-    }
-  }
+    },
 );
