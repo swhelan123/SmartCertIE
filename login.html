@@ -1,57 +1,79 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>SmartCert - Login</title>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SmartCert - Login</title>
 
-        <!-- Google Font -->
-        <link rel="preconnect" href="https://fonts.gstatic.com" />
-        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet" />
+    <!-- Google Font -->
+    <link rel="preconnect" href="https://fonts.gstatic.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap"
+      rel="stylesheet"
+    />
 
-        <!-- Shared CSS -->
-        <link rel="stylesheet" href="styles.css" />
+    <!-- Shared CSS -->
+    <link rel="stylesheet" href="styles.css" />
 
-        <!-- Tab Icon -->
-        <link rel="icon" type="image/png" href="assets/img/tab_icon.png" />
-    </head>
-    <body>
-        <div id="topRightContainer" class="pill-container">
-            <img id="modeIcon" class="mode-icon" src="assets/img/dark.png" alt="Toggle Theme" />
-        </div>
-        <div class="standalone-page">
-            <h1>Login to SmartCert</h1>
+    <!-- Tab Icon -->
+    <link rel="icon" type="image/png" href="assets/img/tab_icon.png" />
+  </head>
+  <body>
+    <div id="topRightContainer" class="pill-container">
+      <img
+        id="modeIcon"
+        class="mode-icon"
+        src="assets/img/dark.png"
+        alt="Toggle Theme"
+      />
+    </div>
+    <div class="standalone-page">
+      <h1>Login to SmartCert</h1>
 
-            <!-- Firebase Login Form -->
-            <form id="loginForm" class="login-form">
-                <input type="email" id="emailInput" placeholder="Email" required />
-                <input type="password" id="passwordInput" placeholder="Password" required />
-                <!-- Forgot Password Button -->
-                <a href="forgot_pass.html" class="click-link">Forgot Password?</a>
-                <button type="submit">Log In</button>
-            </form>
+      <!-- Firebase Login Form -->
+      <form id="loginForm" class="login-form">
+        <input type="email" id="emailInput" placeholder="Email" required />
+        <input
+          type="password"
+          id="passwordInput"
+          placeholder="Password"
+          required
+        />
+        <a href="forgot_pass.html" class="click-link">Forgot Password?</a>
+        <button type="submit">Log In</button>
+        <div id="errorMessage" style="color: red; margin-top: 10px"></div>
+        <!-- Add this line -->
+      </form>
 
-            <p class="note">— or —</p>
+      <p class="note">— or —</p>
 
-            <!-- Google Sign-Up Button -->
-            <button id="googleSignupBtn" class="login-button" style="margin-top: 0.5rem">
-                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google Logo" style="width: 18px; height: 18px; margin-right: 0.5rem" />
-                Log In with Google
-            </button>
-            <br /><br />
+      <!-- Google Sign-Up Button -->
+      <button
+        id="googleSignupBtn"
+        class="login-button"
+        style="margin-top: 0.5rem"
+      >
+        <img
+          src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
+          alt="Google Logo"
+          style="width: 18px; height: 18px; margin-right: 0.5rem"
+        />
+        Log In with Google
+      </button>
+      <br /><br />
 
-            <p class="note">
-                Don’t have an account yet?
-                <!-- Link to a sign-up page or your sign-up flow, if you have one -->
-                <a href="signup.html" class="click-link">Create one here.</a>
-            </p>
-            <br />
-            <p>
-                <a href="index.html" class="click-link">← Back to Home</a>
-            </p>
-        </div>
+      <p class="note">
+        Don’t have an account yet?
+        <!-- Link to a sign-up page or your sign-up flow, if you have one -->
+        <a href="signup.html" class="click-link">Create one here.</a>
+      </p>
+      <br />
+      <p>
+        <a href="index.html" class="click-link">← Back to Home</a>
+      </p>
+    </div>
 
-        <!-- IMPORTANT: load script.js as a module if using v9 modular approach -->
-        <script type="module" src="js/script.js"></script>
-    </body>
+    <!-- IMPORTANT: load script.js as a module if using v9 modular approach -->
+    <script type="module" src="js/script.js"></script>
+  </body>
 </html>

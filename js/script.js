@@ -313,26 +313,28 @@ if (changeTopicBtn) {
  * LOGIN PAGE (login.html) - Real Firebase Login
  *******************************************************/
 const loginForm = document.getElementById("loginForm");
+const errorMessage = document.getElementById("errorMessage");
+
 if (loginForm) {
   loginForm.addEventListener("submit", async (e) => {
     e.preventDefault();
     const emailVal = document.getElementById("emailInput")?.value.trim();
     const passVal = document.getElementById("passwordInput")?.value.trim();
+
     if (!emailVal || !passVal) {
-      alert("Please enter email and password");
+      errorMessage.textContent = "Please enter email and password.";
       return;
     }
 
     try {
-      // Attempt to sign in with Firebase
       await signInWithEmailAndPassword(auth, emailVal, passVal);
-      alert("Logged in successfully!");
-      window.location.href = "chat.html"; // go back to home
+      window.location.href = "chat.html"; // Successful login, redirect user
     } catch (err) {
-      alert("Login error: " + err.message);
+      errorMessage.textContent = "Invalid email or password. Please try again.";
     }
   });
 }
+
 
 /*******************************************************
  * ACCOUNT PAGE (account.html)
