@@ -467,7 +467,7 @@ if (setupForm) {
     // 1) Ensure user is logged in
     const user = auth.currentUser;
     if (!user) {
-      alert("You must be logged in!");
+      customAlert("You must be logged in!");
       return;
     }
   
@@ -497,7 +497,7 @@ if (setupForm) {
     );
   
     // 5) Redirect or show success
-    alert("Profile setup complete!");
+    customAlert("Profile setup complete!");
     window.location.href = "chat.html";
   });
 }
@@ -591,7 +591,7 @@ if (updateAccountForm) {
   
     const user = auth.currentUser;
     if (!user) {
-      alert("Not logged in!");
+      customAlert("Not logged in!");
       return;
     }
   
@@ -621,11 +621,11 @@ if (updateAccountForm) {
       // 4) Update the <img> on account page (if you want immediate UI update)
       accountProfilePic.src = newPhotoURL || "assets/img/pfp.avif";
   
-      alert("Profile updated successfully!");
+      customAlert("Profile updated successfully!");
       window.location.href = "chat.html";
     } catch (err) {
       console.error("Update profile error:", err);
-      alert("Error updating profile: " + err.message);
+      customAlert("Error updating profile: " + err.message);
     }
   });  
 }
