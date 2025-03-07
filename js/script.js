@@ -26,7 +26,7 @@ const firebaseConfig = {
   apiKey: "AIzaSyDe5pXEGR015hQbXvoSGyJc955hgXO8tio",
   authDomain: "smartcert-f1965.firebaseapp.com",
   projectId: "smartcert-f1965",
-  storageBucket: "smartcert-f1965.appspot.com",
+  storageBucket: "smartcert-f1965.firebasestorage.app",
   messagingSenderId: "1075815326636",
   appId: "1:1075815326636:web:ffd63ed204d2832e295009",
   measurementId: "G-6CJR44Z4MK",
