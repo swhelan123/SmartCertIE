@@ -107,6 +107,10 @@ onAuthStateChanged(auth, async (user) => {
       // Default to "not-subscribed" if subscriptionStatus is missing
       const subscriptionStatus = userData.subscriptionStatus || "not-subscribed";
 
+      if (userData.photoURL) {
+        profilePic.src = userData.photoURL;
+      }      
+
       if (subscriptionStatus === "active") {
         // User is subscribed: enable chat
         chatInput.disabled = false;

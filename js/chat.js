@@ -49,7 +49,7 @@ async function queryAimlApi(question) {
     if (data.choices && data.choices[0]?.message?.content) {
       return data.choices[0].message.content;
     } else {
-      return "Sorry, I didn’t understand that.";
+      return "Sorry, I didn't understand that.";
     }
   } catch (error) {
     console.error("oh no! aimlapi error:", error);
@@ -108,6 +108,8 @@ if (sendBtn && chatInput && chatMessages) {
 
     const userAvatar = document.createElement("img");
     userAvatar.classList.add("chat-avatar");
+
+
     userAvatar.src = "assets/img/pfp.avif";
     userAvatar.alt = "User Avatar";
 
