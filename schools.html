@@ -1,100 +1,123 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>SmartCert - Schools</title>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>SmartCert - Schools</title>
 
-    <!-- Google Font -->
-    <link rel="preconnect" href="https://fonts.gstatic.com" />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap"
-      rel="stylesheet"
-    />
+        <!-- Google Font -->
+        <link rel="preconnect" href="https://fonts.gstatic.com" />
+        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet" />
 
-    <!-- Shared CSS -->
-    <link rel="stylesheet" href="styles.css" />
+        <!-- Shared CSS -->
+        <link rel="stylesheet" href="styles.css" />
 
-    <!-- Tab Icon -->
-    <link rel="icon" type="image/png" href="assets/img/tab_icon.png" />
+        <!-- Tab Icon -->
+        <link rel="icon" type="image/png" href="assets/img/tab_icon.png" />
 
-    <!-- Script (if needed for nav chat link, etc.) -->
-    <script type="module" src="js/script.js"></script>
+        <!-- Script (if needed for nav chat link, etc.) -->
+        <script type="module" src="js/script.js"></script>
 
-    <style>
-      /* Optional: some local styling for the schools page */
-      .schools-hero {
-        display: flex;
-        align-items: center;
-        gap: 2rem;
-        padding: 2rem;
-      }
+        <style>
+            /* Optional: some local styling for the schools page */
+            .schools-hero {
+                display: flex;
+                align-items: center;
+                gap: 2rem;
+                padding: 2rem;
+            }
 
-      .schools-hero .hero-text {
-        flex: 1;
-      }
+            .schools-hero .hero-text {
+                flex: 1;
+            }
 
-      .schools-hero img {
-        max-width: 400px;
-        width: 100%;
-        border-radius: var(--border-radius);
-        box-shadow: var(--shadow-blue);
-      }
+            .schools-hero img {
+                max-width: 400px;
+                width: 100%;
+                border-radius: var(--border-radius);
+                box-shadow: var(--shadow-blue);
+            }
 
-      .contact-box {
-        margin-top: 1rem;
-        padding: 1rem;
-        background-color: #f9f9f9;
-        border-radius: var(--border-radius);
-        box-shadow: var(--shadow-blue);
-      }
-    </style>
-  </head>
-  <body class="standalone-mode">
-    <!-- NAV BAR -->
-    <nav class="navbar">
-      <div class="navbar-container">
-        <!-- Brand on the left -->
-        <a href="index.html?showLanding" class="brand">SmartCert</a>
+            .contact-box {
+                margin-top: 1rem;
+                padding: 1rem;
+                background-color: #f9f9f9;
+                border-radius: var(--border-radius);
+                box-shadow: var(--shadow-blue);
+            }
+            /* Mobile override: place image on top */
+            @media (max-width: 600px) {
+                .schools-hero {
+                    flex-direction: column; /* stack them vertically */
+                    padding: 0; /* remove the big padding so the image can touch top edges */
+                }
 
-        <!-- Links in the middle -->
-        <div class="nav-links">
-          <a href="pricing.html">Pricing</a>
-          <a href="about.html">About</a>
-          <a href="schools.html">For Schools</a>
+                .schools-hero img {
+                    width: 100%; /* fill the container’s width */
+                    max-width: none; /* remove the 400px limit */
+                    border-radius: var(--border-radius) var(--border-radius) 0 0;
+                    margin: 0; /* no extra margins */
+                    order: -1; /* ensure the image is at the top if needed */
+                    box-shadow: none;
+                }
+
+                .schools-hero .hero-text {
+                    padding: 1rem; /* add some spacing under the image */
+                    text-align: left; /* keep text left-aligned */
+                }
+
+                .standalone-page {
+                    padding-top: 0; /* remove top padding so image is flush with the top */
+                }
+            }
+        </style>
+    </head>
+    <body class="standalone-mode">
+        <!-- NAV BAR -->
+        <nav class="navbar">
+            <div class="navbar-container">
+                <a href="index.html" class="brand">SmartCert</a>
+
+                <!-- Desktop nav links -->
+                <div class="nav-links" id="navLinks">
+                    <a href="pricing.html">Pricing</a>
+                    <a href="about.html">About</a>
+                    <a href="schools.html">For Schools</a>
+                </div>
+
+                <!-- Put Chat + Hamburger together with no gap -->
+                <div style="display: flex; align-items: center; gap: 0.5rem">
+                    <a href="#" class="chat-button" id="navChatLink">Chat</a>
+                    <div class="hamburger" id="hamburgerBtn">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main content container -->
+        <div class="standalone-page schools-page">
+            <!-- “Schools” Hero Section -->
+            <section class="schools-hero">
+                <img src="assets/img/school.jpg" alt="School building" />
+                <div class="hero-text">
+                    <h1>SmartCert for Schools</h1>
+                    <p>
+                        Looking to provide all your Leaving Cert Biology students with instant, exam-focused AI support? Our school license option gives entire classes and staff the power of
+                        SmartCert, so everyone can learn and revise more efficiently.
+                    </p>
+                    <br />
+                    <div class="highlight-box">
+                        <h3>Interested?</h3>
+                        Contact us at <strong>contact@smartcert.ie</strong> to arrange a custom school license. We'll be happy to discuss features, pricing, and onboarding to make SmartCert a perfect
+                        fit for your school.
+                    </div>
+                </div>
+            </section>
         </div>
 
-        <!-- Chat button on the right -->
-        <a href="#" id="navChatLink" class="chat-button">Chat</a>
-      </div>
-    </nav>
-
-    <!-- Main content container -->
-    <div class="standalone-page">
-      <!-- “Schools” Hero Section -->
-      <section class="schools-hero">
-        <div class="hero-text">
-          <h1>SmartCert for Schools</h1>
-          <p>
-            Looking to provide all your Leaving Cert Biology students with
-            instant, exam-focused AI support? Our school license option gives
-            entire classes and staff the power of SmartCert, so everyone can
-            learn and revise more efficiently.
-          </p>
-          <br />
-          <div class="highlight-box">
-            <h3>Interested?</h3>
-            Contact us at <strong>contact@smartcert.ie</strong> to arrange a
-            custom school license. We'll be happy to discuss features, pricing,
-            and onboarding to make SmartCert a perfect fit for your school.
-          </div>
-        </div>
-        <img src="assets/img/school.jpg" alt="School building" />
-      </section>
-    </div>
-
-    <footer class="landing-footer">
-      © 2025 SmartCert — All rights reserved
-    </footer>
-  </body>
+        <footer class="landing-footer">© 2025 SmartCert — All rights reserved</footer>
+    </body>
 </html>

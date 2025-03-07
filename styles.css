@@ -32,7 +32,6 @@ body {
         background-color 0.3s,
         color 0.3s,
         background 0.3s;
-    overflow: hidden;
 }
 
 body.dark-mode {
@@ -222,7 +221,7 @@ body.dark-mode .sidebar-footer a {
     color: var(--dark-text);
 }
 
-/* Main content area (on index.html) */
+/* Main content area (on chat.html) */
 .main-content {
     flex: 1;
     display: flex;
@@ -333,26 +332,50 @@ body.dark-mode .standalone-page {
     background-color: #2b2b2b;
 }
 
-/* CHANGED: remove forced min-width. Now just max-width and full width below */
-.login-form,
-.signup-form {
+/* For login/signup or any form-page container */
+.standalone-page.form-page {
+    width: 100%; /* fills the screen on small devices */
+    max-width: 550px; /* caps at 550 on desktops */
+    margin: 4rem auto; /* centres horizontally, with top/bottom spacing */
+    padding: 2rem; /* your preferred padding */
+}
+
+@media (max-width: 600px) {
+    .standalone-page.form-page {
+        margin: 2rem;
+        padding: 1.5rem;
+    }
+}
+
+body .standalone-page.form-page {
+    /* Let the .form-page container handle its own scroll */
+    height: auto; /* So it can grow if needed */
+    overflow-y: auto; /* Let it scroll if content is taller than viewport */
+}
+
+/* LOGIN / SIGNUP FORMS */
+/* Replace the existing .login-form, .signup-form sections with this */
+
+.login-form {
     display: flex;
     flex-direction: column;
     gap: 1rem;
-    margin: 1rem 0;
-    width: 100%;           /* NEW */
-    max-width: 550px;      /* NEW */
-    min-width: 0;          /* NEW */
+    /* Instead of forcing min-width: 550px, let's allow them to shrink on mobile */
+    width: 100%;
+    max-width: 550px;
+    margin: 1rem auto; /* centre horizontally */
 }
-.login-form input,
-.signup-form input {
+
+/* For their child inputs/buttons, you can keep these as-is or tweak spacing */
+.login-form input {
     padding: 0.8rem;
     border: 1px solid #ccc;
     border-radius: var(--border-radius);
     font-size: 1rem;
 }
-.login-form button,
-.signup-form button {
+
+/* The form button can remain as-is */
+.login-form button {
     background-color: var(--primary-color);
     color: #fff;
     border: none;
@@ -362,8 +385,8 @@ body.dark-mode .standalone-page {
     font-weight: 500;
     transition: background-color 0.2s;
 }
-.login-form button:hover,
-.signup-form button:hover {
+
+.login-form button:hover {
     background-color: #2563eb;
 }
 
@@ -524,7 +547,7 @@ body.dark-mode .account-welcome-text {
    Founder Section (Unified)
    ================================ */
 .team-section {
-    flex: 2; 
+    flex: 2;
     background-color: #f9f9f9;
     border-radius: var(--border-radius);
     padding: 2rem;
@@ -665,8 +688,8 @@ h1 {
 }
 
 body.standalone-mode {
-    height: auto; 
-    overflow: auto; 
+    height: auto;
+    overflow: auto;
     display: block;
 }
 
@@ -687,12 +710,12 @@ body.standalone-mode {
 }
 .chat-bubble ul,
 .chat-bubble ol {
-  margin: 0;
-  padding-left: 1.5rem;
-  list-style-position: outside;
+    margin: 0;
+    padding-left: 1.5rem;
+    list-style-position: outside;
 }
 .chat-bubble li {
-  margin-bottom: 0.4rem;
+    margin-bottom: 0.4rem;
 }
 .chat-avatar {
     width: 40px;
@@ -760,6 +783,7 @@ body.dark-mode *::-webkit-scrollbar-thumb:hover {
 }
 
 /* ===== NAVBAR STYLES ===== */
+/* 1) Basic Navbar Container (unchanged from your existing code) */
 .navbar {
     position: sticky;
     top: 0;
@@ -771,25 +795,31 @@ body.dark-mode *::-webkit-scrollbar-thumb:hover {
     padding: 0 2rem;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
-.navbar .brand {
+
+.navbar-container {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    height: 70px;
+    width: 100%;
+    justify-content: space-between; /* brand left, others right */
+}
+
+/* 2) The brand link (SmartCert) */
+.brand {
     font-size: 1.8rem;
     font-weight: 600;
     color: var(--primary-color);
     text-decoration: none;
-    border: none;
-    outline: none;
 }
-.navbar .brand:focus,
-.navbar .brand:active {
-    outline: none;
-    box-shadow: none;
-}
+
+/* 3) Nav Links: display inline on desktop */
 .nav-links {
-    flex: 1;
     display: flex;
-    justify-content: center;
     gap: 2rem;
 }
+
 .navbar .nav-links a {
     font-weight: 700;
     font-size: 1.1rem;
@@ -799,27 +829,68 @@ body.dark-mode *::-webkit-scrollbar-thumb:hover {
 .navbar .nav-links a:hover {
     text-decoration: underline;
 }
-@media (max-width: 768px) {
-    .navbar {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-    .navbar .nav-links {
-        margin-top: 1rem;
-        flex-direction: column; /* NEW: stacked on mobile */
-        align-items: flex-start;
-        gap: 1rem;
-    }
+
+/* 4) The Chat button on the right (already in your code) */
+.chat-button {
+    background-color: #3b82f6;
+    color: #fff !important;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 500;
+    margin-left: 1rem;
+    transition: background-color 0.2s;
 }
-.navbar-container {
-    max-width: 1100px;
-    margin: 0 auto;
-    display: flex;
-    align-items: center;
-    height: 70px;
-    padding: 0 1rem;
-    gap: 1rem;
+.chat-button:hover {
+    background-color: #2563eb;
+}
+
+/* 5) The Hamburger Icon: hidden on desktop by default */
+.hamburger {
+    display: none; /* hide on desktop */
+    width: 2rem;
+    height: 2rem;
+    flex-direction: column;
+    justify-content: space-around;
+    cursor: pointer;
+}
+
+.hamburger span {
+    display: block;
     width: 100%;
+    height: 3px;
+    background-color: #333;
+    border-radius: 4px;
+    transition:
+        transform 0.3s,
+        opacity 0.3s;
+}
+
+/* 6) MOBILE STYLES: at max-width 768px, we hide .nav-links by default,
+      show the hamburger. */
+@media (max-width: 768px) {
+    .nav-links {
+        display: none; /* hide nav links by default */
+        position: absolute;
+        top: 70px; /* just below the navbar */
+        right: 0;
+        background-color: #fff;
+        flex-direction: column;
+        gap: 1rem;
+        padding: 1rem 2rem;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        border-radius: var(--border-radius);
+    }
+
+    /* When we add a .show class, display them as a dropdown */
+    .nav-links.show {
+        display: flex;
+    }
+
+    /* Show hamburger on mobile */
+    .hamburger {
+        display: flex;
+    }
 }
 
 .landing-footer {
@@ -873,85 +944,4 @@ code {
     border-radius: var(--border-radius);
     box-shadow: var(--shadow-blue);
     max-width: 90%;
-    text-align: center;
-    font-family: "Poppins", sans-serif;
-}
-.custom-alert-button {
-    margin-top: 15px;
-    padding: 8px 16px;
-    background: var(--primary-color);
-    color: #fff;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: background 0.2s;
-}
-.custom-alert-button:hover {
-    background: #2563eb;
-}
-.custom-confirm-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0,0,0,0.4);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 9999;
-}
-.custom-confirm-modal {
-    background: #fff;
-    border-radius: 12px;
-    padding: 1.5rem 2rem;
-    max-width: 400px;
-    width: 90%;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
-    text-align: center;
-    font-family: "Poppins", sans-serif;
-}
-.custom-confirm-buttons {
-    margin-top: 1rem;
-    display: flex;
-    gap: 1rem;
-    justify-content: center;
-}
-.custom-confirm-buttons button {
-    background-color: var(--primary-color);
-    color: #fff;
-    border: none;
-    border-radius: 8px;
-    padding: 0.5rem 1rem;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: background-color 0.2s;
-}
-.custom-confirm-buttons button:hover {
-    background-color: #2563eb;
-}
-.custom-confirm-no {
-    background-color: #aaa;
-}
-.custom-confirm-no:hover {
-    background-color: #777;
-}
-
-/* NEW: Additional media query to shrink hero text & images on very small screens */
-@media (max-width: 480px) {
-    h1 {
-      font-size: 1.6rem; /* Scale down main headings slightly */
-    }
-    .hero-container {
-      flex-direction: column;
-      align-items: center;
-    }
-    .hero-text {
-      margin-right: 0;
-      text-align: center; /* Centre the text on small screens */
-    }
-    .hero-image img {
-      max-width: 100%;
-      height: auto;
-    }
-}
+    t

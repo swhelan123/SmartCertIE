@@ -109,7 +109,7 @@ onAuthStateChanged(auth, async (user) => {
 
       if (userData.photoURL) {
         profilePic.src = userData.photoURL;
-      }      
+      }
 
       if (subscriptionStatus === "active") {
         // User is subscribed: enable chat
@@ -215,7 +215,7 @@ if (sidebarLinks && chatSection && notebookSection) {
           // Create the <li> with the AI text
           const li = document.createElement("li");
           li.textContent = entry.text;
-        
+
           // Create a small "Delete" button
           const delBtn = document.createElement("button");
           delBtn.textContent = "Delete";
@@ -240,17 +240,15 @@ if (sidebarLinks && chatSection && notebookSection) {
             delBtn.style.backgroundColor = "#e53e3e"; // revert
           });
 
-        
           // On click => call a new function to delete from Firestore
           delBtn.addEventListener("click", async () => {
-            
             const confirmed = await showCustomConfirm("Are you sure you want to delete this entry?");
             if (!confirmed) return;
-        
+
             try {
               // Use the doc ID we stored in entry.id
               await deleteDoc(doc(db, "users", auth.currentUser.uid, "notebook", entry.id));
-        
+
               // Remove this <li> from the DOM
               li.remove();
             } catch (err) {
@@ -258,14 +256,13 @@ if (sidebarLinks && chatSection && notebookSection) {
               customAlert("Could not delete entry");
             }
           });
-        
+
           // Append the button to the <li>
           li.appendChild(delBtn);
-        
+
           // Finally, add the <li> to <ul id="savedResponses">
           savedResponses.appendChild(li);
         });
-        
       }
 
       // 3) Remove 'active' from all sidebar links
@@ -286,7 +283,6 @@ if (sidebarLinks && chatSection && notebookSection) {
     chatLink.classList.add("active");
   }
 }
-
 
 /*******************************************************
  * Dropdown topic menu
@@ -402,7 +398,6 @@ if (loginForm) {
   });
 }
 
-
 /*******************************************************
  * ACCOUNT PAGE (account.html)
  *******************************************************/
@@ -467,18 +462,18 @@ const setupForm = document.getElementById("setupForm");
 if (setupForm) {
   setupForm.addEventListener("submit", async (e) => {
     e.preventDefault();
-  
+
     // 1) Ensure user is logged in
     const user = auth.currentUser;
     if (!user) {
       customAlert("You must be logged in!");
       return;
     }
-  
+
     // 2) Gather form inputs
     const file = document.getElementById("profilePicInput").files[0];
     let photoURL = "";
-  
+
     // 3) If user selected a file, upload to Storage
     if (file) {
       const storage = getStorage(app);
@@ -489,7 +484,7 @@ if (setupForm) {
       // Get a download URL to store in Firestore
       photoURL = await getDownloadURL(storageRef);
     }
-  
+
     // 4) Save user profile data to Firestore (including photoURL)
     await setDoc(
       doc(db, "users", user.uid),
@@ -497,9 +492,9 @@ if (setupForm) {
         photoURL,
         // plus any other fields: name, phone, etc.
       },
-      { merge: true }
+      { merge: true },
     );
-  
+
     // 5) Redirect or show success
     customAlert("Profile setup complete!");
     window.location.href = "chat.html";
@@ -592,18 +587,18 @@ onAuthStateChanged(auth, async (user) => {
 if (updateAccountForm) {
   updateAccountForm.addEventListener("submit", async (e) => {
     e.preventDefault();
-  
+
     const user = auth.currentUser;
     if (!user) {
       customAlert("Not logged in!");
       return;
     }
-  
+
     try {
       // 1) Check if user selected a new file
       const file = document.getElementById("newProfilePic").files[0];
       let newPhotoURL = ""; // fallback or existing photo
-  
+
       if (file) {
         // 2) Upload to Storage
         const storage = getStorage(app);
@@ -611,7 +606,7 @@ if (updateAccountForm) {
         await uploadBytes(storageRef, file);
         newPhotoURL = await getDownloadURL(storageRef);
       }
-  
+
       // 3) Merge new photoURL into Firestore
       await setDoc(
         doc(db, "users", user.uid),
@@ -619,19 +614,19 @@ if (updateAccountForm) {
           photoURL: newPhotoURL,
           // plus any other updated fields
         },
-        { merge: true }
+        { merge: true },
       );
-  
+
       // 4) Update the <img> on account page (if you want immediate UI update)
       accountProfilePic.src = newPhotoURL || "assets/img/pfp.avif";
-  
+
       customAlert("Profile updated successfully!");
       window.location.href = "chat.html";
     } catch (err) {
       console.error("Update profile error:", err);
       customAlert("Error updating profile: " + err.message);
     }
-  });  
+  });
 }
 
 // Grab references to the chat elements
@@ -899,13 +894,12 @@ if (navChatLink) {
   });
 }
 
-
 /*******************************************************
  * NOTEBOOK
  *******************************************************/
 
 // We'll define a global function so we can call it from chat.js
-window.saveNotebookEntry = async function(answer) {
+window.saveNotebookEntry = async function (answer) {
   const user = auth.currentUser;
   if (!user) {
     customAlert("Please log in to save to your notebook!");
@@ -917,9 +911,9 @@ window.saveNotebookEntry = async function(answer) {
     await addDoc(collection(db, "users", user.uid, "notebook"), {
       text: answer,
       topic: window.selectedTopic || "",
-      createdAt: serverTimestamp()
+      createdAt: serverTimestamp(),
     });
-    
+
     customAlert("Response saved to notebook!");
   } catch (err) {
     console.error("Error saving notebook entry:", err);
@@ -927,14 +921,11 @@ window.saveNotebookEntry = async function(answer) {
   }
 };
 
-window.loadNotebookEntries = async function() {
+window.loadNotebookEntries = async function () {
   const user = auth.currentUser;
   if (!user) return [];
 
-  const qRef = query(
-    collection(db, "users", user.uid, "notebook"),
-    orderBy("createdAt", "desc")
-  );
+  const qRef = query(collection(db, "users", user.uid, "notebook"), orderBy("createdAt", "desc"));
   const snapshot = await getDocs(qRef);
 
   const entries = [];
@@ -942,12 +933,11 @@ window.loadNotebookEntries = async function() {
     // Grab docSnap.id plus the actual data
     entries.push({
       id: docSnap.id,
-      ...docSnap.data()
+      ...docSnap.data(),
     });
   });
   return entries;
 };
-
 
 /**************************************
  * custom alerts
@@ -986,7 +976,7 @@ function customAlert(message) {
  * custom confirms
  **************************************/
 
-window.showCustomConfirm = function(message) {
+window.showCustomConfirm = function (message) {
   return new Promise((resolve) => {
     // 1) Create overlay
     const overlay = document.createElement("div");
@@ -1034,3 +1024,49 @@ window.showCustomConfirm = function(message) {
     document.body.appendChild(overlay);
   });
 };
+
+// script.js (simplified snippet)
+document.addEventListener("DOMContentLoaded", () => {
+  const hamburgerBtn = document.getElementById("hamburgerBtn");
+  const navLinks = document.getElementById("navLinks");
+
+  hamburgerBtn.addEventListener("click", () => {
+    // Toggle the "show" class on the nav-links
+    navLinks.classList.toggle("show");
+  });
+});
+
+document.addEventListener("DOMContentLoaded", () => {
+  const hamburgerBtnChat = document.getElementById("hamburgerBtnChat");
+  const sidebar = document.getElementById("sidebar");
+  const sidebarOverlay = document.getElementById("sidebarOverlay");
+
+  if (hamburgerBtnChat && sidebar && sidebarOverlay) {
+    hamburgerBtnChat.addEventListener("click", () => {
+      // Toggle the 'show' class on the sidebar
+      sidebar.classList.toggle("show");
+      sidebarOverlay.classList.toggle("show");
+      // Also toggle the overlay
+      if (sidebar.classList.contains("show")) {
+        sidebarOverlay.classList.add("show");
+      } else {
+        sidebarOverlay.classList.remove("show");
+      }
+    });
+
+    // Clicking the overlay also closes the sidebar
+    sidebarOverlay.addEventListener("click", () => {
+      sidebar.classList.remove("show");
+      sidebarOverlay.classList.remove("show");
+    });
+
+    // Also auto-close the sidebar if a link is clicked
+    const sidebarLinks = sidebar.querySelectorAll("a");
+    sidebarLinks.forEach((link) => {
+      link.addEventListener("click", () => {
+        sidebar.classList.remove("show");
+        sidebarOverlay.classList.remove("show");
+      });
+    });
+  }
+});
