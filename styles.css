@@ -944,4 +944,191 @@ code {
     border-radius: var(--border-radius);
     box-shadow: var(--shadow-blue);
     max-width: 90%;
-    t
+    text-align: center;
+    font-family: "Poppins", sans-serif;
+}
+.custom-alert-button {
+    margin-top: 15px;
+    padding: 8px 16px;
+    background: var(--primary-color);
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.custom-alert-button:hover {
+    background: #2563eb;
+}
+.custom-confirm-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
+.custom-confirm-modal {
+    background: #fff;
+    border-radius: 12px;
+    padding: 1.5rem 2rem;
+    max-width: 400px;
+    width: 90%;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    text-align: center;
+    font-family: "Poppins", sans-serif;
+}
+.custom-confirm-buttons {
+    margin-top: 1rem;
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+}
+.custom-confirm-buttons button {
+    background-color: var(--primary-color);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+.custom-confirm-buttons button:hover {
+    background-color: #2563eb;
+}
+.custom-confirm-no {
+    background-color: #aaa;
+}
+.custom-confirm-no:hover {
+    background-color: #777;
+}
+
+/* NEW: Additional media query to shrink hero text & images on very small screens */
+@media (max-width: 480px) {
+    h1 {
+        font-size: 1.6rem; /* Scale down main headings slightly */
+    }
+    .hero-container {
+        flex-direction: column;
+        align-items: center;
+    }
+    .hero-text {
+        margin-right: 0;
+        text-align: center; /* Centre the text on small screens */
+    }
+    .hero-image img {
+        max-width: 100%;
+        height: auto;
+    }
+}
+
+/* Make it behave like .form-page, but for schools */
+.standalone-page.schools-page {
+    max-width: 1200px; /* or 600px if you prefer */
+    margin: 4rem auto; /* center on desktop */
+    padding: 0; /* let’s handle padding carefully */
+    border-radius: var(--border-radius);
+    overflow: hidden; /* so the top corners are clipped by the container's radius */
+    box-shadow: var(--shadow-blue);
+    background-color: #fff;
+}
+
+/* On smaller screens, reduce margin/padding similarly to login forms */
+@media (max-width: 1250px) {
+    .standalone-page.schools-page {
+        margin: 2rem; /* keep the slight margin so it doesn't fill the screen edge */
+    }
+}
+
+/* Make it behave like .form-page, but for schools */
+.standalone-page.schools-page {
+    max-width: 1200px; /* or 600px if you prefer */
+    margin: 4rem auto; /* center on desktop */
+    padding: 0; /* let’s handle padding carefully */
+    border-radius: var(--border-radius);
+    overflow: hidden; /* so the top corners are clipped by the container's radius */
+    box-shadow: var(--shadow-blue);
+    background-color: #fff;
+}
+
+/* On smaller screens, reduce margin/padding similarly to login forms */
+@media (max-width: 1250px) {
+    .standalone-page.schools-page {
+        margin: 2rem; /* keep the slight margin so it doesn't fill the screen edge */
+    }
+}
+
+/* Make a second pill container class that is positioned top-left. */
+.pill-container.pill-left {
+    top: 1rem;
+    left: 1rem; /* Instead of right: 1rem */
+    right: auto; /* override default if needed */
+}
+
+.sidebar-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 1050; /* between the main content and the sidebar */
+    pointer-events: none;
+}
+
+.sidebar-overlay.show {
+    opacity: 1;
+    pointer-events: all;
+}
+
+/* Mobile styles: sidebar slides in from the left */
+@media (max-width: 768px) {
+    /* Adjust the sidebar to have the same transition duration */
+    .sidebar {
+        position: fixed;
+        top: 0;
+        bottom: 0;
+        left: -260px; /* off-screen */
+        width: 260px;
+        z-index: 1100; /* above the overlay, so it appears on top */
+        transition: left 0.3s ease; /* match the same duration as the overlay */
+        /* the rest of your existing sidebar styles */
+    }
+
+    /* If we add .show to the sidebar, it slides in */
+    .sidebar.show {
+        left: 0;
+    }
+
+    .hamburgerChat {
+        display: flex;
+        width: 2rem;
+        height: 2rem;
+        flex-direction: column;
+        justify-content: space-around;
+        align-items: center;
+        cursor: pointer;
+        z-index: 997;
+    }
+    .hamburgerChat span {
+        display: block;
+        width: 100%;
+        height: 3px;
+        background-color: #333;
+        border-radius: 4px;
+        transition:
+            transform 0.3s,
+            opacity 0.3s;
+    }
+
+    body.dark-mode .hamburgerChat span {
+        background-color: #fff;
+    }
+}
