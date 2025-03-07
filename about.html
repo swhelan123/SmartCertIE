@@ -1,172 +1,235 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>SmartCert - About Our Team</title>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SmartCert - About Our Team</title>
 
-        <!-- Google Font -->
-        <link rel="preconnect" href="https://fonts.gstatic.com" />
-        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet" />
+    <!-- Google Font -->
+    <link rel="preconnect" href="https://fonts.gstatic.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap"
+      rel="stylesheet"
+    />
 
-        <!-- Shared CSS -->
-        <link rel="stylesheet" href="styles.css" />
+    <!-- Shared CSS -->
+    <link rel="stylesheet" href="styles.css" />
 
-        <!-- Tab Icon -->
-        <link rel="icon" type="image/png" href="assets/img/tab_icon.png" />
+    <!-- Tab Icon -->
+    <link rel="icon" type="image/png" href="assets/img/tab_icon.png" />
 
-        <script type="module" src="js/script.js"></script>
+    <script type="module" src="js/script.js"></script>
 
-        <!-- Additional styles for the about page layout -->
-        <style>
-            /* Ensure the main container is vertical */
-            .standalone-page {
-                padding: 2rem;
-                margin: 2rem auto;
-            }
-            /* About section takes full width */
-            .about-section {
-                margin-bottom: 2rem;
-            }
-            /* Grid for team members with three equal columns */
-            .team-grid {
-                display: grid;
-                grid-template-columns: repeat(3, 1fr);
-                gap: 2rem;
-            }
-            @media screen and (max-width: 768px) {
-                .team-grid {
-                    grid-template-columns: 1fr;
-                }
-            }
-            /* Founder boxes: stack image above text and centre content */
-            .founder-box {
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                text-align: center;
-                padding: 1rem;
-                background-color: #fff;
-                border-radius: var(--border-radius);
-                box-shadow: var(--shadow-blue);
-            }
-            .founder-box .founder-photo {
-                margin-bottom: 1rem;
-            }
-            /* Footer */
-            .landing-footer {
-                text-align: center;
-                padding: 1rem 0;
-                font-size: 0.9rem;
-                color: #777;
-                margin-top: auto;
-            }
-        </style>
-    </head>
-    <body class="standalone-mode">
-        <!-- NAV BAR -->
-        <nav class="navbar">
-            <div class="brand">SmartCert</div>
-            <div class="nav-links">
-                <a href="index.html?showLanding">Home</a>
-                <a href="pricing.html">Pricing</a>
-                <a href="about.html">About</a>
-                <!-- <a href="login.html">Log In</a> -->
-                <!-- Removed Sign Up; replaced with a “Chat” button -->
-                <a href="#" id="navChatLink" class="chat-button">Chat</a>
+    <!-- Additional styles for the about page layout -->
+    <style>
+      /* Ensure the main container is vertical */
+      .standalone-page {
+        padding: 2rem;
+        margin: 2rem auto;
+      }
+      /* About section takes full width */
+      .about-section {
+        margin-bottom: 2rem;
+      }
+      .about-section ul {
+        margin: 1rem 0; /* some space above/below the list */
+        padding-left: 1.5rem; /* indent bullets/numbers */
+        list-style-position: outside;
+        line-height: 1.4; /* line spacing */
+      }
+
+      .about-section li {
+        margin-bottom: 0.5rem; /* space between items */
+      }
+      /* Grid for team members with three equal columns */
+      .team-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 2rem;
+      }
+      @media screen and (max-width: 768px) {
+        .team-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+      /* Founder boxes: stack image above text and centre content */
+      .founder-box {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        padding: 1rem;
+        background-color: #fff;
+        border-radius: var(--border-radius);
+        box-shadow: var(--shadow-blue);
+      }
+      .founder-box .founder-photo {
+        margin-bottom: 1rem;
+      }
+      /* Footer */
+      .landing-footer {
+        text-align: center;
+        padding: 1rem 0;
+        font-size: 0.9rem;
+        color: #777;
+        margin-top: auto;
+      }
+    </style>
+  </head>
+  <body class="standalone-mode">
+    <!-- NAV BAR -->
+    <nav class="navbar">
+      <div class="navbar-container">
+        <!-- Brand on the left -->
+        <a href="index.html?showLanding" class="brand">SmartCert</a>
+
+        <!-- Links in the middle -->
+        <div class="nav-links">
+          <a href="pricing.html">Pricing</a>
+          <a href="about.html">About</a>
+          <a href="schools.html">For Schools</a>
+        </div>
+
+        <!-- Chat button on the right -->
+        <a href="#" id="navChatLink" class="chat-button">Chat</a>
+      </div>
+    </nav>
+
+    <!-- Main container with vertical layout -->
+    <div class="standalone-page">
+      <!-- About SmartCert Section (full-width) -->
+      <section class="about-section">
+        <h1>About SmartCert</h1>
+
+        <p>
+          SmartCert is the only AI-driven study platform dedicated to the
+          Leaving Cert curriculum. By focusing on exam-focused content, we help
+          you learn exactly what you need—no time wasted on irrelevant topics.
+        </p>
+
+        <h3>Key Features</h3>
+        <ul>
+          <li>
+            <strong>LC-Focused AI:</strong> Our chatbot is trained on the
+            official syllabus and exam patterns.
+          </li>
+          <li>
+            <strong>Personal Notebook:</strong> Save important answers and
+            revisit them anytime.
+          </li>
+          <li>
+            <strong>Topic-by-Topic Prep:</strong> Zoom in on exactly the
+            chapters you need.
+          </li>
+          <li>
+            <strong>School Access (Coming Soon):</strong> We'll soon offer
+            licenses for entire schools.
+          </li>
+          <li>
+            <strong>More Subjects Ahead:</strong> Biology is just the start—stay
+            tuned for expansions!
+          </li>
+        </ul>
+
+        <p>
+          Whether you're aiming for a H1 or just want a better grasp of the
+          curriculum, SmartCert offers a straightforward way to revise. We
+          streamline your study process so you can focus on what matters most.
+        </p>
+        <br />
+        <div class="highlight-box">
+          <h3>Need Help?</h3>
+          <p>
+            Questions or feedback? Reach out anytime at
+            <strong>contact@smartcert.ie</strong>. We're always improving
+            SmartCert and would love to hear from you!
+          </p>
+        </div>
+      </section>
+
+      <!-- Meet Our Team Section -->
+      <section class="team-section">
+        <div class="team-intro">
+          <h1>Meet Our Team</h1>
+          <h3>Dedicated founders - here to help you succeed!</h3>
+        </div>
+        <div class="team-grid">
+          <!-- Founder 1 -->
+          <div class="founder-box">
+            <div class="founder-photo">
+              <img src="assets/img/founder1.png" alt="Shane Whelan" />
             </div>
-        </nav>
-
-        <!-- Main container with vertical layout -->
-        <div class="standalone-page">
-            <!-- About SmartCert Section (full-width) -->
-            <section class="about-section">
-                <h1>About SmartCert</h1>
-
-                <h3>What We Offer</h3>
-                <ul>
-                    <li>AI Chatbot for quick Biology Q&A</li>
-                    <li>Notebook feature to save responses</li>
-                    <li>Topic-based structure for easy revision</li>
-                </ul>
-                <br />
-                <h3>Why It Helps</h3>
-                <p>We aim to make studying simpler, more interactive, and fun! All of our advanced AI models are trained on Leaving Cert–specific context, ensuring exam-focused answers.</p>
-                <br /><br />
-                <div class="highlight-box">
-                    <h3>Need Help?</h3>
-                    <p>Contact us at <strong>contact@smartcert.ie</strong></p>
-                </div>
-            </section>
-
-            <!-- Meet Our Team Section -->
-            <section class="team-section">
-                <div class="team-intro">
-                    <h1>Meet Our Team</h1>
-                    <h3>Dedicated founders - here to help you succeed!</h3>
-                </div>
-                <div class="team-grid">
-                    <!-- Founder 1 -->
-                    <div class="founder-box">
-                        <div class="founder-photo">
-                            <img src="assets/img/founder1.png" alt="Shane Whelan" />
-                        </div>
-                        <div class="founder-info">
-                            <h3>Shane Whelan</h3>
-                            <!-- <h4>2nd Year Computer Science Student, UCD</h4> -->
-                            <h4>Co-founder & Senior Developer</h4>
-                            <!-- <p>
+            <div class="founder-info">
+              <h3>Shane Whelan</h3>
+              <!-- <h4>2nd Year Computer Science Student, UCD</h4> -->
+              <h4>Co-founder & Senior Developer</h4>
+              <!-- <p>
                                 Did I study biology? No. What did I study—enough to make a website with integrated AI Q&A features, helping you achieve that H1 in your upcoming exams. Take it from a
                                 625 student—you need this in your bio study!
                             </p> -->
-                            <p>massive nerd, has a website.</p>
-                            <p>
-                                <a href="https://linkedin.com/in/shane-whelan-364988291" target="_blank">LinkedIn</a>
-                                <a href="https://www.shane-whelan.ie" target="_blank">Website</a>
-                            </p>
-                        </div>
-                    </div>
+              <p>massive nerd, has a website.</p>
+              <p>
+                <a
+                  href="https://linkedin.com/in/shane-whelan-364988291"
+                  target="_blank"
+                  >LinkedIn</a
+                >
+                <a href="https://www.shane-whelan.ie" target="_blank"
+                  >Website</a
+                >
+              </p>
+            </div>
+          </div>
 
-                    <!-- Founder 2 -->
-                    <div class="founder-box">
-                        <div class="founder-photo">
-                            <img src="assets/img/founder2.jpg" alt="Alex McConnell" />
-                        </div>
-                        <div class="founder-info">
-                            <h3>Alex McConnell</h3>
-                            <!-- <h4>Engineering with Management, Trinity College Dublin</h4> -->
-                            <h4>Co-founder & Senior Developer</h4>
-                            <!-- <p>
+          <!-- Founder 2 -->
+          <div class="founder-box">
+            <div class="founder-photo">
+              <img src="assets/img/founder2.jpg" alt="Alex McConnell" />
+            </div>
+            <div class="founder-info">
+              <h3>Alex McConnell</h3>
+              <!-- <h4>Engineering with Management, Trinity College Dublin</h4> -->
+              <h4>Co-founder & Senior Developer</h4>
+              <!-- <p>
                                 I HATED having to learn all the useless information that authors put in the biology books. I wish I had this website when I was preparing for exams. I had to grind out
                                 the H1 the hard way! Don't fear, you don't have to work hard anymore. Why would you when AI can do all the heavy lifting?
                             </p> -->
-                            <p>less of a nerd, doesn't have a website.</p>
-                            <p>
-                                <a href="https://www.linkedin.com/in/alexmcconnell1002" target="_blank">LinkedIn</a>
-                            </p>
-                        </div>
-                    </div>
+              <p>less of a nerd, doesn't have a website.</p>
+              <p>
+                <a
+                  href="https://www.linkedin.com/in/alexmcconnell1002"
+                  target="_blank"
+                  >LinkedIn</a
+                >
+              </p>
+            </div>
+          </div>
 
-                    <!-- Founder 3 -->
-                    <div class="founder-box">
-                        <div class="founder-photo">
-                            <img src="assets/img/founder3.png" alt="Charlie McConnell" />
-                        </div>
-                        <div class="founder-info">
-                            <h3>Charlie McConnell</h3>
-                            <!-- <h4>6th Year Student @ St. Michael's College</h4> -->
-                            <h4>Co-founder & Director of Marketing and Finance</h4>
-                            <!-- <p>
+          <!-- Founder 3 -->
+          <div class="founder-box">
+            <div class="founder-photo">
+              <img src="assets/img/founder3.png" alt="Charlie McConnell" />
+            </div>
+            <div class="founder-info">
+              <h3>Charlie McConnell</h3>
+              <!-- <h4>6th Year Student @ St. Michael's College</h4> -->
+              <h4>Co-founder & Director of Marketing and Finance</h4>
+              <!-- <p>
                                 I'm in this with you—due to sit my LC this June. When I came up with the idea for this website, I knew I had to build it. Not only has it transformed my biology
                                 learning, it's given me more time to focus on my other subjects. With the features we offer, you can walk into that exam hall, demand the superintendent put the H1 in
                                 your backpack and walk out. You won't even need to sit the paper haha ;] test 3
                             </p> -->
-                            <p>handles the business side of things, doesn't own a white shirt (shane photoshopped that pic).</p>
-                        </div>
-                    </div>
-                </div>
-            </section>
+              <p>
+                handles the business side of things, doesn't own a white shirt
+                (shane photoshopped that pic).
+              </p>
+            </div>
+          </div>
         </div>
-        <footer class="landing-footer">© 2025 SmartCert — All rights reserved</footer>
-    </body>
+      </section>
+    </div>
+    <footer class="landing-footer">
+      © 2025 SmartCert — All rights reserved
+    </footer>
+  </body>
 </html>

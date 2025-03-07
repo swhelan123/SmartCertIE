@@ -18,7 +18,7 @@ import {
   confirmPasswordReset,
 } from "https://www.gstatic.com/firebasejs/9.17.2/firebase-auth.js";
 import { getFirestore } from "https://www.gstatic.com/firebasejs/9.17.2/firebase-firestore.js";
-import { doc, getDoc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.17.2/firebase-firestore.js";
+import { doc, getDoc, setDoc, serverTimestamp, addDoc, collection, query, orderBy, getDocs, deleteDoc } from "https://www.gstatic.com/firebasejs/9.17.2/firebase-firestore.js";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.17.2/firebase-storage.js";
 
 // 2) Your Firebase configuration (replace with your real config)
@@ -37,8 +37,8 @@ const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
 
 // 4) Get Auth & Firestore instances
-const auth = getAuth(app);
-const db = getFirestore(app);
+export const auth = getAuth(app);
+export const db = getFirestore(app);
 
 const googleProvider = new GoogleAuthProvider();
 
@@ -181,9 +181,10 @@ const sidebarLinks = document.querySelectorAll(".sidebar-nav a[data-section]");
 const chatSection = document.getElementById("chatSection");
 const notebookSection = document.getElementById("notebookSection");
 
+// Right after your existing lines that show/hide sections
 if (sidebarLinks && chatSection && notebookSection) {
   sidebarLinks.forEach((link) => {
-    link.addEventListener("click", (e) => {
+    link.addEventListener("click", async (e) => {
       e.preventDefault();
       const target = link.getAttribute("data-section");
 
@@ -197,6 +198,70 @@ if (sidebarLinks && chatSection && notebookSection) {
       }
       if (target === "notebookSection") {
         notebookSection.classList.remove("hidden");
+
+        // === ADD THIS: Load the user’s notebook ===
+        const entries = await window.loadNotebookEntries();
+
+        // Clear the <ul> before we append new items
+        const savedResponses = document.getElementById("savedResponses");
+        savedResponses.innerHTML = "";
+
+        // Populate the <ul> with each doc
+        entries.forEach((entry) => {
+          // Create the <li> with the AI text
+          const li = document.createElement("li");
+          li.textContent = entry.text;
+        
+          // Create a small "Delete" button
+          const delBtn = document.createElement("button");
+          delBtn.textContent = "Delete";
+          Object.assign(delBtn.style, {
+            marginLeft: "12px",
+            color: "#fff",
+            backgroundColor: "#e53e3e", // a less intense red
+            border: "none",
+            borderRadius: "6px",
+            cursor: "pointer",
+            fontSize: "14px",
+            padding: "4px 8px",
+            boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+            transition: "background-color 0.2s",
+          });
+
+          // Add a simple hover effect
+          delBtn.addEventListener("mouseover", () => {
+            delBtn.style.backgroundColor = "#c53030"; // darker red on hover
+          });
+          delBtn.addEventListener("mouseout", () => {
+            delBtn.style.backgroundColor = "#e53e3e"; // revert
+          });
+
+        
+          // On click => call a new function to delete from Firestore
+          delBtn.addEventListener("click", async () => {
+            
+            const confirmed = await showCustomConfirm("Are you sure you want to delete this entry?");
+            if (!confirmed) return;
+        
+            try {
+              // Use the doc ID we stored in entry.id
+              await deleteDoc(doc(db, "users", auth.currentUser.uid, "notebook", entry.id));
+        
+              // Remove this <li> from the DOM
+              li.remove();
+            } catch (err) {
+              console.error("Error deleting doc:", err);
+              customAlert("Could not delete entry");
+            }
+          });
+        
+          // Append the button to the <li>
+          li.appendChild(delBtn);
+        
+          // Finally, add the <li> to <ul id="savedResponses">
+          savedResponses.appendChild(li);
+        });
+        
       }
 
       // 3) Remove 'active' from all sidebar links
@@ -210,16 +275,14 @@ if (sidebarLinks && chatSection && notebookSection) {
   });
 
   // MAKE CHAT ACTIVE BY DEFAULT:
-  // (1) Show chat, hide notebook
   chatSection.classList.remove("hidden");
   notebookSection.classList.add("hidden");
-
-  // (2) Add "active" to the chat link
   const chatLink = document.querySelector(".sidebar-nav a[data-section='chatSection']");
   if (chatLink) {
     chatLink.classList.add("active");
   }
 }
+
 
 /*******************************************************
  * Dropdown topic menu
@@ -353,8 +416,8 @@ onAuthStateChanged(auth, (user) => {
       accountInfo.textContent = "Welcome to your account page! (Firebase user: " + user.email + ")";
       logoutBtn.addEventListener("click", async () => {
         await signOut(auth);
-        alert("Logged out!");
-        window.location.href = "index.html";
+        customAlert("Logged out!");
+        // window.location.href = "index.html";
       });
     }
   }
@@ -374,21 +437,21 @@ if (signupForm) {
     const confirmVal = document.getElementById("confirmPasswordInput")?.value.trim();
 
     if (!emailVal || !passVal || !confirmVal) {
-      alert("Please fill in all fields.");
+      customAlert("Please fill in all fields.");
       return;
     }
     if (passVal !== confirmVal) {
-      alert("Passwords do not match.");
+      customAlert("Passwords do not match.");
       return;
     }
 
     try {
       // Create user with Firebase
       await createUserWithEmailAndPassword(auth, emailVal, passVal);
-      alert("Account created successfully!");
+      customAlert("Account created successfully!");
       window.location.href = "setup.html";
     } catch (err) {
-      alert("Sign-up error: " + err.message);
+      customAlert("Sign-up error: " + err.message);
     }
   });
 }
@@ -404,7 +467,7 @@ if (setupForm) {
     // 1) Ensure user is logged in
     const user = auth.currentUser;
     if (!user) {
-      alert("You must be logged in to complete setup.");
+      customAlert("You must be logged in to complete setup.");
       window.location.href = "login.html";
       return;
     }
@@ -418,7 +481,7 @@ if (setupForm) {
 
       // Basic validation
       if (!firstName || !lastName || !phoneNumber) {
-        alert("Please fill in all required fields.");
+        customAlert("Please fill in all required fields.");
         return;
       }
 
@@ -454,11 +517,11 @@ if (setupForm) {
       );
 
       // 5) Redirect to main page
-      alert("Profile setup complete!");
+      customAlert("Profile setup complete!");
       window.location.href = "chat.html";
     } catch (err) {
       console.error("Setup error:", err);
-      alert("Error completing setup: " + err.message);
+      customAlert("Error completing setup: " + err.message);
     }
   });
 }
@@ -477,7 +540,7 @@ if (googleSignupBtn) {
 
       if (!userSnap.exists()) {
         // No doc => definitely new user => redirect to setup
-        alert("Google account created successfully!");
+        customAlert("Google account created successfully!");
         window.location.href = "setup.html";
       } else {
         // Existing user => go to home (or skip if you want them to do setup anyway)
@@ -485,7 +548,7 @@ if (googleSignupBtn) {
       }
     } catch (err) {
       console.error("Google sign-up error:", err);
-      alert("Google sign-up error: " + err.message);
+      customAlert("Google sign-up error");
     }
   });
 }
@@ -553,7 +616,7 @@ if (updateAccountForm) {
     // Ensure user is logged in
     const user = auth.currentUser;
     if (!user) {
-      alert("Not logged in.");
+      customAlert("Not logged in.");
       return;
     }
 
@@ -566,7 +629,7 @@ if (updateAccountForm) {
 
       // (Optional) basic validation
       if (!newFirstName || !newLastName || !newPhone) {
-        alert("Please fill in all fields before saving.");
+        customAlert("Please fill in all fields before saving.");
         return;
       }
 
@@ -597,11 +660,11 @@ if (updateAccountForm) {
       accountPhone.textContent = newPhone;
       accountProfilePic.src = newPhotoURL;
 
-      alert("Profile updated successfully!");
+      customAlert("Profile updated successfully!");
       window.location.href = "chat.html";
     } catch (err) {
       console.error("Update profile error:", err);
-      alert("Error updating profile: " + err.message);
+      customAlert("Error updating profile: " + err.message);
     }
   });
 }
@@ -621,20 +684,20 @@ if (forgotPassForm) {
     // 1) Grab the email from the resetEmailInput field
     const resetEmailVal = document.getElementById("resetEmailInput")?.value.trim();
     if (!resetEmailVal) {
-      alert("Please enter your email address.");
+      customAlert("Please enter your email address.");
       return;
     }
 
     try {
       // 2) Use Firebase to send the password reset email
       await sendPasswordResetEmail(auth, resetEmailVal);
-      alert(`Password reset email sent to: ${resetEmailVal}`);
+      customAlert(`Password reset email sent to: ${resetEmailVal}`);
 
       // Optionally, redirect them to login or show a success message
       window.location.href = "login.html";
     } catch (err) {
       console.error("Password reset error:", err);
-      alert("Error sending reset email: " + err.message);
+      customAlert("Error sending reset email: " + err.message);
     }
   });
 }
@@ -647,7 +710,7 @@ if (newPassForm) {
   const oobCode = queryParams.get("oobCode"); // e.g. ?oobCode=abc123
 
   if (!oobCode) {
-    alert("Invalid or missing reset code in URL.");
+    customAlert("Invalid or missing reset code in URL.");
     // optionally redirect them somewhere
   }
 
@@ -660,24 +723,24 @@ if (newPassForm) {
 
     // Basic checks
     if (!newPassword || !confirmPassword) {
-      alert("Please fill out both fields.");
+      customAlert("Please fill out both fields.");
       return;
     }
     if (newPassword !== confirmPassword) {
-      alert("Passwords do not match.");
+      customAlert("Passwords do not match.");
       return;
     }
 
     try {
       // 3) Confirm the password reset using Firebase
       await confirmPasswordReset(auth, oobCode, newPassword);
-      alert("Your password has been reset successfully!");
+      customAlert("Your password has been reset successfully!");
 
       // Optionally redirect to login or auto-login
       window.location.href = "login.html";
     } catch (error) {
       console.error("confirmPasswordReset error:", error);
-      alert("Error resetting password: " + error.message);
+      customAlert("Error resetting password: " + error.message);
     }
   });
 
@@ -729,7 +792,7 @@ onAuthStateChanged(auth, async (user) => {
           subscribeBtn.addEventListener("click", async () => {
             const currentUser = auth.currentUser;
             if (!currentUser) {
-              alert("You must be logged in to subscribe.");
+              customAlert("You must be logged in to subscribe.");
               return;
             }
 
@@ -749,11 +812,11 @@ onAuthStateChanged(auth, async (user) => {
                 window.location.href = data.url;
               } else {
                 console.error("No checkout URL returned:", data);
-                alert("An error occurred while creating the checkout session.");
+                customAlert("An error occurred while creating the checkout session.");
               }
             } catch (err) {
               console.error("Error creating checkout session:", err);
-              alert("An error occurred while processing your subscription.");
+              customAlert("An error occurred while processing your subscription.");
             }
           });
           subscribeBtn.dataset.listenerAttached = "true";
@@ -791,7 +854,7 @@ onAuthStateChanged(auth, async (user) => {
     finalBtn.textContent = "Get full access";
     finalBtn.disabled = false;
     finalBtn.addEventListener("click", () => {
-      alert("You must be logged in to subscribe.");
+      customAlert("You must be logged in to subscribe.");
       window.location.href = "login.html";
     });
   } else {
@@ -837,17 +900,17 @@ onAuthStateChanged(auth, async (user) => {
               window.location.href = data.url; // Stripe checkout
             } else {
               console.error("No checkout URL returned:", data);
-              alert("An error occurred while creating the checkout session.");
+              customAlert("An error occurred while creating the checkout session.");
             }
           } catch (err) {
             console.error("Error creating checkout session:", err);
-            alert("An error occurred while processing your subscription.");
+            customAlert("An error occurred while processing your subscription.");
           }
         });
       }
     } catch (err) {
       console.error("Error fetching user data:", err);
-      alert("An error occurred while checking your subscription status.");
+      customAlert("An error occurred while checking your subscription status.");
     }
   }
 });
@@ -870,3 +933,139 @@ if (navChatLink) {
     }
   });
 }
+
+
+/*******************************************************
+ * NOTEBOOK
+ *******************************************************/
+
+// We'll define a global function so we can call it from chat.js
+window.saveNotebookEntry = async function(answer) {
+  const user = auth.currentUser;
+  if (!user) {
+    customAlert("Please log in to save to your notebook!");
+    return;
+  }
+
+  try {
+    // Create a new doc in /users/{uid}/notebook
+    await addDoc(collection(db, "users", user.uid, "notebook"), {
+      text: answer,
+      topic: window.selectedTopic || "",
+      createdAt: serverTimestamp()
+    });
+    
+    customAlert("Response saved to notebook!");
+  } catch (err) {
+    console.error("Error saving notebook entry:", err);
+    customAlert("Couldn't save to notebook: " + err.message);
+  }
+};
+
+window.loadNotebookEntries = async function() {
+  const user = auth.currentUser;
+  if (!user) return [];
+
+  const qRef = query(
+    collection(db, "users", user.uid, "notebook"),
+    orderBy("createdAt", "desc")
+  );
+  const snapshot = await getDocs(qRef);
+
+  const entries = [];
+  snapshot.forEach((docSnap) => {
+    // Grab docSnap.id plus the actual data
+    entries.push({
+      id: docSnap.id,
+      ...docSnap.data()
+    });
+  });
+  return entries;
+};
+
+
+/**************************************
+ * custom alerts
+ **************************************/
+
+function customAlert(message) {
+  // Create the overlay and modal elements
+  const overlay = document.createElement("div");
+  overlay.className = "custom-alert-overlay";
+
+  const modalBox = document.createElement("div");
+  modalBox.className = "custom-alert-box";
+
+  const msgParagraph = document.createElement("p");
+  msgParagraph.textContent = message;
+
+  const closeBtn = document.createElement("button");
+  closeBtn.className = "custom-alert-button";
+  closeBtn.textContent = "OK";
+
+  // Append elements together
+  modalBox.appendChild(msgParagraph);
+  modalBox.appendChild(closeBtn);
+  overlay.appendChild(modalBox);
+
+  // Append overlay to the body (or a designated container)
+  document.body.appendChild(overlay);
+
+  // Close the modal when button is clicked
+  closeBtn.addEventListener("click", () => {
+    document.body.removeChild(overlay);
+  });
+}
+
+/**************************************
+ * custom confirms
+ **************************************/
+
+window.showCustomConfirm = function(message) {
+  return new Promise((resolve) => {
+    // 1) Create overlay
+    const overlay = document.createElement("div");
+    overlay.classList.add("custom-confirm-overlay");
+
+    // 2) Create the modal
+    const modal = document.createElement("div");
+    modal.classList.add("custom-confirm-modal");
+
+    // 3) The text
+    const msg = document.createElement("p");
+    msg.textContent = message;
+
+    // 4) Buttons container
+    const btnContainer = document.createElement("div");
+    btnContainer.classList.add("custom-confirm-buttons");
+
+    // 5) "Yes" button
+    const yesBtn = document.createElement("button");
+    yesBtn.textContent = "Yes";
+
+    yesBtn.addEventListener("click", () => {
+      document.body.removeChild(overlay);
+      resolve(true); // user confirmed
+    });
+
+    // 6) "No" button
+    const noBtn = document.createElement("button");
+    noBtn.textContent = "No";
+    noBtn.classList.add("custom-confirm-no");
+
+    noBtn.addEventListener("click", () => {
+      document.body.removeChild(overlay);
+      resolve(false); // user canceled
+    });
+
+    // 7) Assemble
+    btnContainer.appendChild(yesBtn);
+    btnContainer.appendChild(noBtn);
+    modal.appendChild(msg);
+    modal.appendChild(btnContainer);
+    overlay.appendChild(modal);
+
+    // 8) Append overlay to body
+    document.body.appendChild(overlay);
+  });
+};

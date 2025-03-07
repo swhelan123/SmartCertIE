@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>SmartCert - The Simpler Way to Study</title>
+    <title>SmartCert - Home</title>
 
     <!-- Google Font -->
     <link rel="preconnect" href="https://fonts.gstatic.com" />
@@ -28,17 +28,43 @@
       }
 
       /* Hero Section */
+      /* 1) Constrain hero to same max-width as navbar, center it, and allow overflow */
       .landing-hero {
-        flex: 1;
+        position: relative;
+        overflow: visible; /* allow the image to extend out */
+        background: none; /* or keep your existing background if any */
+        padding: 2rem 0; /* top/bottom space */
+      }
+
+      .hero-container {
+        max-width: 1100px; /* same as your navbar container */
+        margin: 0 auto; /* center the container */
         display: flex;
         align-items: center;
-        justify-content: space-between;
-        padding: 2rem;
-        gap: 0.5rem;
+        padding: 0 1rem; /* small side padding so text is flush */
       }
+
+      /* 2) Text block on the left, with spacing on the right */
       .hero-text {
-        flex: 1;
+        flex: 0 0 50%; /* or just flex: 1 if you prefer */
+        margin-right: 2rem; /* space between text and image */
       }
+
+      /* 3) Image on the right, partially offscreen */
+      .hero-image {
+        flex: 0 0 auto; /* do not stretch */
+        position: relative;
+        /* transform: translateX(10%); shift it out to the right by ~10% */
+      }
+
+      .hero-image img {
+        display: block;
+        max-width: 50%; /* scale as needed */
+        height: auto;
+        border-radius: var(--border-radius);
+        box-shadow: var(--shadow-blue);
+      }
+
       .hero-text h1 {
         font-size: 2.2rem;
         line-height: 1.2;
@@ -77,20 +103,6 @@
       .btn-secondary:hover {
         background-color: var(--primary-color);
         color: #fff;
-      }
-
-      /* Hero image */
-      .hero-image {
-        flex: 1;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-      }
-      .hero-image img {
-        max-width: 100%;
-        height: auto;
-        border-radius: var(--border-radius);
-        box-shadow: var(--shadow-blue);
       }
 
       /* Features section */
@@ -137,34 +149,41 @@
   <body class="landing-page-container">
     <!-- NAV BAR -->
     <nav class="navbar">
-      <div class="brand">SmartCert</div>
-      <div class="nav-links">
-        <a href="index.html?showLanding">Home</a>
-        <a href="pricing.html">Pricing</a>
-        <a href="about.html">About</a>
-        <!-- <a href="login.html">Log In</a> -->
-        <!-- Removed Sign Up; replaced with a “Chat” button -->
+      <div class="navbar-container">
+        <!-- Brand on the left -->
+        <a href="index.html?showLanding" class="brand">SmartCert</a>
+
+        <!-- Links in the middle -->
+        <div class="nav-links">
+          <a href="pricing.html">Pricing</a>
+          <a href="about.html">About</a>
+          <a href="schools.html">For Schools</a>
+        </div>
+
+        <!-- Chat button on the right -->
         <a href="#" id="navChatLink" class="chat-button">Chat</a>
       </div>
     </nav>
 
     <!-- Hero Section -->
     <section class="landing-hero">
-      <div class="hero-text">
-        <h1>Less time studying.<br />Get better results.</h1>
-        <p>
-          The fastest growing platform for Leaving Cert Biology.
-          <strong>Study smarter, not harder.</strong> With exam-focused Q&A from
-          our AI tutor, you’ll master biology in no time!
-        </p>
-        <div class="cta-buttons">
-          <a href="signup.html" class="btn-primary">Sign Up for Free</a>
-          <a href="about.html" class="btn-secondary">Learn More</a>
+      <div class="hero-container">
+        <div class="hero-text">
+          <h1>Less time studying.<br />Get better results.</h1>
+          <p>
+            The fastest growing platform for Leaving Cert Biology.
+            <strong>Study smarter, not harder.</strong> With exam-focused Q&A
+            from our AI tutor, you’ll master biology in no time!
+          </p>
+          <div class="cta-buttons">
+            <a href="signup.html" class="btn-primary">Sign Up for Free</a>
+            <a href="about.html" class="btn-secondary">Learn More</a>
+          </div>
         </div>
-      </div>
-      <div class="hero-image">
-        <!-- Use whichever hero image you want -->
-        <img src="assets/img/mockup.png" alt="SmartCert Preview" />
+        <div class="hero-image">
+          <!-- Use whichever hero image you want -->
+          <img src="assets/img/mockup.png" alt="SmartCert Preview" />
+        </div>
       </div>
     </section>
 
