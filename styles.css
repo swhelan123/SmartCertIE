@@ -1057,6 +1057,8 @@ code {
     }
     .chat-avatar {
         margin-top: 0.25rem;
+        border-radius: 50%;
+        object-fit: cover;
     }
     .chat-bubble {
         max-width: 85%;
