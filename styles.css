@@ -63,7 +63,7 @@ body.dark-mode {
 #topRightLoginContainer {
     position: absolute;
     top: 1rem;
-    right: 7rem; /* Enough space so it doesn't overlap the dark mode toggle */
+    right: 7rem;
     display: flex;
     align-items: center;
     gap: 1rem;
@@ -80,7 +80,7 @@ body.dark-mode {
     align-items: center;
     gap: 0.5rem;
     background-color: #fff;
-    border-radius: 9999px; /* fully rounded pill shape */
+    border-radius: 9999px;
     padding: 0.4rem 0.8rem;
     box-shadow: var(--shadow-blue);
     z-index: 1001;
@@ -117,7 +117,7 @@ body.dark-mode .pill-container {
     border-radius: 50%;
     object-fit: cover;
     box-shadow: var(--shadow-blue);
-    cursor: pointer; /* So it’s clickable if needed */
+    cursor: pointer;
 }
 
 /*******************************************************
@@ -260,11 +260,43 @@ body.dark-mode .chat-container {
     margin: 0.5rem 0;
     line-height: 1.5;
 }
-.message-bot {
-    align-self: flex-start;
+
+/* Updated message alignment using overlay-row */
+/* Remove old .chat-row rule */
+/* New overlay-row structure for consistent avatar and bubble styling */
+.overlay-row {
+    width: 100%;
+    margin-bottom: 2rem; /* spacing between messages */
 }
-.message-user {
-    align-self: flex-end;
+.overlay-row .bubble-container {
+    position: relative;
+    width: 100%;
+}
+.overlay-row .chat-avatar {
+    position: absolute;
+    top: 0;
+    z-index: 2;
+    width: 40px;
+    height: 40px;
+    transform: translateY(-50%);
+}
+.overlay-row.message-bot .chat-avatar {
+    left: 1rem;
+}
+.overlay-row.message-user .chat-avatar {
+    right: 1rem;
+}
+.overlay-row .chat-bubble {
+    width: 100%;
+    margin: 0;
+    padding: 1rem;
+    padding-top: 2.5rem; /* room for avatar */
+    box-sizing: border-box;
+    border-radius: 1rem;
+    background-color: var(--secondary-color);
+}
+.overlay-row.message-user .chat-bubble {
+    background-color: #e7ffea;
 }
 
 /* Chat input area */
@@ -334,10 +366,10 @@ body.dark-mode .standalone-page {
 
 /* For login/signup or any form-page container */
 .standalone-page.form-page {
-    width: 100%; /* fills the screen on small devices */
-    max-width: 550px; /* caps at 550 on desktops */
-    margin: 4rem auto; /* centres horizontally, with top/bottom spacing */
-    padding: 2rem; /* your preferred padding */
+    width: 100%;
+    max-width: 550px;
+    margin: 4rem auto;
+    padding: 2rem;
 }
 
 @media (max-width: 600px) {
@@ -346,35 +378,26 @@ body.dark-mode .standalone-page {
         padding: 1.5rem;
     }
 }
-
 body .standalone-page.form-page {
-    /* Let the .form-page container handle its own scroll */
-    height: auto; /* So it can grow if needed */
-    overflow-y: auto; /* Let it scroll if content is taller than viewport */
+    height: auto;
+    overflow-y: auto;
 }
 
 /* LOGIN / SIGNUP FORMS */
-/* Replace the existing .login-form, .signup-form sections with this */
-
 .login-form {
     display: flex;
     flex-direction: column;
     gap: 1rem;
-    /* Instead of forcing min-width: 550px, let's allow them to shrink on mobile */
     width: 100%;
     max-width: 550px;
-    margin: 1rem auto; /* centre horizontally */
+    margin: 1rem auto;
 }
-
-/* For their child inputs/buttons, you can keep these as-is or tweak spacing */
 .login-form input {
     padding: 0.8rem;
     border: 1px solid #ccc;
     border-radius: var(--border-radius);
     font-size: 1rem;
 }
-
-/* The form button can remain as-is */
 .login-form button {
     background-color: var(--primary-color);
     color: #fff;
@@ -385,7 +408,6 @@ body .standalone-page.form-page {
     font-weight: 500;
     transition: background-color 0.2s;
 }
-
 .login-form button:hover {
     background-color: #2563eb;
 }
@@ -474,7 +496,7 @@ body.dark-mode .account-welcome-text {
 
 .unit-button {
     border: none;
-    border-radius: 9999px; /* fully round */
+    border-radius: 9999px;
     padding: 0.8rem 1.2rem;
     font-size: 1rem;
     cursor: pointer;
@@ -514,7 +536,6 @@ body.dark-mode .account-welcome-text {
     transition: background-color 0.3s;
 }
 
-/* For smaller screens: single column of chapters */
 @media (max-width: 600px) {
     .chapter-container {
         grid-template-columns: 1fr;
@@ -693,97 +714,7 @@ body.standalone-mode {
     display: block;
 }
 
-/* Additional chat row styling for avatar + bubble */
-.chat-row {
-    display: flex;
-    align-items: flex-end;
-    margin: 0.5rem 0;
-    gap: 0.5rem;
-}
-.chat-bubble {
-    padding: 0.8rem 1rem;
-    border-radius: var(--border-radius);
-    line-height: 1.5;
-    box-shadow: var(--shadow-blue);
-    max-width: 70%;
-    word-wrap: break-word;
-}
-.chat-bubble ul,
-.chat-bubble ol {
-    margin: 0;
-    padding-left: 1.5rem;
-    list-style-position: outside;
-}
-.chat-bubble li {
-    margin-bottom: 0.4rem;
-}
-.chat-avatar {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    object-fit: cover;
-    box-shadow: var(--shadow-blue);
-}
-.message-bot {
-    justify-content: flex-start;
-}
-.message-bot.chat-row {
-    flex-direction: row;
-}
-.message-bot .chat-bubble {
-    background-color: var(--secondary-color);
-}
-body.dark-mode .message-bot .chat-bubble {
-    background-color: #3a3f45;
-}
-.message-user {
-    justify-content: flex-end;
-}
-.message-user.chat-row {
-    flex-direction: row-reverse;
-}
-.message-user .chat-bubble {
-    background-color: #e7ffea;
-}
-body.dark-mode .message-user .chat-bubble {
-    background-color: #344b37;
-}
-
-/* Scrollbar styling (WebKit) */
-*::-webkit-scrollbar {
-    width: 8px;
-}
-*::-webkit-scrollbar-track {
-    background: transparent;
-    margin: 0.5rem;
-}
-*::-webkit-scrollbar-thumb {
-    background-color: #999;
-    border-radius: 4px;
-}
-*::-webkit-scrollbar-thumb:hover {
-    background-color: #424242;
-}
-body.dark-mode *::-webkit-scrollbar-thumb {
-    background-color: #666;
-    border-color: #2b2b2b;
-}
-body.dark-mode *::-webkit-scrollbar-thumb:hover {
-    background-color: #999;
-}
-/* Firefox scrollbar (partial styling) */
-@supports (scrollbar-width: thin) {
-    * {
-        scrollbar-width: thin;
-        scrollbar-color: #999 transparent;
-    }
-    body.dark-mode * {
-        scrollbar-color: #666 transparent;
-    }
-}
-
 /* ===== NAVBAR STYLES ===== */
-/* 1) Basic Navbar Container (unchanged from your existing code) */
 .navbar {
     position: sticky;
     top: 0;
@@ -803,10 +734,9 @@ body.dark-mode *::-webkit-scrollbar-thumb:hover {
     align-items: center;
     height: 70px;
     width: 100%;
-    justify-content: space-between; /* brand left, others right */
+    justify-content: space-between;
 }
 
-/* 2) The brand link (SmartCert) */
 .brand {
     font-size: 1.8rem;
     font-weight: 600;
@@ -814,7 +744,6 @@ body.dark-mode *::-webkit-scrollbar-thumb:hover {
     text-decoration: none;
 }
 
-/* 3) Nav Links: display inline on desktop */
 .nav-links {
     display: flex;
     gap: 2rem;
@@ -830,7 +759,6 @@ body.dark-mode *::-webkit-scrollbar-thumb:hover {
     text-decoration: underline;
 }
 
-/* 4) The Chat button on the right (already in your code) */
 .chat-button {
     background-color: #3b82f6;
     color: #fff !important;
@@ -845,9 +773,8 @@ body.dark-mode *::-webkit-scrollbar-thumb:hover {
     background-color: #2563eb;
 }
 
-/* 5) The Hamburger Icon: hidden on desktop by default */
 .hamburger {
-    display: none; /* hide on desktop */
+    display: none;
     width: 2rem;
     height: 2rem;
     flex-direction: column;
@@ -866,13 +793,11 @@ body.dark-mode *::-webkit-scrollbar-thumb:hover {
         opacity 0.3s;
 }
 
-/* 6) MOBILE STYLES: at max-width 768px, we hide .nav-links by default,
-      show the hamburger. */
 @media (max-width: 768px) {
     .nav-links {
-        display: none; /* hide nav links by default */
+        display: none;
         position: absolute;
-        top: 70px; /* just below the navbar */
+        top: 70px;
         right: 0;
         background-color: #fff;
         flex-direction: column;
@@ -881,13 +806,9 @@ body.dark-mode *::-webkit-scrollbar-thumb:hover {
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         border-radius: var(--border-radius);
     }
-
-    /* When we add a .show class, display them as a dropdown */
     .nav-links.show {
         display: flex;
     }
-
-    /* Show hamburger on mobile */
     .hamburger {
         display: flex;
     }
@@ -1011,7 +932,7 @@ code {
 /* NEW: Additional media query to shrink hero text & images on very small screens */
 @media (max-width: 480px) {
     h1 {
-        font-size: 1.6rem; /* Scale down main headings slightly */
+        font-size: 1.6rem;
     }
     .hero-container {
         flex-direction: column;
@@ -1019,7 +940,7 @@ code {
     }
     .hero-text {
         margin-right: 0;
-        text-align: center; /* Centre the text on small screens */
+        text-align: center;
     }
     .hero-image img {
         max-width: 100%;
@@ -1027,47 +948,27 @@ code {
     }
 }
 
-/* Make it behave like .form-page, but for schools */
+/* Schools page styles */
 .standalone-page.schools-page {
-    max-width: 1200px; /* or 600px if you prefer */
-    margin: 4rem auto; /* center on desktop */
-    padding: 0; /* let’s handle padding carefully */
+    max-width: 1200px;
+    margin: 4rem auto;
+    padding: 0;
     border-radius: var(--border-radius);
-    overflow: hidden; /* so the top corners are clipped by the container's radius */
+    overflow: hidden;
     box-shadow: var(--shadow-blue);
     background-color: #fff;
 }
-
-/* On smaller screens, reduce margin/padding similarly to login forms */
 @media (max-width: 1250px) {
     .standalone-page.schools-page {
-        margin: 2rem; /* keep the slight margin so it doesn't fill the screen edge */
+        margin: 2rem;
     }
 }
 
-/* Make it behave like .form-page, but for schools */
-.standalone-page.schools-page {
-    max-width: 1200px; /* or 600px if you prefer */
-    margin: 4rem auto; /* center on desktop */
-    padding: 0; /* let’s handle padding carefully */
-    border-radius: var(--border-radius);
-    overflow: hidden; /* so the top corners are clipped by the container's radius */
-    box-shadow: var(--shadow-blue);
-    background-color: #fff;
-}
-
-/* On smaller screens, reduce margin/padding similarly to login forms */
-@media (max-width: 1250px) {
-    .standalone-page.schools-page {
-        margin: 2rem; /* keep the slight margin so it doesn't fill the screen edge */
-    }
-}
-
-/* Make a second pill container class that is positioned top-left. */
+/* Second pill container class for top-left positioning */
 .pill-container.pill-left {
     top: 1rem;
-    left: 1rem; /* Instead of right: 1rem */
-    right: auto; /* override default if needed */
+    left: 1rem;
+    right: auto;
 }
 
 .sidebar-overlay {
@@ -1079,56 +980,5 @@ code {
     background: rgba(0, 0, 0, 0.5);
     opacity: 0;
     transition: opacity 0.3s ease;
-    z-index: 1050; /* between the main content and the sidebar */
-    pointer-events: none;
-}
-
-.sidebar-overlay.show {
-    opacity: 1;
-    pointer-events: all;
-}
-
-/* Mobile styles: sidebar slides in from the left */
-@media (max-width: 768px) {
-    /* Adjust the sidebar to have the same transition duration */
-    .sidebar {
-        position: fixed;
-        top: 0;
-        bottom: 0;
-        left: -260px; /* off-screen */
-        width: 260px;
-        z-index: 1100; /* above the overlay, so it appears on top */
-        transition: left 0.3s ease; /* match the same duration as the overlay */
-        /* the rest of your existing sidebar styles */
-    }
-
-    /* If we add .show to the sidebar, it slides in */
-    .sidebar.show {
-        left: 0;
-    }
-
-    .hamburgerChat {
-        display: flex;
-        width: 2rem;
-        height: 2rem;
-        flex-direction: column;
-        justify-content: space-around;
-        align-items: center;
-        cursor: pointer;
-        z-index: 997;
-    }
-    .hamburgerChat span {
-        display: block;
-        width: 100%;
-        height: 3px;
-        background-color: #333;
-        border-radius: 4px;
-        transition:
-            transform 0.3s,
-            opacity 0.3s;
-    }
-
-    body.dark-mode .hamburgerChat span {
-        background-color: #fff;
-    }
-}
+    z-index: 1050;
+ 

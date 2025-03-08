@@ -93,49 +93,40 @@ onAuthStateChanged(auth, async (user) => {
   if (!chatContainer || !chatInput || !sendBtn || !chatMessages) return;
 
   if (user) {
-    // Hide the login/signup button and show profile pic/account link
     loginBtn.classList.add("hidden");
     profilePic.classList.remove("hidden");
     accountLink.setAttribute("href", "account.html");
 
-    // Retrieve the user's Firestore document
     const userDocRef = doc(db, "users", user.uid);
     const userSnap = await getDoc(userDocRef);
 
     if (userSnap.exists()) {
       const userData = userSnap.data();
-      // Default to "not-subscribed" if subscriptionStatus is missing
       const subscriptionStatus = userData.subscriptionStatus || "not-subscribed";
 
+      // Set global userAvatarUrl using the user's profile photo or fallback
+      window.userAvatarUrl = userData.photoURL || "assets/img/pfp.avif";
       if (userData.photoURL) {
         profilePic.src = userData.photoURL;
       }
 
       if (subscriptionStatus === "active") {
-        // User is subscribed: enable chat
         chatInput.disabled = false;
         sendBtn.disabled = false;
-        //edited out trying to fix the dissapearing message problem
-        //chatMessages.innerHTML = ""; // Optionally, add a welcome message
-
-        // Hide the subscribe button if it exists
         const subscribeBtn = document.getElementById("subscribeBtn");
         if (subscribeBtn) subscribeBtn.classList.add("hidden");
       } else {
-        // User is logged in but not subscribed: disable chat and show subscribe prompt
         chatInput.disabled = true;
         sendBtn.disabled = true;
         chatMessages.innerHTML = `
           <div class="chat-message message-bot">
             Click subscribe to use SmartCert chat.
           </div>`;
-
-        // Create or show the subscribe button in the top-right container
         let subscribeBtn = document.getElementById("subscribeBtn");
         if (!subscribeBtn) {
           subscribeBtn = document.createElement("button");
           subscribeBtn.id = "subscribeBtn";
-          subscribeBtn.className = "login-button"; // Reuse existing styling or change as needed
+          subscribeBtn.className = "login-button";
           subscribeBtn.textContent = "Subscribe";
           document.getElementById("topRightContainer").appendChild(subscribeBtn);
         } else {
@@ -143,11 +134,10 @@ onAuthStateChanged(auth, async (user) => {
         }
       }
     } else {
-      // If no Firestore document exists for this user, redirect to setup
       window.location.href = "setup.html";
     }
   } else {
-    // User is not logged in: disable chat and show login/signup message
+    window.userAvatarUrl = "assets/img/pfp.avif";
     chatInput.disabled = true;
     sendBtn.disabled = true;
     chatMessages.innerHTML = `
@@ -155,16 +145,12 @@ onAuthStateChanged(auth, async (user) => {
         You must be logged in to use the chat.
         <a class="click-link" href="login.html">Log in here</a>.
       </div>`;
-
     loginBtn.classList.remove("hidden");
-
-    // Hide the subscribe button if it exists
     const subscribeBtn = document.getElementById("subscribeBtn");
     if (subscribeBtn) subscribeBtn.classList.add("hidden");
   }
 });
 
-//Event listener for pfp -> account
 if (profilePic) {
   profilePic.addEventListener("click", () => {
     window.location.href = "account.html";

@@ -102,32 +102,38 @@ if (sendBtn && chatInput && chatMessages) {
     const question = chatInput.value.trim();
     if (!question) return;
 
-    // === 1) Create USER message row
+    // === 1) Create USER message row using overlay-row structure
     const userRow = document.createElement("div");
-    userRow.classList.add("chat-message", "message-user", "chat-row");
+    userRow.classList.add("chat-message", "message-user", "overlay-row");
+
+    const userBubbleContainer = document.createElement("div");
+    userBubbleContainer.classList.add("bubble-container");
 
     const userAvatar = document.createElement("img");
     userAvatar.classList.add("chat-avatar");
-
-
-    userAvatar.src = "assets/img/pfp.avif";
+    // Use the global profile image URL (fallback if not set)
+    userAvatar.src = window.userAvatarUrl || "assets/img/pfp.avif";
     userAvatar.alt = "User Avatar";
 
     const userBubble = document.createElement("div");
     userBubble.classList.add("chat-bubble");
     userBubble.textContent = question;
 
-    userRow.appendChild(userBubble);
-    userRow.appendChild(userAvatar);
+    userBubbleContainer.appendChild(userAvatar);
+    userBubbleContainer.appendChild(userBubble);
+    userRow.appendChild(userBubbleContainer);
     chatMessages.appendChild(userRow);
 
     // Clear input
     chatInput.value = "";
     chatMessages.scrollTop = chatMessages.scrollHeight;
 
-    // === 2) Create BOT message row
+    // === 2) Create BOT message row using overlay-row structure
     const botRow = document.createElement("div");
-    botRow.classList.add("chat-message", "message-bot", "chat-row");
+    botRow.classList.add("chat-message", "message-bot", "overlay-row");
+
+    const botBubbleContainer = document.createElement("div");
+    botBubbleContainer.classList.add("bubble-container");
 
     const botAvatar = document.createElement("img");
     botAvatar.classList.add("chat-avatar");
@@ -137,8 +143,9 @@ if (sendBtn && chatInput && chatMessages) {
     const botBubble = document.createElement("div");
     botBubble.classList.add("chat-bubble");
 
-    botRow.appendChild(botAvatar);
-    botRow.appendChild(botBubble);
+    botBubbleContainer.appendChild(botAvatar);
+    botBubbleContainer.appendChild(botBubble);
+    botRow.appendChild(botBubbleContainer);
     chatMessages.appendChild(botRow);
 
     chatMessages.scrollTop = chatMessages.scrollHeight;
@@ -163,12 +170,8 @@ if (sendBtn && chatInput && chatMessages) {
       color: "#fff",
     });
 
-    // Attach click handler
     saveBtn.addEventListener("click", () => {
-      // 5A) Call our global function in script.js
       window.saveNotebookEntry(answer);
-
-      // 5B) (Optional) Also add to the local <ul id="savedResponses">
       const li = document.createElement("li");
       li.textContent = answer;
       savedResponses.appendChild(li);
@@ -188,4 +191,3 @@ if (sendBtn && chatInput && chatMessages) {
     }
   });
 }
-
