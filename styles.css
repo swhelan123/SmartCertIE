@@ -1132,15 +1132,19 @@ code {
 @media (max-width: 600px) {
     /* Ensure avatar sits at the appropriate edge */
     .overlay-row {
-        align-items: flex-start;
+        /* Use center so avatars line up vertically */
+        align-items: center;
     }
     .message-bot.overlay-row,
     .message-user.overlay-row {
         flex-direction: row;
     }
+
+    /* Remove the forced margin-top so both avatars match up */
     .chat-avatar {
-        margin-top: 0.25rem;
+        margin-top: 0;
     }
+
     .chat-bubble {
         max-width: 85%;
     }
