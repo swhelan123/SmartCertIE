@@ -406,24 +406,32 @@ body.dark-mode .standalone-page {
 }
 
 @media (max-width: 600px) {
+    /* 1) Let body/content grow as needed */
+    body {
+        flex-direction: column;
+        height: auto;
+    }
+
     .standalone-page.form-page {
         margin: 2rem;
         padding: 1.5rem;
     }
-    /* Remove extra padding and shadows so the chat fills the width */
+
+    /* 2) Remove extra padding/shadows so the chat fills width on mobile */
     .main-content {
         padding: 0;
+        height: auto;
+        overflow: visible;
     }
 
     .chat-container {
         border-radius: 0;
         box-shadow: none;
         padding: 0;
-        /* Optional: remove overflow if you want to allow content to scroll */
         overflow: visible;
     }
 
-    /* Pin the chat input to the bottom */
+    /* 3) Pin chat input to the bottom */
     .chat-input-area {
         position: fixed;
         bottom: 0;
@@ -432,12 +440,49 @@ body.dark-mode .standalone-page {
         padding: 0.5rem;
         background-color: #fff;
         box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.1);
-        z-index: 999; /* above other elements */
+        z-index: 999;
     }
 
-    /* Give the chat container extra bottom padding so last messages aren’t hidden behind the input */
+    /* 4) Extra bottom padding so last messages aren’t hidden behind pinned input */
     .chat-messages {
-        padding-bottom: 4rem; /* or enough space to fit the input area */
+        padding-bottom: 4rem; /* Enough space to fit the input area */
+        flex: none; /* Remove if you're using flex for internal scrolling */
+        overflow: visible; /* Let it scroll with the page */
+    }
+
+    /* 5) Tame the big “Unit” buttons on mobile */
+    .topic-selector h3 {
+        font-size: 1rem;
+        margin-bottom: 0.5rem;
+        text-align: center;
+    }
+
+    .unit-container {
+        display: flex;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        gap: 0.5rem;
+        justify-content: flex-start;
+        padding: 0.5rem;
+    }
+
+    .unit-container::-webkit-scrollbar {
+        display: none; /* Hide scrollbar if you like */
+    }
+
+    .unit-button {
+        font-size: 0.8rem;
+        padding: 0.4rem 0.8rem;
+        border-radius: 1rem;
+        white-space: nowrap; /* So text doesn’t wrap onto two lines */
+        flex-shrink: 0;
+    }
+
+    .chapter-container {
+        display: grid;
+        grid-template-columns: 1fr 1fr; /* 2 columns on mobile */
+        gap: 0.5rem;
+        padding: 0.5rem;
     }
 }
 
