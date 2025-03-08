@@ -187,4 +187,14 @@ if (sendBtn && chatInput && chatMessages) {
     botBubble.appendChild(saveBtn);
 
     // Scroll to bottom
-    chatMessages.scroll
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+  });
+
+  // Press Enter to send
+  chatInput.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      sendBtn.click();
+    }
+  });
+}
