@@ -254,7 +254,7 @@ body.dark-mode .chat-container {
     padding-right: 0.5rem;
 }
 .chat-message {
-    max-width: 70%;
+    max-width: none;
     padding: 0.8rem 1rem;
     border-radius: var(--border-radius);
     margin: 0.5rem 0;
@@ -271,6 +271,8 @@ body.dark-mode .chat-container {
 .overlay-row .bubble-container {
     position: relative;
     width: 100%;
+    margin: 0 1rem;
+    box-sizing: border-box;
 }
 .overlay-row .chat-avatar {
     position: absolute;
