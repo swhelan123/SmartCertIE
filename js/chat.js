@@ -128,7 +128,7 @@ if (sendBtn && chatInput && chatMessages) {
     chatInput.value = "";
     chatMessages.scrollTop = chatMessages.scrollHeight;
 
-    // === 2) Create BOT message row using overlay-row structure
+    // 2) Create the BOT message row
     const botRow = document.createElement("div");
     botRow.classList.add("chat-message", "message-bot", "overlay-row");
 
@@ -143,20 +143,27 @@ if (sendBtn && chatInput && chatMessages) {
     const botBubble = document.createElement("div");
     botBubble.classList.add("chat-bubble");
 
+    // 3) Set placeholder text so user sees "Thinking..."
+    botBubble.textContent = "Thinking...";
+
     botBubbleContainer.appendChild(botAvatar);
     botBubbleContainer.appendChild(botBubble);
     botRow.appendChild(botBubbleContainer);
     chatMessages.appendChild(botRow);
 
+    // Scroll to bottom
     chatMessages.scrollTop = chatMessages.scrollHeight;
 
-    // === 3) Query the AI
+    // 4) Query the AI
     const answer = await queryAimlApi(question);
 
-    // === 4) Type out the final *formatted* HTML
+    // 5) Replace "Thinking..." with typed-out answer
+    botBubble.innerHTML = ""; // clear out "Thinking..."
+
+    // === 6) Type out the final *formatted* HTML
     await typeMarkdownAsHtml(answer, botBubble, 5);
 
-    // === 5) Add a "Save to Notebook" button
+    // === 7) Add a "Save to Notebook" button
     const saveBtn = document.createElement("button");
     saveBtn.textContent = "Save to Notebook";
     Object.assign(saveBtn.style, {
