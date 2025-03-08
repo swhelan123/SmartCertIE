@@ -292,6 +292,8 @@ body.dark-mode .chat-container {
     width: 40px;
     height: 40px;
     transform: translateY(-50%);
+    border-radius: 50%;
+    object-fit: cover;
 }
 .overlay-row.message-bot .chat-avatar {
     left: 1rem;
@@ -1057,8 +1059,6 @@ code {
     }
     .chat-avatar {
         margin-top: 0.25rem;
-        border-radius: 50%;
-        object-fit: cover;
     }
     .chat-bubble {
         max-width: 85%;
