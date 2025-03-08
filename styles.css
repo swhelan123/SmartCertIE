@@ -422,7 +422,25 @@ body.dark-mode .standalone-page {
         /* Optional: remove overflow if you want to allow content to scroll */
         overflow: visible;
     }
+
+    /* Pin the chat input to the bottom */
+    .chat-input-area {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        padding: 0.5rem;
+        background-color: #fff;
+        box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.1);
+        z-index: 999; /* above other elements */
+    }
+
+    /* Give the chat container extra bottom padding so last messages aren’t hidden behind the input */
+    .chat-messages {
+        padding-bottom: 4rem; /* or enough space to fit the input area */
+    }
 }
+
 body .standalone-page.form-page {
     height: auto;
     overflow-y: auto;
