@@ -314,6 +314,18 @@ body.dark-mode .chat-container {
     background-color: var(--secondary-color);
 }
 
+/* Add left indentation to lists in the chat bubble */
+.chat-bubble ul,
+.chat-bubble ol {
+    margin-left: 1.5rem; /* or 2rem, tweak as desired */
+    padding-left: 0; /* if you prefer to rely on margin only */
+}
+
+/* Optionally add spacing for paragraphs too */
+.chat-bubble p {
+    margin-bottom: 0.75rem;
+}
+
 /* Bot vs. User bubble colors & text alignment */
 .overlay-row.message-user .chat-bubble {
     background-color: #e7ffea; /* user bubble color */
