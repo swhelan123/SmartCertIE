@@ -260,20 +260,31 @@ body.dark-mode .chat-container {
     margin: 0.5rem 0;
     line-height: 1.5;
 }
-
-/* Updated message alignment using overlay-row */
-/* Remove old .chat-row rule */
-/* New overlay-row structure for consistent avatar and bubble styling */
+/* 1) Make each row a flex container so we can push bot/user to opposite sides */
 .overlay-row {
+    display: flex;
     width: 100%;
     margin-bottom: 2rem; /* spacing between messages */
 }
+
+/* Bot messages align left */
+.overlay-row.message-bot {
+    justify-content: flex-start;
+}
+/* User messages align right */
+.overlay-row.message-user {
+    justify-content: flex-end;
+}
+
+/* 2) Constrain each bubble container so it doesn't span the full width */
 .overlay-row .bubble-container {
     position: relative;
-    width: 100%;
-    margin: 0 1rem;
+    max-width: 70%; /* or 80%, etc., to taste */
+    margin: 0 1rem; /* small horizontal gap */
     box-sizing: border-box;
 }
+
+/* 3) Keep avatars pinned near their respective edges */
 .overlay-row .chat-avatar {
     position: absolute;
     top: 0;
@@ -287,18 +298,24 @@ body.dark-mode .chat-container {
 }
 .overlay-row.message-user .chat-avatar {
     right: 1rem;
+    left: auto; /* ensure it doesn't conflict with left: 1rem */
 }
+
+/* 4) Style the bubbles themselves */
 .overlay-row .chat-bubble {
     width: 100%;
     margin: 0;
     padding: 1rem;
-    padding-top: 2.5rem; /* room for avatar */
+    padding-top: 2.5rem; /* room for avatar overlap */
     box-sizing: border-box;
     border-radius: 1rem;
     background-color: var(--secondary-color);
 }
+
+/* Bot vs. User bubble colors & text alignment */
 .overlay-row.message-user .chat-bubble {
-    background-color: #e7ffea;
+    background-color: #e7ffea; /* user bubble color */
+    text-align: right; /* user text aligned right */
 }
 
 /* Chat input area */

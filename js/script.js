@@ -1031,30 +1031,4 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (hamburgerBtnChat && sidebar && sidebarOverlay) {
     hamburgerBtnChat.addEventListener("click", () => {
-      // Toggle the 'show' class on the sidebar
-      sidebar.classList.toggle("show");
-      sidebarOverlay.classList.toggle("show");
-      // Also toggle the overlay
-      if (sidebar.classList.contains("show")) {
-        sidebarOverlay.classList.add("show");
-      } else {
-        sidebarOverlay.classList.remove("show");
-      }
-    });
-
-    // Clicking the overlay also closes the sidebar
-    sidebarOverlay.addEventListener("click", () => {
-      sidebar.classList.remove("show");
-      sidebarOverlay.classList.remove("show");
-    });
-
-    // Also auto-close the sidebar if a link is clicked
-    const sidebarLinks = sidebar.querySelectorAll("a");
-    sidebarLinks.forEach((link) => {
-      link.addEventListener("click", () => {
-        sidebar.classList.remove("show");
-        sidebarOverlay.classList.remove("show");
-      });
-    });
-  }
-});
+      // Toggle the 'show' c

@@ -172,22 +172,4 @@ if (sendBtn && chatInput && chatMessages) {
 
     saveBtn.addEventListener("click", () => {
       window.saveNotebookEntry(answer);
-      const li = document.createElement("li");
-      li.textContent = answer;
-      savedResponses.appendChild(li);
-    });
-
-    botBubble.appendChild(saveBtn);
-
-    // Scroll to bottom
-    chatMessages.scrollTop = chatMessages.scrollHeight;
-  });
-
-  // Press Enter to send
-  chatInput.addEventListener("keydown", (e) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      sendBtn.click();
-    }
-  });
-}
+      const li = document.createElement
