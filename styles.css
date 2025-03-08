@@ -410,6 +410,18 @@ body.dark-mode .standalone-page {
         margin: 2rem;
         padding: 1.5rem;
     }
+    /* Remove extra padding and shadows so the chat fills the width */
+    .main-content {
+        padding: 0;
+    }
+
+    .chat-container {
+        border-radius: 0;
+        box-shadow: none;
+        padding: 0;
+        /* Optional: remove overflow if you want to allow content to scroll */
+        overflow: visible;
+    }
 }
 body .standalone-page.form-page {
     height: auto;
