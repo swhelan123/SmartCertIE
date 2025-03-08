@@ -444,6 +444,7 @@ body.dark-mode .standalone-page {
     /* Shrink the topic selector & buttons a bit */
     .topic-selector {
         padding: 1rem;
+        position: sticky;
     }
     .topic-selector h3 {
         font-size: 1rem;
