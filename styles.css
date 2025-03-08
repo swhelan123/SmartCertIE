@@ -1140,11 +1140,6 @@ code {
         flex-direction: row;
     }
 
-    /* Remove the forced margin-top so both avatars match up */
-    .chat-avatar {
-        margin-top: 0;
-    }
-
     .chat-bubble {
         max-width: 85%;
     }
