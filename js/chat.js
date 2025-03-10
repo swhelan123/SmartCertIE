@@ -4,9 +4,22 @@
 
 // --- Example topic context data ---
 const topicData = {
-  "The Scientific Method": "Context: Review key steps of the scientific method...",
-  "The Characteristics of Life": "Context: Cover cellular organization, metabolism...",
-  // etc. (unchanged)
+  "The Scientific Method": "Context: Review key steps of the scientific method, including hypothesis formulation, experimentation, and analysis.",
+   "The Characteristics of Life": "Context: Cover cellular organization, metabolism, growth, reproduction, and homeostasis in living organisms.",
+   "Nutrition": "Context: Focus on the role of nutrients, digestion, absorption, and the importance of a balanced diet.",
+   "General Principles of Ecology": "Context: Emphasize ecosystems, energy flow, nutrient cycling, and population dynamics.",
+   "A Study of an Ecosystem": "Context: Consider real-life case studies of ecosystems, interactions among species, and environmental factors.",
+   "Cell Structure": "Context: Dive into the details of organelles, membrane structures, and the differences between prokaryotic and eukaryotic cells.",
+   "Cell Metabolism": "Context: Review key metabolic pathways, enzyme activity, and energy production within cells.",
+   "Cell Continuity": "Context: Explore cell cycle regulation, mitosis, meiosis, and mechanisms that ensure continuity of life.",
+   "Cell Diversity": "Context: Understand the variety of cell types and their specialized functions within an organism.",
+   "Genetics": "Context: Cover DNA structure, replication, gene expression, and basic genetic inheritance patterns.",
+   "Diversity of Organisms": "Context: Examine the classification, evolution, and diversity of life forms on Earth.",
+   "Organisation and the Vascular Structures": "Context: Focus on how organisms are organized, including tissue types and the role of vascular systems.",
+   "Transport and Nutrition": "Context: Explain mechanisms for nutrient and gas transport in organisms.",
+   "Breathing System and Excretion": "Context: Detail the processes of respiration and excretion, and how organisms maintain internal balance.",
+   "Responses to Stimuli": "Context: Review the ways organisms detect and respond to environmental changes.",
+   "Reproduction and Growth": "Context: Discuss sexual and asexual reproduction, developmental biology, and growth processes."
 };
 
 // Query the AI

@@ -171,7 +171,17 @@ const sidebarLinks = document.querySelectorAll(".sidebar-nav a[data-section]");
 const chatSection = document.getElementById("chatSection");
 const notebookSection = document.getElementById("notebookSection");
 
-// Right after your existing lines that show/hide sections
+// --- Set default state: show chat and highlight its link ---
+if (chatSection && notebookSection) {
+  chatSection.classList.remove("hidden");
+  notebookSection.classList.add("hidden");
+}
+const chatLink = document.querySelector(".sidebar-nav a[data-section='chatSection']");
+if (chatLink) {
+  chatLink.classList.add("active");
+}
+
+// --- Sidebar click event listeners ---
 if (sidebarLinks && chatSection && notebookSection) {
   sidebarLinks.forEach((link) => {
     link.addEventListener("click", async (e) => {
@@ -189,66 +199,61 @@ if (sidebarLinks && chatSection && notebookSection) {
       if (target === "notebookSection") {
         notebookSection.classList.remove("hidden");
 
-        // === ADD THIS: Load the user’s notebook ===
+        // === Load the user’s notebook ===
         const entries = await window.loadNotebookEntries();
 
         // Clear the <ul> before we append new items
         const savedResponses = document.getElementById("savedResponses");
-        savedResponses.innerHTML = "";
+        if (savedResponses) {
+          savedResponses.innerHTML = "";
 
-        // Populate the <ul> with each doc
-        entries.forEach((entry) => {
-          // Create the <li> with the AI text
-          const li = document.createElement("li");
-          li.textContent = entry.text;
+          // Populate the <ul> with each doc
+          entries.forEach((entry) => {
+            // Create the <li> with the AI text
+            const li = document.createElement("li");
+            li.textContent = entry.text;
 
-          // Create a small "Delete" button
-          const delBtn = document.createElement("button");
-          delBtn.textContent = "Delete";
-          Object.assign(delBtn.style, {
-            marginLeft: "12px",
-            color: "#fff",
-            backgroundColor: "#e53e3e", // a less intense red
-            border: "none",
-            borderRadius: "6px",
-            cursor: "pointer",
-            fontSize: "14px",
-            padding: "4px 8px",
-            boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
-            transition: "background-color 0.2s",
+            // Create a small "Delete" button
+            const delBtn = document.createElement("button");
+            delBtn.textContent = "Delete";
+            Object.assign(delBtn.style, {
+              marginLeft: "12px",
+              color: "#fff",
+              backgroundColor: "#e53e3e", // a less intense red
+              border: "none",
+              borderRadius: "6px",
+              cursor: "pointer",
+              fontSize: "14px",
+              padding: "4px 8px",
+              boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+              transition: "background-color 0.2s",
+            });
+
+            // Add hover effects for the Delete button
+            delBtn.addEventListener("mouseover", () => {
+              delBtn.style.backgroundColor = "#c53030"; // darker red on hover
+            });
+            delBtn.addEventListener("mouseout", () => {
+              delBtn.style.backgroundColor = "#e53e3e"; // revert
+            });
+
+            // On click => delete from Firestore and remove from DOM
+            delBtn.addEventListener("click", async () => {
+              const confirmed = await showCustomConfirm("Are you sure you want to delete this entry?");
+              if (!confirmed) return;
+              try {
+                await deleteDoc(doc(db, "users", auth.currentUser.uid, "notebook", entry.id));
+                li.remove();
+              } catch (err) {
+                console.error("Error deleting doc:", err);
+                customAlert("Could not delete entry");
+              }
+            });
+
+            li.appendChild(delBtn);
+            savedResponses.appendChild(li);
           });
-
-          // Add a simple hover effect
-          delBtn.addEventListener("mouseover", () => {
-            delBtn.style.backgroundColor = "#c53030"; // darker red on hover
-          });
-          delBtn.addEventListener("mouseout", () => {
-            delBtn.style.backgroundColor = "#e53e3e"; // revert
-          });
-
-          // On click => call a new function to delete from Firestore
-          delBtn.addEventListener("click", async () => {
-            const confirmed = await showCustomConfirm("Are you sure you want to delete this entry?");
-            if (!confirmed) return;
-
-            try {
-              // Use the doc ID we stored in entry.id
-              await deleteDoc(doc(db, "users", auth.currentUser.uid, "notebook", entry.id));
-
-              // Remove this <li> from the DOM
-              li.remove();
-            } catch (err) {
-              console.error("Error deleting doc:", err);
-              customAlert("Could not delete entry");
-            }
-          });
-
-          // Append the button to the <li>
-          li.appendChild(delBtn);
-
-          // Finally, add the <li> to <ul id="savedResponses">
-          savedResponses.appendChild(li);
-        });
+        }
       }
 
       // 3) Remove 'active' from all sidebar links
@@ -260,15 +265,8 @@ if (sidebarLinks && chatSection && notebookSection) {
       link.classList.add("active");
     });
   });
-
-  // MAKE CHAT ACTIVE BY DEFAULT:
-  chatSection.classList.remove("hidden");
-  notebookSection.classList.add("hidden");
-  const chatLink = document.querySelector(".sidebar-nav a[data-section='chatSection']");
-  if (chatLink) {
-    chatLink.classList.add("active");
-  }
 }
+
 
 /*******************************************************
  * Dropdown topic menu

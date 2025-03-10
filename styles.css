@@ -332,6 +332,18 @@ body.dark-mode .chat-container {
     text-align: right; /* user text aligned right */
 }
 
+/* Bot vs. User bubble colors & text alignment */
+.dark-mode .overlay-row.message-user .chat-bubble {
+    background-color: #333;
+    color: #fff;
+}
+
+.dark-mode .overlay-row.message-bot .chat-bubble {
+    background-color: #444; /* or #333, to taste */
+    color: #fff;
+  }
+  
+
 /* Chat input area */
 .chat-input-area {
     display: flex;
@@ -1090,7 +1102,15 @@ code {
     pointer-events: all;
 }
 
+.pill-container.pill-left {
+    display: none;
+}
+
 @media (max-width: 768px) {
+    .pill-container.pill-left {
+        display: flex;
+    }
+
     .sidebar {
         position: fixed;
         top: 0;
