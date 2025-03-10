@@ -1058,12 +1058,14 @@ const modal = document.getElementById("notebookModal");
 const modalContent = document.querySelector(".notebook-modal-content");
 
 // 3) If the user clicks anywhere outside the .notebook-modal-content, close:
-modal.addEventListener("click", (e) => {
-  // If the click is on the background overlay (i.e., the modal itself), not on the content
-  if (e.target === modal) {
-    closeNotebookModal();
-  }
-});
+if (modal) {
+  modal.addEventListener("click", (e) => {
+    // If the click is on the background overlay (i.e., the modal itself), not on the content
+    if (e.target === modal) {
+      closeNotebookModal();
+    }
+  });
+}
 
 // 4) Also listen for the Escape key on the whole document
 document.addEventListener("keydown", (e) => {
