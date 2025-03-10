@@ -142,20 +142,55 @@
 
       <!-- Notebook Section -->
       <section id="notebookSection" class="section-content hidden">
-        <h2>Notebook</h2>
-        <p>Saved chatbot responses will appear here.</p>
+        <h2>Filter Topics</h2>
 
-        <!-- Topic Selector -->
-        <!-- Topic Selector -->
-        <div>
-          <label for="notebookTopicSelect">Choose a topic:</label>
-          <select id="notebookTopicSelect">
-            <option value="all">All</option>
-            <!-- We'll programmatically add other topics here -->
-          </select>
+        <!-- Filter Buttons (A/B/C) in a "pill" style container -->
+        <div id="notebookUnitContainer" class="unit-container">
+          <button data-unit="all" class="unit-button unit-gray">All</button>
+          <button data-unit="A" class="unit-button unit-green">
+            Unit 1: The Study of Life
+          </button>
+          <button data-unit="B" class="unit-button unit-purple">
+            Unit 2: The Cell
+          </button>
+          <button data-unit="C" class="unit-button unit-red">
+            Unit 3: The Organism
+          </button>
         </div>
-        <ul id="savedResponses"></ul>
+
+        <!-- Grid of cards -->
+        <div id="notebookGrid" class="notebook-grid"></div>
       </section>
+
+      <!-- Modal for viewing a single notebook entry in detail -->
+      <div id="notebookModal" class="notebook-modal hidden">
+        <div class="notebook-modal-content">
+          <button id="notebookModalClose" class="notebook-modal-close">
+            <!-- Simple SVG close icon (24x24) -->
+            <svg
+              width="24"
+              height="24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+
+          <h3 id="notebookModalQuestion"></h3>
+          <div id="notebookModalAnswer"></div>
+          <div class="notebook-modal-footer">
+            <span id="notebookModalDate"></span>
+            <button id="notebookModalDelete" class="notebook-delete-button">
+              Delete
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
     <!-- Link to our main JS (Firebase logic + chat + chatbot integration) -->
     <script type="module" src="js/script.js"></script>

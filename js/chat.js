@@ -191,7 +191,7 @@ if (sendBtn && chatInput && chatMessages) {
     });
 
     saveBtn.addEventListener("click", () => {
-      window.saveNotebookEntry(answer);
+      window.saveNotebookEntry(answer, question);
       const li = document.createElement("li");
       li.textContent = answer;
       savedResponses.appendChild(li);
