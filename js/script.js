@@ -18,24 +18,8 @@ import {
   confirmPasswordReset,
 } from "https://www.gstatic.com/firebasejs/9.17.2/firebase-auth.js";
 import { getFirestore } from "https://www.gstatic.com/firebasejs/9.17.2/firebase-firestore.js";
-import {
-  doc,
-  getDoc,
-  setDoc,
-  serverTimestamp,
-  addDoc,
-  collection,
-  query,
-  orderBy,
-  getDocs,
-  deleteDoc,
-} from "https://www.gstatic.com/firebasejs/9.17.2/firebase-firestore.js";
-import {
-  getStorage,
-  ref,
-  uploadBytes,
-  getDownloadURL,
-} from "https://www.gstatic.com/firebasejs/9.17.2/firebase-storage.js";
+import { doc, getDoc, setDoc, serverTimestamp, addDoc, collection, query, orderBy, getDocs, deleteDoc } from "https://www.gstatic.com/firebasejs/9.17.2/firebase-firestore.js";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.17.2/firebase-storage.js";
 
 // 2) Your Firebase configuration (replace with your real config)
 const firebaseConfig = {
@@ -62,11 +46,7 @@ const googleProvider = new GoogleAuthProvider();
  * REDIRECT IF LOGGED IN ALREADY
  *******************************************************/
 // In script.js
-if (
-  (window.location.pathname === "/" ||
-    window.location.pathname.endsWith("index.html")) &&
-  !window.location.search.includes("showLanding")
-) {
+if ((window.location.pathname === "/" || window.location.pathname.endsWith("index.html")) && !window.location.search.includes("showLanding")) {
   onAuthStateChanged(auth, (user) => {
     if (user) {
       // If logged in, redirect to chat.html
@@ -122,8 +102,7 @@ onAuthStateChanged(auth, async (user) => {
 
     if (userSnap.exists()) {
       const userData = userSnap.data();
-      const subscriptionStatus =
-        userData.subscriptionStatus || "not-subscribed";
+      const subscriptionStatus = userData.subscriptionStatus || "not-subscribed";
 
       // Set global userAvatarUrl using the user's profile photo or fallback
       window.userAvatarUrl = userData.photoURL || "assets/img/pfp.avif";
@@ -149,9 +128,7 @@ onAuthStateChanged(auth, async (user) => {
           subscribeBtn.id = "subscribeBtn";
           subscribeBtn.className = "login-button";
           subscribeBtn.textContent = "Subscribe";
-          document
-            .getElementById("topRightContainer")
-            .appendChild(subscribeBtn);
+          document.getElementById("topRightContainer").appendChild(subscribeBtn);
         } else {
           subscribeBtn.classList.remove("hidden");
         }
@@ -199,9 +176,7 @@ if (chatSection && notebookSection) {
   chatSection.classList.remove("hidden");
   notebookSection.classList.add("hidden");
 }
-const chatLink = document.querySelector(
-  ".sidebar-nav a[data-section='chatSection']"
-);
+const chatLink = document.querySelector(".sidebar-nav a[data-section='chatSection']");
 if (chatLink) {
   chatLink.classList.add("active");
 }
@@ -224,21 +199,60 @@ if (sidebarLinks && chatSection && notebookSection) {
       if (target === "notebookSection") {
         notebookSection.classList.remove("hidden");
 
-        // 1) Load the user’s notebook
-        const allEntries = await window.loadNotebookEntries();
+        // === Load the user’s notebook ===
+        const entries = await window.loadNotebookEntries();
 
-        // 2) Immediately render them as a grid
-        renderNotebookGrid(allEntries);
+        // Clear the <ul> before we append new items
+        const savedResponses = document.getElementById("savedResponses");
+        if (savedResponses) {
+          savedResponses.innerHTML = "";
 
-        // 3) Optionally highlight “All” as active
-        const allBtn = document.querySelector('button[data-unit="all"]');
-        if (allBtn) {
-          // remove active from all filter buttons
-          document
-            .querySelectorAll("#notebookUnitContainer button[data-unit]")
-            .forEach((b) => b.classList.remove("active"));
+          // Populate the <ul> with each doc
+          entries.forEach((entry) => {
+            // Create the <li> with the AI text
+            const li = document.createElement("li");
+            li.textContent = entry.text;
 
-          allBtn.classList.add("active");
+            // Create a small "Delete" button
+            const delBtn = document.createElement("button");
+            delBtn.textContent = "Delete";
+            Object.assign(delBtn.style, {
+              marginLeft: "12px",
+              color: "#fff",
+              backgroundColor: "#e53e3e", // a less intense red
+              border: "none",
+              borderRadius: "6px",
+              cursor: "pointer",
+              fontSize: "14px",
+              padding: "4px 8px",
+              boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+              transition: "background-color 0.2s",
+            });
+
+            // Add hover effects for the Delete button
+            delBtn.addEventListener("mouseover", () => {
+              delBtn.style.backgroundColor = "#c53030"; // darker red on hover
+            });
+            delBtn.addEventListener("mouseout", () => {
+              delBtn.style.backgroundColor = "#e53e3e"; // revert
+            });
+
+            // On click => delete from Firestore and remove from DOM
+            delBtn.addEventListener("click", async () => {
+              const confirmed = await showCustomConfirm("Are you sure you want to delete this entry?");
+              if (!confirmed) return;
+              try {
+                await deleteDoc(doc(db, "users", auth.currentUser.uid, "notebook", entry.id));
+                li.remove();
+              } catch (err) {
+                console.error("Error deleting doc:", err);
+                customAlert("Could not delete entry");
+              }
+            });
+
+            li.appendChild(delBtn);
+            savedResponses.appendChild(li);
+          });
         }
       }
 
@@ -260,36 +274,15 @@ if (sidebarLinks && chatSection && notebookSection) {
 // References to the DOM elements
 const unitContainer = document.getElementById("unitContainer");
 const chapterContainer = document.getElementById("chapterContainer");
-const selectedTopicContainer = document.getElementById(
-  "selectedTopicContainer"
-);
+const selectedTopicContainer = document.getElementById("selectedTopicContainer");
 const selectedTopicLabel = document.getElementById("selectedTopicLabel");
 const changeTopicBtn = document.getElementById("changeTopicBtn");
 
 // Define chapters for each unit (A, B, C)
 const chapters = {
-  A: [
-    "The Scientific Method",
-    "The Characteristics of Life",
-    "Nutrition",
-    "General Principles of Ecology",
-    "A Study of an Ecosystem",
-  ],
-  B: [
-    "Cell Structure",
-    "Cell Metabolism",
-    "Cell Continuity",
-    "Cell Diversity",
-    "Genetics",
-  ],
-  C: [
-    "Diversity of Organisms",
-    "Organisation and the Vascular Structures",
-    "Transport and Nutrition",
-    "Breathing System and Excretion",
-    "Responses to Stimuli",
-    "Reproduction and Growth",
-  ],
+  A: ["The Scientific Method", "The Characteristics of Life", "Nutrition", "General Principles of Ecology", "A Study of an Ecosystem"],
+  B: ["Cell Structure", "Cell Metabolism", "Cell Continuity", "Cell Diversity", "Genetics"],
+  C: ["Diversity of Organisms", "Organisation and the Vascular Structures", "Transport and Nutrition", "Breathing System and Excretion", "Responses to Stimuli", "Reproduction and Growth"],
 };
 
 // Grab all unit buttons (A/B/C)
@@ -397,14 +390,12 @@ const logoutBtn = document.getElementById("logoutBtn");
 onAuthStateChanged(auth, (user) => {
   if (accountInfo && logoutBtn) {
     if (!user) {
-      accountInfo.textContent =
-        "You are not logged in. Redirecting to login...";
+      accountInfo.textContent = "You are not logged in. Redirecting to login...";
       setTimeout(() => {
         window.location.href = "index.html";
       }, 2000);
     } else {
-      accountInfo.textContent =
-        "Welcome to your account page! (Firebase user: " + user.email + ")";
+      accountInfo.textContent = "Welcome to your account page! (Firebase user: " + user.email + ")";
       logoutBtn.addEventListener("click", async () => {
         await signOut(auth);
         customAlert("Logged out!");
@@ -425,9 +416,7 @@ if (signupForm) {
     e.preventDefault();
     const emailVal = document.getElementById("emailInput")?.value.trim();
     const passVal = document.getElementById("passwordInput")?.value.trim();
-    const confirmVal = document
-      .getElementById("confirmPasswordInput")
-      ?.value.trim();
+    const confirmVal = document.getElementById("confirmPasswordInput")?.value.trim();
 
     if (!emailVal || !passVal || !confirmVal) {
       customAlert("Please fill in all fields.");
@@ -486,7 +475,7 @@ if (setupForm) {
         photoURL,
         // plus any other fields: name, phone, etc.
       },
-      { merge: true }
+      { merge: true },
     );
 
     // 5) Redirect or show success
@@ -536,8 +525,7 @@ onAuthStateChanged(auth, async (user) => {
     if (!user) {
       // Not logged in → redirect to login
       if (accountInfo) {
-        accountInfo.textContent =
-          "You are not logged in. Redirecting to login...";
+        accountInfo.textContent = "You are not logged in. Redirecting to login...";
       }
       setTimeout(() => {
         window.location.href = "login.html";
@@ -552,8 +540,7 @@ onAuthStateChanged(auth, async (user) => {
         const data = userSnap.data();
 
         // 1) Display greeting in #accountInfo
-        const displayName =
-          (data.firstName || "") + " " + (data.lastName || "");
+        const displayName = (data.firstName || "") + " " + (data.lastName || "");
         accountInfo.textContent = `Hello, ${displayName.trim()}!`;
 
         // 2) Show email from Firestore if stored, else from auth
@@ -610,7 +597,7 @@ if (updateAccountForm) {
           photoURL: newPhotoURL,
           // plus any other updated fields
         },
-        { merge: true }
+        { merge: true },
       );
 
       // 4) Update the <img> on account page (if you want immediate UI update)
@@ -638,9 +625,7 @@ if (forgotPassForm) {
     e.preventDefault();
 
     // 1) Grab the email from the resetEmailInput field
-    const resetEmailVal = document
-      .getElementById("resetEmailInput")
-      ?.value.trim();
+    const resetEmailVal = document.getElementById("resetEmailInput")?.value.trim();
     if (!resetEmailVal) {
       customAlert("Please enter your email address.");
       return;
@@ -677,9 +662,7 @@ if (newPassForm) {
     e.preventDefault();
 
     const newPassword = document.getElementById("newPassword").value.trim();
-    const confirmPassword = document
-      .getElementById("confirmPassword")
-      .value.trim();
+    const confirmPassword = document.getElementById("confirmPassword").value.trim();
 
     // Basic checks
     if (!newPassword || !confirmPassword) {
@@ -731,8 +714,7 @@ onAuthStateChanged(auth, async (user) => {
     const userSnap = await getDoc(userDocRef);
     if (userSnap.exists()) {
       const userData = userSnap.data();
-      const subscriptionStatus =
-        userData.subscriptionStatus || "not-subscribed";
+      const subscriptionStatus = userData.subscriptionStatus || "not-subscribed";
 
       if (subscriptionStatus !== "active") {
         // Only create/show button if not subscribed
@@ -743,9 +725,7 @@ onAuthStateChanged(auth, async (user) => {
           subscribeBtn.id = "subscribeBtn";
           subscribeBtn.className = "login-button"; // Use your desired styling class
           subscribeBtn.textContent = "Subscribe";
-          document
-            .getElementById("topRightContainer")
-            .appendChild(subscribeBtn);
+          document.getElementById("topRightContainer").appendChild(subscribeBtn);
         } else {
           subscribeBtn.classList.remove("hidden");
         }
@@ -760,8 +740,7 @@ onAuthStateChanged(auth, async (user) => {
             }
 
             try {
-              const endpointURL =
-                "https://createcheckoutsession-63mubklboq-uc.a.run.app";
+              const endpointURL = "https://createcheckoutsession-63mubklboq-uc.a.run.app";
               const response = await fetch(endpointURL, {
                 method: "POST",
                 headers: {
@@ -776,15 +755,11 @@ onAuthStateChanged(auth, async (user) => {
                 window.location.href = data.url;
               } else {
                 console.error("No checkout URL returned:", data);
-                customAlert(
-                  "An error occurred while creating the checkout session."
-                );
+                customAlert("An error occurred while creating the checkout session.");
               }
             } catch (err) {
               console.error("Error creating checkout session:", err);
-              customAlert(
-                "An error occurred while processing your subscription."
-              );
+              customAlert("An error occurred while processing your subscription.");
             }
           });
           subscribeBtn.dataset.listenerAttached = "true";
@@ -842,8 +817,7 @@ onAuthStateChanged(auth, async (user) => {
       }
 
       const userData = userSnap.data();
-      const subscriptionStatus =
-        userData.subscriptionStatus || "not-subscribed";
+      const subscriptionStatus = userData.subscriptionStatus || "not-subscribed";
 
       if (subscriptionStatus === "active") {
         // 3) Already subscribed => Show “Current Plan” + disable
@@ -857,8 +831,7 @@ onAuthStateChanged(auth, async (user) => {
 
         finalBtn.addEventListener("click", async () => {
           try {
-            const endpointURL =
-              "https://createcheckoutsession-63mubklboq-uc.a.run.app";
+            const endpointURL = "https://createcheckoutsession-63mubklboq-uc.a.run.app";
             const response = await fetch(endpointURL, {
               method: "POST",
               headers: { "Content-Type": "application/json" },
@@ -870,15 +843,11 @@ onAuthStateChanged(auth, async (user) => {
               window.location.href = data.url; // Stripe checkout
             } else {
               console.error("No checkout URL returned:", data);
-              customAlert(
-                "An error occurred while creating the checkout session."
-              );
+              customAlert("An error occurred while creating the checkout session.");
             }
           } catch (err) {
             console.error("Error creating checkout session:", err);
-            customAlert(
-              "An error occurred while processing your subscription."
-            );
+            customAlert("An error occurred while processing your subscription.");
           }
         });
       }
@@ -913,7 +882,7 @@ if (navChatLink) {
  *******************************************************/
 
 // We'll define a global function so we can call it from chat.js
-window.saveNotebookEntry = async function (answer, userPrompt) {
+window.saveNotebookEntry = async function (answer) {
   const user = auth.currentUser;
   if (!user) {
     customAlert("Please log in to save to your notebook!");
@@ -921,10 +890,10 @@ window.saveNotebookEntry = async function (answer, userPrompt) {
   }
 
   try {
+    // Create a new doc in /users/{uid}/notebook
     await addDoc(collection(db, "users", user.uid, "notebook"), {
-      question: userPrompt || "", // The user's prompt
-      text: answer || "", // The bot’s response
-      topic: window.selectedTopic || "", // Which chapter was active
+      text: answer,
+      topic: window.selectedTopic || "",
       createdAt: serverTimestamp(),
     });
 
@@ -938,13 +907,13 @@ window.saveNotebookEntry = async function (answer, userPrompt) {
 window.loadNotebookEntries = async function () {
   const user = auth.currentUser;
   if (!user) return [];
-  const qRef = query(
-    collection(db, "users", user.uid, "notebook"),
-    orderBy("createdAt", "desc")
-  );
+
+  const qRef = query(collection(db, "users", user.uid, "notebook"), orderBy("createdAt", "desc"));
   const snapshot = await getDocs(qRef);
+
   const entries = [];
   snapshot.forEach((docSnap) => {
+    // Grab docSnap.id plus the actual data
     entries.push({
       id: docSnap.id,
       ...docSnap.data(),
@@ -952,169 +921,6 @@ window.loadNotebookEntries = async function () {
   });
   return entries;
 };
-
-// Renders the grid of notebook "cards"
-function renderNotebookGrid(entries) {
-  const notebookGrid = document.getElementById("notebookGrid");
-  if (!notebookGrid) return;
-
-  notebookGrid.innerHTML = "";
-
-  entries.forEach((entry) => {
-    // Create the card
-    const card = document.createElement("div");
-    card.classList.add("notebook-card");
-    // 1) Identify the unit
-    const unit = getUnitForTopic(entry.topic);
-
-    // 2) Decide which colour class
-    let colorClass = "unit-gray"; // fallback
-    if (unit === "A") {
-      colorClass = "unit-green";
-    } else if (unit === "B") {
-      colorClass = "unit-purple";
-    } else if (unit === "C") {
-      colorClass = "unit-red";
-    }
-
-    // 3) Add that class to the card
-    card.classList.add(colorClass);
-
-    // Display the user’s prompt as truncated heading
-    const heading = document.createElement("div");
-    heading.classList.add("notebook-card-heading");
-    heading.textContent = entry.question || "(No prompt)";
-
-    card.appendChild(heading);
-
-    // On click => open the modal to see full content
-    card.addEventListener("click", () => {
-      openNotebookModal(entry);
-    });
-
-    notebookGrid.appendChild(card);
-  });
-}
-
-// Opens a modal showing the full note
-function openNotebookModal(entry) {
-  const modal = document.getElementById("notebookModal");
-  const questionEl = document.getElementById("notebookModalQuestion");
-  const answerEl = document.getElementById("notebookModalAnswer");
-  const dateEl = document.getElementById("notebookModalDate");
-  const deleteBtn = document.getElementById("notebookModalDelete");
-
-  // Fill in data
-  questionEl.textContent = entry.question || "(No prompt)";
-
-  // parse
-  answerEl.innerHTML = marked.parse(entry.text || "");
-
-  // 3) Date, delete, etc.
-  const dateVal = entry.createdAt ? entry.createdAt.toDate() : new Date();
-  dateEl.textContent = dateVal.toLocaleString();
-
-  // Show modal
-  modal.classList.remove("hidden");
-
-  // Handle delete
-  deleteBtn.onclick = async () => {
-    const confirmed = await showCustomConfirm(
-      "Are you sure you want to delete this entry?"
-    );
-    if (!confirmed) return;
-
-    try {
-      await deleteDoc(
-        doc(db, "users", auth.currentUser.uid, "notebook", entry.id)
-      );
-      // Close modal & re-render
-      closeNotebookModal();
-      // If you re-loaded all entries in memory, just remove the item from your array, then re-render
-      // Or fetch from Firestore again:
-      const allEntries = await loadNotebookEntries();
-      renderNotebookGrid(allEntries);
-    } catch (err) {
-      console.error("Error deleting doc:", err);
-      customAlert("Could not delete entry");
-    }
-  };
-}
-
-// Closes the modal
-function closeNotebookModal() {
-  const modal = document.getElementById("notebookModal");
-  modal.classList.add("hidden");
-}
-
-// Close button
-const modalCloseBtn = document.getElementById("notebookModalClose");
-if (modalCloseBtn) {
-  modalCloseBtn.addEventListener("click", closeNotebookModal);
-}
-
-// 1) Grab the modal & modal-content elements
-const modal = document.getElementById("notebookModal");
-const modalContent = document.querySelector(".notebook-modal-content");
-
-// 3) If the user clicks anywhere outside the .notebook-modal-content, close:
-if (modal) {
-  modal.addEventListener("click", (e) => {
-    // If the click is on the background overlay (i.e., the modal itself), not on the content
-    if (e.target === modal) {
-      closeNotebookModal();
-    }
-  });
-}
-
-// 4) Also listen for the Escape key on the whole document
-document.addEventListener("keydown", (e) => {
-  if (e.key === "Escape") {
-    // Make sure the modal is actually open
-    if (!modal.classList.contains("hidden")) {
-      closeNotebookModal();
-    }
-  }
-});
-
-// Filter logic: re-use your existing chapters object, then:
-function filterByUnit(entries, unit) {
-  if (unit === "all") return entries;
-  const validChapters = chapters[unit] || [];
-  return entries.filter((e) => validChapters.includes(e.topic));
-}
-
-// Example usage in your "notebookSection" click or on page load:
-const notebookUnitContainer = document.getElementById("notebookUnitContainer");
-if (notebookUnitContainer) {
-  notebookUnitContainer.addEventListener("click", async (ev) => {
-    const btn = ev.target.closest("button[data-unit]");
-    if (!btn) return;
-    const unit = btn.getAttribute("data-unit");
-
-    // Re-load from Firestore
-    const allEntries = await loadNotebookEntries();
-    const filtered = filterByUnit(allEntries, unit);
-    renderNotebookGrid(filtered);
-  });
-}
-
-// Helper to filter notebook entries by unit:
-function filterNotebookEntriesByUnit(entries, unit) {
-  if (unit === "all") return entries; // show all
-  const validChapters = chapters[unit] || [];
-  return entries.filter((entry) => validChapters.includes(entry.topic));
-}
-
-// Given a topic string (e.g. "Cell Structure"), return "A", "B", or "C"
-function getUnitForTopic(topic) {
-  for (const [unitKey, topics] of Object.entries(chapters)) {
-    if (topics.includes(topic)) {
-      return unitKey; // e.g. "A"
-    }
-  }
-  return null; // not found
-}
 
 /**************************************
  * custom alerts
