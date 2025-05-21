@@ -1,7 +1,3 @@
-/**************************************
- * chat.js — typed-out fully formatted HTML
- **************************************/
-
 // --- Example topic context data ---
 const topicData = {
   "The Scientific Method": "Context: Review key steps of the scientific method, including hypothesis formulation, experimentation, and analysis.",
@@ -25,7 +21,7 @@ const topicData = {
 // Query the AI
 async function queryAimlApi(question) {
   const apiUrl = "https://api.aimlapi.com/v1/chat/completions";
-  const apiKey = "6f38c7556ee5413694304b0be2c3fa33";
+  const apiKey = "6f38c7556ee5413694304b0be2c3fa33"; // IMPORTANT: Consider moving API keys to a backend or environment variables for security.
 
   let systemPrompt = "You are a friendly Leaving Certificate biology tutor named Certi...";
   if (window.selectedTopic && topicData[window.selectedTopic]) {
@@ -64,7 +60,7 @@ async function queryAimlApi(question) {
     } else {
       return "Sorry, I didn't understand that.";
     }
-  } catch (error) {
+  } catch (error)
     console.error("oh no! aimlapi error:", error);
     return "Daily credits are all gone!";
   }
@@ -107,7 +103,7 @@ async function typeMarkdownAsHtml(markdownString, container, speed = 20) {
 const sendBtn = document.getElementById("sendBtn");
 const chatInput = document.getElementById("chatInput");
 const chatMessages = document.getElementById("chatMessages");
-const savedResponses = document.getElementById("savedResponses");
+// const savedResponses = document.getElementById("savedResponses"); // Removed as notebook is removed
 
 // Single event listener for "Send"
 if (sendBtn && chatInput && chatMessages) {
@@ -176,28 +172,7 @@ if (sendBtn && chatInput && chatMessages) {
     // === 6) Type out the final *formatted* HTML
     await typeMarkdownAsHtml(answer, botBubble, 5);
 
-    // === 7) Add a "Save to Notebook" button
-    const saveBtn = document.createElement("button");
-    saveBtn.textContent = "Save to Notebook";
-    Object.assign(saveBtn.style, {
-      marginLeft: "10px",
-      padding: "2px 6px",
-      fontSize: "0.8rem",
-      cursor: "pointer",
-      borderRadius: "6px",
-      border: "none",
-      backgroundColor: "var(--primary-color)",
-      color: "#fff",
-    });
-
-    saveBtn.addEventListener("click", () => {
-      window.saveNotebookEntry(answer, question);
-      const li = document.createElement("li");
-      li.textContent = answer;
-      savedResponses.appendChild(li);
-    });
-
-    botBubble.appendChild(saveBtn);
+    // === 7) "Save to Notebook" button and its logic have been removed ===
 
     // Scroll to bottom
     chatMessages.scrollTop = chatMessages.scrollHeight;
