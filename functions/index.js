@@ -48,6 +48,9 @@ exports.createCheckoutSession = onRequest(
             price: "price_1Qy1kzGsigejaHFWZKqC600v", // Replace with
             quantity: 1,
           }],
+          subscription_data: {
+            trial_period_days: 28, // Change this number to your desired trial length
+          },
           success_url: "https://smartcert.ie/success.html",
           cancel_url: "https://smartcert.ie/success.html",
           metadata: {firebaseUserId: firebaseUserId},

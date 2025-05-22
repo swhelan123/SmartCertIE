@@ -107,7 +107,6 @@ async function typeMarkdownAsHtml(markdownString, container, speed = 20) {
 const sendBtn = document.getElementById("sendBtn");
 const chatInput = document.getElementById("chatInput");
 const chatMessages = document.getElementById("chatMessages");
-const savedResponses = document.getElementById("savedResponses");
 
 // Single event listener for "Send"
 if (sendBtn && chatInput && chatMessages) {
@@ -175,29 +174,6 @@ if (sendBtn && chatInput && chatMessages) {
 
     // === 6) Type out the final *formatted* HTML
     await typeMarkdownAsHtml(answer, botBubble, 5);
-
-    // === 7) Add a "Save to Notebook" button
-    const saveBtn = document.createElement("button");
-    saveBtn.textContent = "Save to Notebook";
-    Object.assign(saveBtn.style, {
-      marginLeft: "10px",
-      padding: "2px 6px",
-      fontSize: "0.8rem",
-      cursor: "pointer",
-      borderRadius: "6px",
-      border: "none",
-      backgroundColor: "var(--primary-color)",
-      color: "#fff",
-    });
-
-    saveBtn.addEventListener("click", () => {
-      window.saveNotebookEntry(answer, question);
-      const li = document.createElement("li");
-      li.textContent = answer;
-      savedResponses.appendChild(li);
-    });
-
-    botBubble.appendChild(saveBtn);
 
     // Scroll to bottom
     chatMessages.scrollTop = chatMessages.scrollHeight;
