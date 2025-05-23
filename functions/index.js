@@ -49,7 +49,7 @@ exports.createCheckoutSession = onRequest(
             quantity: 1,
           }],
           subscription_data: {
-            trial_period_days: 28, // Change this number to your desired trial length
+            trial_period_days: 28, // Length trial
           },
           success_url: "https://smartcert.ie/success.html",
           cancel_url: "https://smartcert.ie/success.html",
@@ -70,14 +70,17 @@ exports.createCheckoutSession = onRequest(
 
 const admin = require("firebase-admin");
 
-admin.initializeApp();
+// Check if Firebase Admin has already been initialized
+if (admin.apps.length === 0) {
+  admin.initializeApp();
+}
 
 exports.getSubscriptionDetails = onRequest(
-    {secrets: ["STRIPE_SECRET_KEY"]}, // This makes process.env.STRIPE_SECRET_KEY available
+    {secrets: ["STRIPE_SECRET_KEY"]}, // process.env.STRIPE_SECRET_KEY
     async (req, res) => {
     // Optional: If you need Stripe in this function, instantiate it here.
     // If you’re only reading from Firestore, you can skip this.
-      const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
+    // const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 
       // Get the uid from the query parameter
       const uid = req.query.uid;
@@ -87,24 +90,31 @@ exports.getSubscriptionDetails = onRequest(
 
       try {
       // Retrieve user document from Firestore
-        const userDoc = await admin.firestore().collection("users").doc(uid).get();
+        const userDoc = await admin.firestore()
+            .collection("users")
+            .doc(uid)
+            .get();
         if (!userDoc.exists) {
           return res.status(404).json({error: "User not found"});
         }
         const userData = userDoc.data();
 
-        // Retrieve subscription data from Firestore (ensure you store this when a user subscribes)
+        // Retrieve subscription data from Firestore
+        // (ensure you store this when a user subscribes)
         const subscription = userData.subscription;
         if (!subscription) {
           return res.status(404).json({error: "Subscription data not found"});
         }
 
-        // Format dates assuming they are stored as Firestore Timestamps
-        const startDate = subscription.startDate.toDate().toISOString().split("T")[0];
-        const nextBillingDate = subscription.nextBillingDate.toDate().toISOString().split("T")[0];
+        // Format dates assuming stored as Firestore Timestamps
+        const startDate = subscription.startDate.toDate().toISOString()
+            .split("T")[0];
+        const nextBillingDate = subscription.nextBillingDate.toDate()
+            .toISOString().split("T")[0];
 
         // Payment method info (for example, "Visa ending in 4242")
-        const paymentMethod = subscription.paymentMethod || "Card info unavailable";
+        const paymentMethod = subscription.paymentMethod ||
+            "Card info unavailable";
 
         // Determine if the subscription is active
         const isActive = subscription.isActive === true;
