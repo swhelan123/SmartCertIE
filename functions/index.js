@@ -51,8 +51,8 @@ exports.createCheckoutSession = onRequest(
           subscription_data: {
             trial_period_days: 28, // Length trial
           },
-          success_url: "https://smartcert.ie/success.html",
-          cancel_url: "https://smartcert.ie/success.html",
+          success_url: "https://ExamEdge.ie/success.html",
+          cancel_url: "https://ExamEdge.ie/success.html",
           metadata: {firebaseUserId: firebaseUserId},
         });
 
