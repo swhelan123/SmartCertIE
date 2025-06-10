@@ -296,7 +296,7 @@ const chapters = {
   ],
   C: [
     { name: "Diversity of Organisms", id: "topic-12-diversity-of-organisms" }, // Renumbered from 11
-    { name: "Organisation and the Vascular Structures", id: "topic-13-organisation-and-the-vascular-structures" }, // Renumbered from 12
+    { name: "Organisation and the Vascular Structures", id: "topic-13-organisation-and-the-vascular-structure" }, // Renumbered from 12
     { name: "Transport and Nutrition", id: "topic-14-transport-and-nutrition" }, // Renumbered from 13
     { name: "Breathing System and Excretion", id: "topic-15-breathing-system-and-excretion" }, // Renumbered from 14
     { name: "Responses to Stimuli", id: "topic-16-responses-to-stimuli" }, // Renumbered from 15
