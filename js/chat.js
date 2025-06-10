@@ -2,34 +2,40 @@
  * chat.js — typed-out fully formatted HTML
  **************************************/
 
-// --- Example topic context data ---
-const topicData = {
-  "The Scientific Method": "Context: Review key steps of the scientific method, including hypothesis formulation, experimentation, and analysis.",
-   "The Characteristics of Life": "Context: Cover cellular organization, metabolism, growth, reproduction, and homeostasis in living organisms.",
-   "Nutrition": "Context: Focus on the role of nutrients, digestion, absorption, and the importance of a balanced diet.",
-   "General Principles of Ecology": "Context: Emphasize ecosystems, energy flow, nutrient cycling, and population dynamics.",
-   "A Study of an Ecosystem": "Context: Consider real-life case studies of ecosystems, interactions among species, and environmental factors.",
-   "Cell Structure": "Context: Dive into the details of organelles, membrane structures, and the differences between prokaryotic and eukaryotic cells.",
-   "Cell Metabolism": "Context: Review key metabolic pathways, enzyme activity, and energy production within cells.",
-   "Cell Continuity": "Context: Explore cell cycle regulation, mitosis, meiosis, and mechanisms that ensure continuity of life.",
-   "Cell Diversity": "Context: Understand the variety of cell types and their specialized functions within an organism.",
-   "Genetics": "Context: Cover DNA structure, replication, gene expression, and basic genetic inheritance patterns.",
-   "Diversity of Organisms": "Context: Examine the classification, evolution, and diversity of life forms on Earth.",
-   "Organisation and the Vascular Structures": "Context: Focus on how organisms are organized, including tissue types and the role of vascular systems.",
-   "Transport and Nutrition": "Context: Explain mechanisms for nutrient and gas transport in organisms.",
-   "Breathing System and Excretion": "Context: Detail the processes of respiration and excretion, and how organisms maintain internal balance.",
-   "Responses to Stimuli": "Context: Review the ways organisms detect and respond to environmental changes.",
-   "Reproduction and Growth": "Context: Discuss sexual and asexual reproduction, developmental biology, and growth processes."
-};
+// Import Firestore functions and db instance from script.js
+// Note: script.js must export 'db', and firebase/firestore functions like 'doc' and 'getDoc'
+// For this to work, script.js should have: export const db = getFirestore(app);
+// And you might need to adjust the import path if script.js is not in the same directory or if it's not a module.
+// Assuming script.js exports db and firebase functions are available globally or via script.js
+import { db } from './script.js'; // Make sure script.js exports db
+import { doc, getDoc } from "https://www.gstatic.com/firebasejs/9.17.2/firebase-firestore.js";
+
 
 // Query the AI
 async function queryAimlApi(question) {
   const apiUrl = "https://api.aimlapi.com/v1/chat/completions";
-  const apiKey = "6f38c7556ee5413694304b0be2c3fa33";
+  const apiKey = "6f38c7556ee5413694304b0be2c3fa33"; // Consider moving API keys to a more secure location
 
   let systemPrompt = "You are a friendly Leaving Certificate biology tutor named Certi...";
-  if (window.selectedTopic && topicData[window.selectedTopic]) {
-    systemPrompt += "\n" + topicData[window.selectedTopic];
+
+  // Fetch context from Firestore if a topicId is selected
+  if (window.currentTopicId) {
+    try {
+      const topicDocRef = doc(db, "biology_context", window.currentTopicId);
+      const topicSnap = await getDoc(topicDocRef);
+
+      if (topicSnap.exists()) {
+        const firestoreContext = topicSnap.data().context; // Using 'context' field
+        if (firestoreContext) {
+          systemPrompt += "\nContext: " + firestoreContext;
+        }
+      } else {
+        console.log("No context document found for topicId:", window.currentTopicId);
+      }
+    } catch (error) {
+      console.error("Error fetching topic context from Firestore:", error);
+      // Decide if you want to inform the user or proceed without context
+    }
   }
 
   const messages = [

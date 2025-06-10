@@ -282,25 +282,25 @@ const changeTopicBtn = document.getElementById("changeTopicBtn");
 const chapters = {
   A: [
     { name: "The Scientific Method", id: "topic-1-the-scientific-method" },
-    { name: "The Characteristics of Life", id: "topic-2-the-characteristics-of-life" },
+    { name: "The Characteristics of Life", id: "topic-2-characteristics-of-life" }, // Corrected slug
     { name: "Nutrition", id: "topic-3-nutrition" },
-    { name: "General Principles of Ecology", id: "topic-4-general-principles-of-ecology" },
-    { name: "A Study of an Ecosystem", id: "topic-5-a-study-of-an-ecosystem" }
+    { name: "General Principles of Ecology", id: "topic-5-general-principles-of-ecology" }, // Renumbered from 4
+    { name: "A Study of an Ecosystem", id: "topic-6-study-of-an-ecosystem" } // Renumbered from 5
   ],
   B: [
-    { name: "Cell Structure", id: "topic-6-cell-structure" },
-    { name: "Cell Metabolism", id: "topic-7-cell-metabolism" },
-    { name: "Cell Continuity", id: "topic-8-cell-continuity" },
-    { name: "Cell Diversity", id: "topic-9-cell-diversity" },
-    { name: "Genetics", id: "topic-10-genetics" }
+    { name: "Cell Structure", id: "topic-7-cell-structure" }, // Renumbered from 6
+    { name: "Cell Metabolism", id: "topic-8-cell-metabolism" }, // Renumbered from 7
+    { name: "Cell Continuity", id: "topic-9-cell-continuity" }, // Renumbered from 8
+    { name: "Cell Diversity", id: "topic-10-cell-diversity" }, // Renumbered from 9
+    { name: "Genetics", id: "topic-11-genetics" } // Renumbered from 10
   ],
   C: [
-    { name: "Diversity of Organisms", id: "topic-11-diversity-of-organisms" },
-    { name: "Organisation and the Vascular Structures", id: "topic-12-organisation-and-the-vascular-structures" },
-    { name: "Transport and Nutrition", id: "topic-13-transport-and-nutrition" },
-    { name: "Breathing System and Excretion", id: "topic-14-breathing-system-and-excretion" },
-    { name: "Responses to Stimuli", id: "topic-15-responses-to-stimuli" },
-    { name: "Reproduction and Growth", id: "topic-16-reproduction-and-growth" }
+    { name: "Diversity of Organisms", id: "topic-12-diversity-of-organisms" }, // Renumbered from 11
+    { name: "Organisation and the Vascular Structures", id: "topic-13-organisation-and-the-vascular-structures" }, // Renumbered from 12
+    { name: "Transport and Nutrition", id: "topic-14-transport-and-nutrition" }, // Renumbered from 13
+    { name: "Breathing System and Excretion", id: "topic-15-breathing-system-and-excretion" }, // Renumbered from 14
+    { name: "Responses to Stimuli", id: "topic-16-responses-to-stimuli" }, // Renumbered from 15
+    { name: "Reproduction and Growth", id: "topic-17-reproduction-and-growth" } // Renumbered from 16
   ]
 };
 
