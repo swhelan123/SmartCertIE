@@ -3,9 +3,9 @@ let selectedTopic = "";
 /*******************************************************
  * FIREBASE v9 SETUP (MODULAR)
  *******************************************************/
-// 1) Import only what you need from the CDN
-import { initializeApp } from "https://www.gstatic.com/firebasejs/9.17.2/firebase-app.js";
-import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.17.2/firebase-analytics.js";
+// 1) Import Firebase SDK from CDN (using latest stable version)
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics.js";
 import {
   getAuth,
   GoogleAuthProvider,
@@ -16,29 +16,40 @@ import {
   signOut,
   sendPasswordResetEmail,
   confirmPasswordReset,
-} from "https://www.gstatic.com/firebasejs/9.17.2/firebase-auth.js";
-import { getFirestore } from "https://www.gstatic.com/firebasejs/9.17.2/firebase-firestore.js";
-import { doc, getDoc, setDoc, serverTimestamp, addDoc, collection, query, orderBy, getDocs, deleteDoc } from "https://www.gstatic.com/firebasejs/9.17.2/firebase-firestore.js";
-import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.17.2/firebase-storage.js";
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getFirestore } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { doc, getDoc, setDoc, serverTimestamp, addDoc, collection, query, orderBy, getDocs, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
 
-// 2) Your Firebase configuration (replace with your real config)
-const firebaseConfig = {
-  apiKey: "AIzaSyDe5pXEGR015hQbXvoSGyJc955hgXO8tio",
-  authDomain: "smartcert-f1965.firebaseapp.com",
-  projectId: "smartcert-f1965",
-  storageBucket: "smartcert-f1965.firebasestorage.app",
-  messagingSenderId: "1075815326636",
-  appId: "1:1075815326636:web:ffd63ed204d2832e295009",
-  measurementId: "G-6CJR44Z4MK",
-};
+// 2) Import configuration
+import { firebaseConfig } from './config.js';
 
-// 3) Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
+// 3) Initialize Firebase with error handling
+let app;
+try {
+  app = initializeApp(firebaseConfig);
+  console.log("Firebase initialized successfully");
+} catch (error) {
+  console.error("Firebase initialization error:", error);
+  // Show user-friendly error message
+  if (typeof customAlert !== 'undefined') {
+    customAlert("Firebase configuration error. Please check your API keys.");
+  }
+}
 
-// 4) Get Auth & Firestore instances
-export const auth = getAuth(app);
-export const db = getFirestore(app);
+// 4) Initialize Analytics (optional, with error handling)
+let analytics;
+try {
+  if (app) {
+    analytics = getAnalytics(app);
+  }
+} catch (error) {
+  console.warn("Analytics initialization failed:", error);
+}
+
+// 5) Get Auth & Firestore instances
+export const auth = app ? getAuth(app) : null;
+export const db = app ? getFirestore(app) : null;
 
 const googleProvider = new GoogleAuthProvider();
 
@@ -47,12 +58,14 @@ const googleProvider = new GoogleAuthProvider();
  *******************************************************/
 // In script.js
 if ((window.location.pathname === "/" || window.location.pathname.endsWith("index.html")) && !window.location.search.includes("showLanding")) {
-  onAuthStateChanged(auth, (user) => {
-    if (user) {
-      // If logged in, redirect to chat.html
-      window.location.href = "chat.html";
-    }
-  });
+  if (auth) {
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        // If logged in, redirect to chat.html
+        window.location.href = "chat.html";
+      }
+    });
+  }
 }
 
 /*******************************************************
@@ -88,25 +101,27 @@ const profilePic = document.getElementById("profilePic");
 const accountLink = document.getElementById("accountLink");
 
 // Listen for Firebase auth changes (logged in/out)
-onAuthStateChanged(auth, async (user) => {
-  // Ensure the chat UI elements exist
-  if (!chatContainer || !chatInput || !sendBtn || !chatMessages) return;
+if (auth && db) {
+  onAuthStateChanged(auth, async (user) => {
+    // Ensure the chat UI elements exist
+    if (!chatContainer || !chatInput || !sendBtn || !chatMessages) return;
 
-  if (user) {
-    loginBtn.classList.add("hidden");
-    profilePic.classList.remove("hidden");
-    accountLink.setAttribute("href", "account.html");
+    if (user) {
+      loginBtn.classList.add("hidden");
+      profilePic.classList.remove("hidden");
+      accountLink.setAttribute("href", "account.html");
 
-    const userDocRef = doc(db, "users", user.uid);
-    const userSnap = await getDoc(userDocRef);
+      try {
+        const userDocRef = doc(db, "users", user.uid);
+        const userSnap = await getDoc(userDocRef);
 
-    if (userSnap.exists()) {
-      const userData = userSnap.data();
-      const subscriptionStatus = userData.subscriptionStatus || "not-subscribed";
+        if (userSnap.exists()) {
+          const userData = userSnap.data();
+          const subscriptionStatus = userData.subscriptionStatus || "not-subscribed";
 
-      // Set global userAvatarUrl using the user's profile photo or fallback
-      window.userAvatarUrl = userData.photoURL || "assets/img/pfp.avif";
-      if (userData.photoURL) {
+          // Set global userAvatarUrl using the user's profile photo or fallback
+          window.userAvatarUrl = userData.photoURL || "assets/img/pfp.avif";
+          if (userData.photoURL) {
         profilePic.src = userData.photoURL;
       }
 
@@ -122,6 +137,19 @@ onAuthStateChanged(auth, async (user) => {
           <div class="chat-message message-bot">
             Click subscribe to use SmartCert chat.
           </div>`;
+        let subscribeBtn = document.getElementById("subscribeBtn");
+        if (!subscribeBtn) {
+          subscribeBtn = document.createElement("button");
+          subscribeBtn.id = "subscribeBtn";
+          subscribeBtn.className = "login-button";
+          subscribeBtn.textContent = "Subscribe";
+          document.getElementById("topRightContainer").appendChild(subscribeBtn);
+        } else {
+          subscribeBtn.classList.remove("hidden");
+        }
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+        // Still show subscribe button even if there's an error
         let subscribeBtn = document.getElementById("subscribeBtn");
         if (!subscribeBtn) {
           subscribeBtn = document.createElement("button");
@@ -150,6 +178,17 @@ onAuthStateChanged(auth, async (user) => {
     if (subscribeBtn) subscribeBtn.classList.add("hidden");
   }
 });
+} else {
+  console.error("Firebase Auth or Firestore not initialized");
+  // Show error message to user
+  const chatContainer = document.getElementById("chatContainer");
+  if (chatContainer) {
+    chatContainer.innerHTML = `
+      <div class="chat-message message-bot">
+        Firebase configuration error. Please check your setup.
+      </div>`;
+  }
+}
 
 if (profilePic) {
   profilePic.addEventListener("click", () => {
@@ -242,6 +281,10 @@ if (sidebarLinks && chatSection && notebookSection) {
               const confirmed = await showCustomConfirm("Are you sure you want to delete this entry?");
               if (!confirmed) return;
               try {
+                if (!auth || !db) {
+                  customAlert("Firebase not initialized!");
+                  return;
+                }
                 await deleteDoc(doc(db, "users", auth.currentUser.uid, "notebook", entry.id));
                 li.remove();
               } catch (err) {
@@ -447,6 +490,10 @@ if (setupForm) {
     e.preventDefault();
 
     // 1) Ensure user is logged in
+    if (!auth) {
+      customAlert("Firebase not initialized!");
+      return;
+    }
     const user = auth.currentUser;
     if (!user) {
       customAlert("You must be logged in!");
@@ -571,6 +618,10 @@ if (updateAccountForm) {
   updateAccountForm.addEventListener("submit", async (e) => {
     e.preventDefault();
 
+    if (!auth) {
+      customAlert("Firebase not initialized!");
+      return;
+    }
     const user = auth.currentUser;
     if (!user) {
       customAlert("Not logged in!");
@@ -733,7 +784,7 @@ onAuthStateChanged(auth, async (user) => {
         // Only attach the event listener once
         if (!subscribeBtn.dataset.listenerAttached) {
           subscribeBtn.addEventListener("click", async () => {
-            const currentUser = auth.currentUser;
+            const currentUser = auth?.currentUser;
             if (!currentUser) {
               customAlert("You must be logged in to subscribe.");
               return;
@@ -883,6 +934,10 @@ if (navChatLink) {
 
 // We'll define a global function so we can call it from chat.js
 window.saveNotebookEntry = async function (answer) {
+  if (!auth || !db) {
+    customAlert("Firebase not initialized!");
+    return;
+  }
   const user = auth.currentUser;
   if (!user) {
     customAlert("Please log in to save to your notebook!");
@@ -905,6 +960,7 @@ window.saveNotebookEntry = async function (answer) {
 };
 
 window.loadNotebookEntries = async function () {
+  if (!auth || !db) return [];
   const user = auth.currentUser;
   if (!user) return [];
 

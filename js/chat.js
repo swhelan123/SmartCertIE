@@ -2,6 +2,9 @@
  * chat.js — typed-out fully formatted HTML
  **************************************/
 
+// Import configuration
+import { geminiConfig, appConfig } from './config.js';
+
 // --- Example topic context data ---
 const topicData = {
   "The Scientific Method": "Context: Review key steps of the scientific method, including hypothesis formulation, experimentation, and analysis.",
@@ -22,51 +25,71 @@ const topicData = {
    "Reproduction and Growth": "Context: Discuss sexual and asexual reproduction, developmental biology, and growth processes."
 };
 
-// Query the AI
-async function queryAimlApi(question) {
-  const apiUrl = "https://api.aimlapi.com/v1/chat/completions";
-  const apiKey = "6f38c7556ee5413694304b0be2c3fa33";
-
-  let systemPrompt = "You are a friendly Leaving Certificate biology tutor named Certi...";
-  if (window.selectedTopic && topicData[window.selectedTopic]) {
-    systemPrompt += "\n" + topicData[window.selectedTopic];
+// Query the Google Gemini AI
+async function queryGeminiApi(question) {
+  // Check if API key is configured
+  if (!geminiConfig.apiKey || geminiConfig.apiKey === "YOUR_GEMINI_API_KEY_HERE") {
+    return "Please configure your Google Gemini API key in the config.js file. You can get one from https://makersuite.google.com/app/apikey";
   }
 
-  const messages = [
-    { role: "system", content: systemPrompt },
-    { role: "user", content: question },
-  ];
+  // Build system prompt with topic context
+  let systemPrompt = appConfig.systemPrompt;
+  if (window.selectedTopic && topicData[window.selectedTopic]) {
+    systemPrompt += "\n\n" + topicData[window.selectedTopic];
+  }
 
+  // Combine system prompt and user question for Gemini
+  const fullPrompt = `${systemPrompt}\n\nStudent Question: ${question}\n\nPlease provide a helpful, clear, and encouraging response:`;
+
+  // Gemini API payload format
   const payload = {
-    model: "mistralai/Mistral-7B-Instruct-v0.2",
-    messages: messages,
-    temperature: 0.7,
-    max_tokens: 512,
+    contents: [
+      {
+        parts: [
+          {
+            text: fullPrompt
+          }
+        ]
+      }
+    ],
+    generationConfig: {
+      temperature: appConfig.temperature,
+      maxOutputTokens: appConfig.maxTokens,
+      topP: 0.8,
+      topK: 10
+    }
   };
 
   try {
-    const response = await fetch(apiUrl, {
+    const response = await fetch(`${geminiConfig.apiUrl}?key=${geminiConfig.apiKey}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${apiKey}`,
       },
       body: JSON.stringify(payload),
     });
 
     if (!response.ok) {
-      throw new Error(`API returned status ${response.status}`);
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(`Gemini API returned status ${response.status}: ${errorData.error?.message || 'Unknown error'}`);
     }
 
     const data = await response.json();
-    if (data.choices && data.choices[0]?.message?.content) {
-      return data.choices[0].message.content;
+    if (data.candidates && data.candidates[0]?.content?.parts[0]?.text) {
+      return data.candidates[0].content.parts[0].text;
     } else {
-      return "Sorry, I didn't understand that.";
+      console.warn("Unexpected Gemini API response format:", data);
+      return "I'm having trouble processing your question right now. Please try again.";
     }
   } catch (error) {
-    console.error("oh no! aimlapi error:", error);
-    return "Daily credits are all gone!";
+    console.error("Gemini API error:", error);
+    if (error.message.includes("API_KEY_INVALID")) {
+      return "Invalid API key. Please check your Gemini API key configuration.";
+    } else if (error.message.includes("QUOTA_EXCEEDED")) {
+      return "API quota exceeded. Please check your Gemini API usage limits.";
+    } else {
+      return "I'm experiencing technical difficulties. Please try again in a moment.";
+    }
   }
 }
 
@@ -168,7 +191,7 @@ if (sendBtn && chatInput && chatMessages) {
     chatMessages.scrollTop = chatMessages.scrollHeight;
 
     // 4) Query the AI
-    const answer = await queryAimlApi(question);
+    const answer = await queryGeminiApi(question);
 
     // 5) Replace "Thinking..." with typed-out answer
     botBubble.innerHTML = ""; // clear out "Thinking..."
