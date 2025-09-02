@@ -20,9 +20,9 @@ export const firebaseConfig = {
 // Google Gemini API Configuration
 // Get your API key from: https://makersuite.google.com/app/apikey
 export const geminiConfig = {
-  apiKey: "YOUR_GEMINI_API_KEY_HERE", // Replace with your actual Gemini API key
-  model: "gemini-1.5-flash", // Using Gemini 1.5 Flash (free tier available)
-  apiUrl: "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent"
+  apiKey: "AIzaSyBYiYPIA-EK00NRzM-mS7dCHgYIaHfjbmQ",
+  model: "gemini-2.0-flash", // Using Gemini 2.0 Flash (free tier available)
+  apiUrl: "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent"
 };
 
 // Application Settings
