@@ -5,6 +5,49 @@
 // Import configuration
 import { geminiConfig, appConfig } from './config.js';
 
+// Conversation history storage
+let conversationHistory = [];
+
+// Load conversation history from localStorage on page load
+function loadConversationHistory() {
+  try {
+    const saved = localStorage.getItem('smartcert_conversation_history');
+    if (saved) {
+      conversationHistory = JSON.parse(saved);
+    }
+  } catch (error) {
+    console.warn('Failed to load conversation history:', error);
+    conversationHistory = [];
+  }
+}
+
+// Save conversation history to localStorage
+function saveConversationHistory() {
+  try {
+    // Keep only the last maxHistoryMessages to prevent localStorage bloat
+    const trimmed = conversationHistory.slice(-appConfig.maxHistoryMessages);
+    localStorage.setItem('smartcert_conversation_history', JSON.stringify(trimmed));
+    conversationHistory = trimmed;
+  } catch (error) {
+    console.warn('Failed to save conversation history:', error);
+  }
+}
+
+// Add message to conversation history
+function addToHistory(role, content) {
+  conversationHistory.push({ role, content });
+  saveConversationHistory();
+}
+
+// Clear conversation history
+function clearConversationHistory() {
+  conversationHistory = [];
+  localStorage.removeItem('smartcert_conversation_history');
+}
+
+// Initialize conversation history on page load
+loadConversationHistory();
+
 // --- Example topic context data ---
 const topicData = {
   "The Scientific Method": "Context: Review key steps of the scientific method, including hypothesis formulation, experimentation, and analysis.",
@@ -38,8 +81,24 @@ async function queryGeminiApi(question) {
     systemPrompt += "\n\n" + topicData[window.selectedTopic];
   }
 
-  // Combine system prompt and user question for Gemini
-  const fullPrompt = `${systemPrompt}\n\nStudent Question: ${question}\n\nPlease provide a helpful, clear, and encouraging response:`;
+  // Add conversation context if available
+  let contextPrompt = systemPrompt;
+  if (conversationHistory.length > 0) {
+    contextPrompt += "\n\nPrevious conversation context:";
+    // Include recent conversation history for context
+    const recentHistory = conversationHistory.slice(-appConfig.maxHistoryMessages);
+    recentHistory.forEach(msg => {
+      if (msg.role === 'user') {
+        contextPrompt += `\nStudent: ${msg.content}`;
+      } else if (msg.role === 'assistant') {
+        contextPrompt += `\nCerti: ${msg.content.substring(0, 200)}...`; // Truncate long responses
+      }
+    });
+    contextPrompt += "\n\nPlease continue the conversation naturally, building on the previous context.";
+  }
+
+  // Combine context and current question for Gemini
+  const fullPrompt = `${contextPrompt}\n\nCurrent Student Question: ${question}\n\nPlease provide a helpful, clear, and encouraging response:`;
 
   // Gemini API payload format
   const payload = {
@@ -76,7 +135,13 @@ async function queryGeminiApi(question) {
 
     const data = await response.json();
     if (data.candidates && data.candidates[0]?.content?.parts[0]?.text) {
-      return data.candidates[0].content.parts[0].text;
+      const answer = data.candidates[0].content.parts[0].text;
+      
+      // Add both question and answer to conversation history
+      addToHistory('user', question);
+      addToHistory('assistant', answer);
+      
+      return answer;
     } else {
       console.warn("Unexpected Gemini API response format:", data);
       return "I'm having trouble processing your question right now. Please try again.";
@@ -131,6 +196,31 @@ const sendBtn = document.getElementById("sendBtn");
 const chatInput = document.getElementById("chatInput");
 const chatMessages = document.getElementById("chatMessages");
 const savedResponses = document.getElementById("savedResponses");
+const clearHistoryBtn = document.getElementById("clearHistoryBtn");
+
+// Clear History button functionality
+if (clearHistoryBtn) {
+  clearHistoryBtn.addEventListener("click", () => {
+    if (confirm("Are you sure you want to clear the conversation history? This will remove context from future responses.")) {
+      clearConversationHistory();
+      
+      // Optionally clear the visible chat messages too
+      if (confirm("Would you also like to clear the visible chat messages?")) {
+        chatMessages.innerHTML = `
+          <div class="chat-message message-bot overlay-row">
+            <div class="bubble-container">
+              <img class="chat-avatar" src="assets/img/certi.png" alt="Bot Avatar" />
+              <div class="chat-bubble">
+                Hi! I'm Certi, your friendly Leaving Certificate biology tutor. How can I help you today?
+                <br><small style="opacity: 0.7; margin-top: 5px; display: block;">Conversation history cleared.</small>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+    }
+  });
+}
 
 // Single event listener for "Send"
 if (sendBtn && chatInput && chatMessages) {

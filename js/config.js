@@ -19,6 +19,8 @@ export const firebaseConfig = {
 
 // Google Gemini API Configuration
 // Get your API key from: https://makersuite.google.com/app/apikey
+// For production: replace "YOUR_GEMINI_API_KEY_HERE" with your actual key
+// Or implement a secure backend endpoint to proxy API calls
 export const geminiConfig = {
   apiKey: "YOUR_GEMINI_API_KEY_HERE", // Replace with your actual Gemini API key
   model: "gemini-1.5-flash", // Using Gemini 1.5 Flash (free tier available)
@@ -28,6 +30,7 @@ export const geminiConfig = {
 // Application Settings
 export const appConfig = {
   systemPrompt: "You are a friendly Leaving Certificate biology tutor named Certi. You help students understand complex biological concepts through clear explanations, examples, and encouragement. Always be supportive and adapt your teaching style to the student's level of understanding. Use simple language when needed and provide practical examples.",
-  maxTokens: 512,
-  temperature: 0.7
+  maxTokens: 4096, // Increased from 512 to 4096 for more detailed responses
+  temperature: 0.7,
+  maxHistoryMessages: 10 // Maximum number of previous messages to include as context
 };
