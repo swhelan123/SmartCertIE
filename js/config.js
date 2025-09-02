@@ -22,9 +22,9 @@ export const firebaseConfig = {
 // For production: replace "YOUR_GEMINI_API_KEY_HERE" with your actual key
 // Or implement a secure backend endpoint to proxy API calls
 export const geminiConfig = {
-  apiKey: "YOUR_GEMINI_API_KEY_HERE", // Replace with your actual Gemini API key
-  model: "gemini-1.5-flash", // Using Gemini 1.5 Flash (free tier available)
-  apiUrl: "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent"
+  apiKey: "AIzaSyBYiYPIA-EK00NRzM-mS7dCHgYIaHfjbmQ",
+  model: "gemini-2.5-flash", // Using Gemini 2.5 Flash (free tier available)
+  apiUrl: "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent"
 };
 
 // Application Settings
