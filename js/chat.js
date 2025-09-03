@@ -45,8 +45,8 @@ function clearConversationHistory() {
   localStorage.removeItem('smartcert_conversation_history');
 }
 
-// Initialize conversation history on page load
-loadConversationHistory();
+// Clear conversation history on page load/refresh
+clearConversationHistory();
 
 // --- Example topic context data ---
 const topicData = {
