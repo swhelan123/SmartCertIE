@@ -1,0 +1,30 @@
+/* Reset and base styling */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Poppins", sans-serif;
+}
+
+body {
+    display: flex;
+    flex-direction: row;
+    height: 100vh;
+    background: linear-gradient(120deg, #ffffff 0%, var(--light-bg) 100%);
+    color: var(--light-text);
+    transition:
+        background-color 0.3s,
+        color 0.3s,
+        background 0.3s;
+    overflow-x: hidden;
+}
+
+body.dark-mode {
+    background: var(--dark-bg);
+    color: var(--dark-text);
+}
+
+/* Hiding elements with .hidden */
+.hidden {
+    display: none !important;
+}

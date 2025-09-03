@@ -1,0 +1,225 @@
+/* Mobile and Responsive Styles */
+
+@media (max-width: 768px) {
+    .pill-container.pill-left {
+        display: flex;
+    }
+
+    .sidebar {
+        position: fixed;
+        top: 0;
+        left: -100%;
+        height: 100%;
+        z-index: 1000;
+        transition: left 0.3s ease;
+    }
+
+    .sidebar.show {
+        left: 0;
+    }
+
+    .main-content {
+        width: 100%;
+        margin-left: 0;
+    }
+
+    /* Chat input area adjustments */
+    .chat-input-area {
+        flex-wrap: wrap;
+        gap: 0.3rem;
+    }
+
+    .chat-input-area input {
+        min-width: 0;
+        flex: 1;
+    }
+
+    #sendBtn {
+        flex-shrink: 0;
+        margin-left: 0.5rem;
+    }
+}
+
+@media (max-width: 600px) {
+    .section-content {
+        box-shadow: none;
+        background-color: #ffffff00;
+    }
+
+    /* Let the page scroll normally, not locked to 100vh */
+    body {
+        flex-direction: column;
+        height: auto;
+    }
+
+    /* Remove the card-like styling from the main content/chat container */
+    .main-content {
+        padding: 0;
+        overflow: visible;
+    }
+    
+    .chat-container {
+        border-radius: 0;
+        box-shadow: none;
+        padding: 0;
+        overflow: visible;
+    }
+
+    /* Pin the chat input bar at the bottom */
+    .chat-input-area {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        padding: 0.5rem;
+        background-color: #fff;
+        box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.1);
+        z-index: 999;
+    }
+
+    body.dark-mode .chat-input-area {
+        background-color: #2a2a2a;
+    }
+
+    /* Add bottom padding so last message isn't hidden by pinned input */
+    .chat-messages {
+        padding-bottom: 4rem;
+    }
+
+    /* Updated for overlay-row messages */
+    .overlay-row {
+        align-items: center;
+    }
+
+    .overlay-row .bubble-container {
+        max-width: 85%;
+    }
+
+    .overlay-row .chat-avatar {
+        width: 32px;
+        height: 32px;
+    }
+
+    .overlay-row.message-bot .chat-avatar {
+        left: 0.5rem;
+    }
+
+    .overlay-row.message-user .chat-avatar {
+        right: 0.5rem;
+    }
+
+    .overlay-row .chat-bubble {
+        padding: 0.8rem;
+        padding-top: 2rem;
+        font-size: 0.9rem;
+    }
+
+    /* Adjust jump to bottom button for mobile */
+    .jump-to-bottom {
+        bottom: 80px;
+        right: 15px;
+        width: 35px;
+        height: 35px;
+    }
+
+    .jump-to-bottom svg {
+        width: 18px;
+        height: 18px;
+    }
+}
+
+@media (max-width: 480px) {
+    h1 {
+        font-size: 1.6rem;
+    }
+    
+    .hero-container {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .hero-text {
+        margin-right: 0;
+        text-align: center;
+    }
+    
+    .hero-image img {
+        max-width: 100%;
+        height: auto;
+    }
+
+    /* Further mobile optimizations */
+    .overlay-row .bubble-container {
+        max-width: 90%;
+        margin: 0 0.5rem;
+    }
+
+    .overlay-row .chat-bubble {
+        padding: 0.6rem;
+        padding-top: 1.8rem;
+        font-size: 0.85rem;
+    }
+
+    .notebook-modal-content {
+        width: 95vw;
+        height: 90vh;
+        padding: 1rem;
+    }
+
+    #notebookModalQuestion {
+        font-size: 1.5rem;
+    }
+}
+
+/* Large screen optimizations */
+@media (min-width: 1200px) {
+    .chat-container {
+        max-width: 1000px;
+        margin: 0 auto;
+    }
+
+    .overlay-row .bubble-container {
+        max-width: 60%;
+    }
+}
+
+/* Print styles */
+@media print {
+    .sidebar,
+    .pill-container,
+    .chat-input-area,
+    .jump-to-bottom {
+        display: none !important;
+    }
+
+    .main-content {
+        margin-left: 0;
+        width: 100%;
+    }
+
+    .chat-messages {
+        overflow: visible;
+        height: auto;
+    }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    .chat-bubble {
+        border: 2px solid currentColor;
+    }
+
+    .unit-button,
+    .chapter-button {
+        border: 2px solid currentColor;
+    }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}

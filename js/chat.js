@@ -1,9 +1,10 @@
 /**************************************
- * chat.js — typed-out fully formatted HTML
+ * chat.js — Enhanced chat with smart scrolling
  **************************************/
 
-// Import configuration
+// Import configuration and components
 import { geminiConfig, appConfig } from './config.js';
+import { ChatScroller } from './components/ChatScroller.js';
 
 // Conversation history storage
 let conversationHistory = [];
@@ -168,6 +169,12 @@ async function typeHtml(sourceNode, targetNode, speed = 20) {
       const text = child.textContent;
       for (let i = 0; i < text.length; i++) {
         targetNode.append(text.charAt(i));
+        
+        // Maintain scroll position during typing
+        if (chatScroller && i % 5 === 0) { // Check every 5 characters to reduce performance impact
+          chatScroller.maintainScroll();
+        }
+        
         await new Promise((r) => setTimeout(r, speed));
       }
     } else if (child.nodeType === Node.ELEMENT_NODE) {
@@ -197,6 +204,12 @@ const chatInput = document.getElementById("chatInput");
 const chatMessages = document.getElementById("chatMessages");
 const savedResponses = document.getElementById("savedResponses");
 const clearHistoryBtn = document.getElementById("clearHistoryBtn");
+
+// Initialize smart scrolling
+let chatScroller = null;
+if (chatMessages) {
+  chatScroller = new ChatScroller(chatMessages);
+}
 
 // Clear History button functionality
 if (clearHistoryBtn) {
@@ -257,7 +270,13 @@ if (sendBtn && chatInput && chatMessages) {
 
     // Clear input
     chatInput.value = "";
-    chatMessages.scrollTop = chatMessages.scrollHeight;
+    
+    // Force scroll to bottom for user message
+    if (chatScroller) {
+      chatScroller.forceScrollToBottom();
+    } else {
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
 
     // 2) Create the BOT message row
     const botRow = document.createElement("div");
@@ -282,8 +301,12 @@ if (sendBtn && chatInput && chatMessages) {
     botRow.appendChild(botBubbleContainer);
     chatMessages.appendChild(botRow);
 
-    // Scroll to bottom
-    chatMessages.scrollTop = chatMessages.scrollHeight;
+    // Scroll to bottom for "Thinking..." message
+    if (chatScroller) {
+      chatScroller.forceScrollToBottom();
+    } else {
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
 
     // 4) Query the AI
     const answer = await queryGeminiApi(question);
@@ -291,8 +314,18 @@ if (sendBtn && chatInput && chatMessages) {
     // 5) Replace "Thinking..." with typed-out answer
     botBubble.innerHTML = ""; // clear out "Thinking..."
 
+    // Start typing indicator for smart scrolling
+    if (chatScroller) {
+      chatScroller.startTyping();
+    }
+
     // === 6) Type out the final *formatted* HTML
     await typeMarkdownAsHtml(answer, botBubble, 5);
+
+    // End typing indicator
+    if (chatScroller) {
+      chatScroller.endTyping();
+    }
 
     // === 7) Add a "Save to Notebook" button
     const saveBtn = document.createElement("button");
@@ -314,8 +347,12 @@ if (sendBtn && chatInput && chatMessages) {
 
     botBubble.appendChild(saveBtn);
 
-    // Scroll to bottom
-    chatMessages.scrollTop = chatMessages.scrollHeight;
+    // Final scroll to bottom (only if user is at bottom)
+    if (chatScroller) {
+      chatScroller.endTyping();
+    } else {
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
   });
 
   // Press Enter to send

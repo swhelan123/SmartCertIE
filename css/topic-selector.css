@@ -1,0 +1,193 @@
+/* Topic Selector and Unit/Chapter Selection */
+
+.topic-selector {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 1.5rem auto;
+    width: 90%;
+    padding: 2rem;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    background-color: #f8fafc;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-blue);
+}
+
+body.dark-mode .topic-selector {
+    background-color: #333;
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+.topic-selector h3 {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    text-align: center;
+    color: var(--light-text);
+}
+
+body.dark-mode .topic-selector h3 {
+    color: var(--dark-text);
+}
+
+/* Unit container */
+.unit-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1rem;
+    width: 100%;
+    justify-items: center;
+}
+
+/* Chapter container */
+.chapter-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 0.8rem;
+    margin-top: 1rem;
+    width: 100%;
+    justify-items: center;
+}
+
+/* Unit button styling */
+.unit-button {
+    padding: 1rem 1.5rem;
+    border: none;
+    border-radius: 9999px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: var(--shadow-blue);
+    min-width: 200px;
+    text-align: center;
+}
+
+.unit-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+}
+
+/* Chapter button styling */
+.chapter-button {
+    padding: 0.8rem 1.2rem;
+    border: none;
+    border-radius: 12px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    min-width: 180px;
+    text-align: center;
+}
+
+.chapter-button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Unit color schemes */
+.unit-green {
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: #fff;
+}
+
+.unit-purple {
+    background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+    color: #fff;
+}
+
+.unit-red {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    color: #fff;
+}
+
+.unit-gray {
+    background: linear-gradient(135deg, #6b7280, #4b5563);
+    color: #fff;
+}
+
+/* Selected topic container */
+.selected-topic-container {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 1rem;
+    padding: 1rem;
+    background-color: var(--secondary-color);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-blue);
+}
+
+body.dark-mode .selected-topic-container {
+    background-color: #444;
+}
+
+.selected-topic-label {
+    font-weight: 600;
+    color: var(--primary-color);
+    font-size: 1.1rem;
+}
+
+body.dark-mode .selected-topic-label {
+    color: #60a5fa;
+}
+
+.change-topic-button {
+    background-color: var(--primary-color);
+    color: #fff;
+    border: none;
+    border-radius: var(--border-radius);
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: background-color 0.2s;
+}
+
+.change-topic-button:hover {
+    background-color: #2563eb;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 600px) {
+    .topic-selector {
+        padding: 1rem;
+        position: sticky;
+    }
+    
+    .topic-selector h3 {
+        font-size: 1rem;
+        margin-bottom: 0.5rem;
+        text-align: center;
+    }
+
+    .unit-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        justify-content: center;
+    }
+    
+    .unit-button {
+        font-size: 0.8rem;
+        padding: 0.5rem 1rem;
+        border-radius: 9999px;
+        min-width: auto;
+    }
+
+    .chapter-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        justify-content: center;
+        margin-top: 0.5rem;
+    }
+    
+    .chapter-button {
+        font-size: 0.8rem;
+        padding: 0.5rem 0.8rem;
+        min-width: auto;
+    }
+}

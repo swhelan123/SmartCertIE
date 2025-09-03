@@ -1,0 +1,92 @@
+/* UI Components - buttons, pills, icons, etc. */
+
+/* Dark Mode Toggle Button */
+.dark-mode-toggle {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background-color: var(--primary-color);
+    color: #fff;
+    border: none;
+    border-radius: var(--border-radius);
+    padding: 0.6rem 1rem;
+    cursor: pointer;
+    font-size: 0.9rem;
+    box-shadow: var(--shadow-blue);
+    transition: background-color 0.3s;
+    z-index: 1001;
+}
+
+.dark-mode-toggle:hover {
+    background-color: #2563eb;
+}
+
+/* Top Right Login Container */
+#topRightLoginContainer {
+    position: absolute;
+    top: 1rem;
+    right: 7rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+/* Pill Container (top-right) */
+.pill-container {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background-color: #fff;
+    border-radius: 9999px;
+    padding: 0.4rem 0.8rem;
+    box-shadow: var(--shadow-blue);
+    z-index: 1001;
+}
+
+body.dark-mode .pill-container {
+    background-color: #333;
+}
+
+/* Second pill container class for top-left positioning */
+.pill-container.pill-left {
+    top: 1rem;
+    left: 1rem;
+    right: auto;
+}
+
+/* Login Button */
+.login-button {
+    background-color: var(--primary-color);
+    color: #fff;
+    border: none;
+    border-radius: var(--border-radius);
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    font-size: 0.9rem;
+    box-shadow: var(--shadow-blue);
+    transition: background-color 0.3s;
+}
+
+.login-button:hover {
+    background-color: #2563eb;
+}
+
+/* Profile Picture */
+.profile-pic {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    box-shadow: var(--shadow-blue);
+    cursor: pointer;
+}
+
+/* Mode Icon (sun/moon) */
+.mode-icon {
+    width: 28px;
+    height: 28px;
+    cursor: pointer;
+}

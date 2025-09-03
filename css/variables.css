@@ -1,0 +1,16 @@
+/* CSS Custom Properties (Variables) */
+:root {
+    --primary-color: #3b82f6; /* Blue accent */
+    --secondary-color: #ecf2ff; /* Subtle background for chat bubbles */
+    --shadow-blue: 0 8px 20px rgba(59, 130, 246, 0.15); /* Blue drop shadow */
+
+    --light-bg: #f7faff; /* A very light bluish background */
+    --light-text: #1f1f1f;
+    --light-sidebar: #ffffff;
+
+    --dark-bg: #1e1e1e;
+    --dark-text: #eaeaea;
+    --dark-sidebar: #2a2a2a;
+
+    --border-radius: 14px;
+}
