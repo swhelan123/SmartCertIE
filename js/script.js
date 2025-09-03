@@ -115,6 +115,11 @@ onAuthStateChanged(auth, async (user) => {
       window.userAvatarUrl = userData.photoURL || "assets/img/pfp.avif";
       if (userData.photoURL) {
         profilePic.src = userData.photoURL;
+        // Add error handling for profile picture loading
+        profilePic.onerror = function() {
+          this.src = "assets/img/pfp.avif"; // Fallback to default if user image fails to load
+          window.userAvatarUrl = "assets/img/pfp.avif"; // Update global URL too
+        };
       }
 
       if (subscriptionStatus === "active") {
@@ -558,6 +563,10 @@ onAuthStateChanged(auth, async (user) => {
         // 4) Show profile pic if we have a photoURL
         if (data.photoURL) {
           accountProfilePic.src = data.photoURL;
+          // Add error handling for account profile picture loading
+          accountProfilePic.onerror = function() {
+            this.src = "assets/img/pfp.avif"; // Fallback to default if user image fails to load
+          };
         }
 
         // 5) Also fill the update form with current data
@@ -609,6 +618,12 @@ if (updateAccountForm) {
 
       // 4) Update the <img> on account page (if you want immediate UI update)
       accountProfilePic.src = newPhotoURL || "assets/img/pfp.avif";
+      // Also update the global userAvatarUrl for chat usage
+      window.userAvatarUrl = newPhotoURL || "assets/img/pfp.avif";
+      // Update the top navigation profile pic if it exists
+      if (profilePic) {
+        profilePic.src = newPhotoURL || "assets/img/pfp.avif";
+      }
 
       customAlert("Profile updated successfully!");
       window.location.href = "chat.html";

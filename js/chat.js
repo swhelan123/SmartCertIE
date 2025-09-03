@@ -240,6 +240,11 @@ if (sendBtn && chatInput && chatMessages) {
     // Use the global profile image URL (fallback if not set)
     userAvatar.src = window.userAvatarUrl || "assets/img/pfp.avif";
     userAvatar.alt = "User Avatar";
+    
+    // Add error handling for avatar image loading
+    userAvatar.onerror = function() {
+      this.src = "assets/img/pfp.avif"; // Fallback to default avatar if user image fails to load
+    };
 
     const userBubble = document.createElement("div");
     userBubble.classList.add("chat-bubble");
