@@ -3,9 +3,9 @@ let selectedTopic = "";
 /*******************************************************
  * FIREBASE v9 SETUP (MODULAR)
  *******************************************************/
-// 1) Import only what you need from the CDN
-import { initializeApp } from "https://www.gstatic.com/firebasejs/9.17.2/firebase-app.js";
-import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.17.2/firebase-analytics.js";
+// 1) Import Firebase SDK from CDN (using latest stable version)
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics.js";
 import {
   getAuth,
   GoogleAuthProvider,
@@ -16,12 +16,12 @@ import {
   signOut,
   sendPasswordResetEmail,
   confirmPasswordReset,
-} from "https://www.gstatic.com/firebasejs/9.17.2/firebase-auth.js";
-import { getFirestore } from "https://www.gstatic.com/firebasejs/9.17.2/firebase-firestore.js";
-import { doc, getDoc, setDoc, serverTimestamp, addDoc, collection, query, orderBy, getDocs, deleteDoc } from "https://www.gstatic.com/firebasejs/9.17.2/firebase-firestore.js";
-import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.17.2/firebase-storage.js";
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getFirestore } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { doc, getDoc, setDoc, serverTimestamp, addDoc, collection, query, orderBy, getDocs, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
 
-// 2) Your Firebase configuration (replace with your real config)
+// 2) Your Firebase configuration - Replace with YOUR_GEMINI_API_KEY placeholder in config.js if needed
 const firebaseConfig = {
   apiKey: "AIzaSyDe5pXEGR015hQbXvoSGyJc955hgXO8tio",
   authDomain: "smartcert-f1965.firebaseapp.com",
@@ -32,9 +32,16 @@ const firebaseConfig = {
   measurementId: "G-6CJR44Z4MK",
 };
 
-// 3) Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
+// 3) Initialize Firebase with improved error handling
+let app;
+let analytics;
+try {
+  app = initializeApp(firebaseConfig);
+  analytics = getAnalytics(app);
+  console.log("Firebase initialized successfully");
+} catch (error) {
+  console.error("Firebase initialization error:", error);
+}
 
 // 4) Get Auth & Firestore instances
 export const auth = getAuth(app);
@@ -108,6 +115,11 @@ onAuthStateChanged(auth, async (user) => {
       window.userAvatarUrl = userData.photoURL || "assets/img/pfp.avif";
       if (userData.photoURL) {
         profilePic.src = userData.photoURL;
+        // Add error handling for profile picture loading
+        profilePic.onerror = function() {
+          this.src = "assets/img/pfp.avif"; // Fallback to default if user image fails to load
+          window.userAvatarUrl = "assets/img/pfp.avif"; // Update global URL too
+        };
       }
 
       if (subscriptionStatus === "active") {
@@ -551,6 +563,10 @@ onAuthStateChanged(auth, async (user) => {
         // 4) Show profile pic if we have a photoURL
         if (data.photoURL) {
           accountProfilePic.src = data.photoURL;
+          // Add error handling for account profile picture loading
+          accountProfilePic.onerror = function() {
+            this.src = "assets/img/pfp.avif"; // Fallback to default if user image fails to load
+          };
         }
 
         // 5) Also fill the update form with current data
@@ -602,6 +618,12 @@ if (updateAccountForm) {
 
       // 4) Update the <img> on account page (if you want immediate UI update)
       accountProfilePic.src = newPhotoURL || "assets/img/pfp.avif";
+      // Also update the global userAvatarUrl for chat usage
+      window.userAvatarUrl = newPhotoURL || "assets/img/pfp.avif";
+      // Update the top navigation profile pic if it exists
+      if (profilePic) {
+        profilePic.src = newPhotoURL || "assets/img/pfp.avif";
+      }
 
       customAlert("Profile updated successfully!");
       window.location.href = "chat.html";
@@ -882,7 +904,7 @@ if (navChatLink) {
  *******************************************************/
 
 // We'll define a global function so we can call it from chat.js
-window.saveNotebookEntry = async function (answer) {
+window.saveNotebookEntry = async function (answer, question) {
   const user = auth.currentUser;
   if (!user) {
     customAlert("Please log in to save to your notebook!");
@@ -893,6 +915,7 @@ window.saveNotebookEntry = async function (answer) {
     // Create a new doc in /users/{uid}/notebook
     await addDoc(collection(db, "users", user.uid, "notebook"), {
       text: answer,
+      question: question || "", // Store the question as well
       topic: window.selectedTopic || "",
       createdAt: serverTimestamp(),
     });

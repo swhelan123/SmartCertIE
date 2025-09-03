@@ -2,6 +2,52 @@
  * chat.js — typed-out fully formatted HTML
  **************************************/
 
+// Import configuration
+import { geminiConfig, appConfig } from './config.js';
+
+// Conversation history storage
+let conversationHistory = [];
+
+// Load conversation history from localStorage on page load
+function loadConversationHistory() {
+  try {
+    const saved = localStorage.getItem('smartcert_conversation_history');
+    if (saved) {
+      conversationHistory = JSON.parse(saved);
+    }
+  } catch (error) {
+    console.warn('Failed to load conversation history:', error);
+    conversationHistory = [];
+  }
+}
+
+// Save conversation history to localStorage
+function saveConversationHistory() {
+  try {
+    // Keep only the last maxHistoryMessages to prevent localStorage bloat
+    const trimmed = conversationHistory.slice(-appConfig.maxHistoryMessages);
+    localStorage.setItem('smartcert_conversation_history', JSON.stringify(trimmed));
+    conversationHistory = trimmed;
+  } catch (error) {
+    console.warn('Failed to save conversation history:', error);
+  }
+}
+
+// Add message to conversation history
+function addToHistory(role, content) {
+  conversationHistory.push({ role, content });
+  saveConversationHistory();
+}
+
+// Clear conversation history
+function clearConversationHistory() {
+  conversationHistory = [];
+  localStorage.removeItem('smartcert_conversation_history');
+}
+
+// Initialize conversation history on page load
+loadConversationHistory();
+
 // --- Example topic context data ---
 const topicData = {
   "The Scientific Method": "Context: Review key steps of the scientific method, including hypothesis formulation, experimentation, and analysis.",
@@ -22,51 +68,93 @@ const topicData = {
    "Reproduction and Growth": "Context: Discuss sexual and asexual reproduction, developmental biology, and growth processes."
 };
 
-// Query the AI
-async function queryAimlApi(question) {
-  const apiUrl = "https://api.aimlapi.com/v1/chat/completions";
-  const apiKey = "6f38c7556ee5413694304b0be2c3fa33";
-
-  let systemPrompt = "You are a friendly Leaving Certificate biology tutor named Certi...";
-  if (window.selectedTopic && topicData[window.selectedTopic]) {
-    systemPrompt += "\n" + topicData[window.selectedTopic];
+// Query the Google Gemini AI
+async function queryGeminiApi(question) {
+  // Check if API key is configured
+  if (!geminiConfig.apiKey || geminiConfig.apiKey === "YOUR_GEMINI_API_KEY_HERE") {
+    return "Please configure your Google Gemini API key in the config.js file. You can get one from https://makersuite.google.com/app/apikey";
   }
 
-  const messages = [
-    { role: "system", content: systemPrompt },
-    { role: "user", content: question },
-  ];
+  // Build system prompt with topic context
+  let systemPrompt = appConfig.systemPrompt;
+  if (window.selectedTopic && topicData[window.selectedTopic]) {
+    systemPrompt += "\n\n" + topicData[window.selectedTopic];
+  }
 
+  // Add conversation context if available
+  let contextPrompt = systemPrompt;
+  if (conversationHistory.length > 0) {
+    contextPrompt += "\n\nPrevious conversation context:";
+    // Include recent conversation history for context (full verbatim messages)
+    const recentHistory = conversationHistory.slice(-appConfig.maxHistoryMessages);
+    recentHistory.forEach(msg => {
+      if (msg.role === 'user') {
+        contextPrompt += `\nStudent: ${msg.content}`;
+      } else if (msg.role === 'assistant') {
+        contextPrompt += `\nCerti: ${msg.content}`; // Full message, not truncated
+      }
+    });
+    contextPrompt += "\n\nPlease continue the conversation naturally, building on the previous context.";
+  }
+
+  // Combine context and current question for Gemini
+  const fullPrompt = `${contextPrompt}\n\nCurrent Student Question: ${question}\n\nPlease provide a helpful, clear, and encouraging response:`;
+
+  // Gemini API payload format
   const payload = {
-    model: "mistralai/Mistral-7B-Instruct-v0.2",
-    messages: messages,
-    temperature: 0.7,
-    max_tokens: 512,
+    contents: [
+      {
+        parts: [
+          {
+            text: fullPrompt
+          }
+        ]
+      }
+    ],
+    generationConfig: {
+      temperature: appConfig.temperature,
+      maxOutputTokens: appConfig.maxTokens,
+      topP: 0.8,
+      topK: 10
+    }
   };
 
   try {
-    const response = await fetch(apiUrl, {
+    const response = await fetch(`${geminiConfig.apiUrl}?key=${geminiConfig.apiKey}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${apiKey}`,
       },
       body: JSON.stringify(payload),
     });
 
     if (!response.ok) {
-      throw new Error(`API returned status ${response.status}`);
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(`Gemini API returned status ${response.status}: ${errorData.error?.message || 'Unknown error'}`);
     }
 
     const data = await response.json();
-    if (data.choices && data.choices[0]?.message?.content) {
-      return data.choices[0].message.content;
+    if (data.candidates && data.candidates[0]?.content?.parts[0]?.text) {
+      const answer = data.candidates[0].content.parts[0].text;
+      
+      // Add both question and answer to conversation history
+      addToHistory('user', question);
+      addToHistory('assistant', answer);
+      
+      return answer;
     } else {
-      return "Sorry, I didn't understand that.";
+      console.warn("Unexpected Gemini API response format:", data);
+      return "I'm having trouble processing your question right now. Please try again.";
     }
   } catch (error) {
-    console.error("oh no! aimlapi error:", error);
-    return "Daily credits are all gone!";
+    console.error("Gemini API error:", error);
+    if (error.message.includes("API_KEY_INVALID")) {
+      return "Invalid API key. Please check your Gemini API key configuration.";
+    } else if (error.message.includes("QUOTA_EXCEEDED")) {
+      return "API quota exceeded. Please check your Gemini API usage limits.";
+    } else {
+      return "I'm experiencing technical difficulties. Please try again in a moment.";
+    }
   }
 }
 
@@ -108,6 +196,31 @@ const sendBtn = document.getElementById("sendBtn");
 const chatInput = document.getElementById("chatInput");
 const chatMessages = document.getElementById("chatMessages");
 const savedResponses = document.getElementById("savedResponses");
+const clearHistoryBtn = document.getElementById("clearHistoryBtn");
+
+// Clear History button functionality
+if (clearHistoryBtn) {
+  clearHistoryBtn.addEventListener("click", () => {
+    if (confirm("Are you sure you want to clear the conversation history? This will remove context from future responses.")) {
+      clearConversationHistory();
+      
+      // Optionally clear the visible chat messages too
+      if (confirm("Would you also like to clear the visible chat messages?")) {
+        chatMessages.innerHTML = `
+          <div class="chat-message message-bot overlay-row">
+            <div class="bubble-container">
+              <img class="chat-avatar" src="assets/img/certi.png" alt="Bot Avatar" />
+              <div class="chat-bubble">
+                Hi! I'm Certi, your friendly Leaving Certificate biology tutor. How can I help you today?
+                <br><small style="opacity: 0.7; margin-top: 5px; display: block;">Conversation history cleared.</small>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+    }
+  });
+}
 
 // Single event listener for "Send"
 if (sendBtn && chatInput && chatMessages) {
@@ -127,6 +240,11 @@ if (sendBtn && chatInput && chatMessages) {
     // Use the global profile image URL (fallback if not set)
     userAvatar.src = window.userAvatarUrl || "assets/img/pfp.avif";
     userAvatar.alt = "User Avatar";
+    
+    // Add error handling for avatar image loading
+    userAvatar.onerror = function() {
+      this.src = "assets/img/pfp.avif"; // Fallback to default avatar if user image fails to load
+    };
 
     const userBubble = document.createElement("div");
     userBubble.classList.add("chat-bubble");
@@ -168,7 +286,7 @@ if (sendBtn && chatInput && chatMessages) {
     chatMessages.scrollTop = chatMessages.scrollHeight;
 
     // 4) Query the AI
-    const answer = await queryAimlApi(question);
+    const answer = await queryGeminiApi(question);
 
     // 5) Replace "Thinking..." with typed-out answer
     botBubble.innerHTML = ""; // clear out "Thinking..."
@@ -192,9 +310,6 @@ if (sendBtn && chatInput && chatMessages) {
 
     saveBtn.addEventListener("click", () => {
       window.saveNotebookEntry(answer, question);
-      const li = document.createElement("li");
-      li.textContent = answer;
-      savedResponses.appendChild(li);
     });
 
     botBubble.appendChild(saveBtn);
