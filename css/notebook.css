@@ -1,0 +1,200 @@
+/* Notebook Section Styles */
+
+/* Container that holds the 3 (or 4) filter buttons */
+#notebookUnitContainer {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+/* Grid container for the notebook cards */
+.notebook-grid {
+    display: grid;
+    /* Each card is at least 200px wide, then expands if space allows */
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    /* Uniform gap between cards both horizontally and vertically */
+    gap: 1.5rem;
+    margin-top: 2rem;
+    /* Align items at the top so taller cards don't misalign spacing */
+    align-items: start;
+}
+
+/* The notebook card itself */
+.notebook-card {
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-blue);
+    padding: 1rem;
+    background-color: #fff;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 1px solid transparent;
+}
+
+body.dark-mode .notebook-card {
+    background-color: #2b2b2b;
+    border-color: #444;
+}
+
+.notebook-card:hover {
+    transform: scale(1.03);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
+
+/* The heading text (user prompt) */
+.notebook-card-heading {
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    white-space: normal;
+    word-wrap: break-word;
+    color: var(--light-text);
+}
+
+body.dark-mode .notebook-card-heading {
+    color: var(--dark-text);
+}
+
+/* Notebook card preview text */
+.notebook-card-preview {
+    color: #666;
+    font-size: 0.9rem;
+    line-height: 1.4;
+    margin-bottom: 0.8rem;
+}
+
+body.dark-mode .notebook-card-preview {
+    color: #aaa;
+}
+
+/* Notebook card metadata */
+.notebook-card-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.8rem;
+    color: #888;
+    border-top: 1px solid #eee;
+    padding-top: 0.5rem;
+}
+
+body.dark-mode .notebook-card-meta {
+    color: #bbb;
+    border-color: #444;
+}
+
+/* Notebook Modal */
+.notebook-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+}
+
+.notebook-modal.hidden {
+    display: none;
+}
+
+.notebook-modal-content {
+    background-color: #fff;
+    width: 80vw;
+    height: 80vh;
+    display: flex;
+    flex-direction: column;
+    border-radius: var(--border-radius);
+    padding: 2rem;
+    position: relative;
+    overflow: hidden;
+}
+
+body.dark-mode .notebook-modal-content {
+    background-color: #2b2b2b;
+}
+
+/* Large bold heading at top (user prompt) */
+#notebookModalQuestion {
+    font-size: 2rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    flex-shrink: 0;
+    color: var(--light-text);
+}
+
+body.dark-mode #notebookModalQuestion {
+    color: var(--dark-text);
+}
+
+/* Scrollable answer area in the middle */
+#notebookModalAnswer {
+    flex: 1;
+    overflow-y: auto;
+    margin-bottom: 1rem;
+    color: var(--light-text);
+    line-height: 1.6;
+}
+
+body.dark-mode #notebookModalAnswer {
+    color: var(--dark-text);
+}
+
+/* Footer pinned at bottom inside the modal */
+.notebook-modal-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+#notebookModalDate {
+    font-size: 0.8rem;
+    color: #666;
+}
+
+body.dark-mode #notebookModalDate {
+    color: #ccc;
+}
+
+.notebook-delete-button {
+    background-color: #e53e3e;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+    transition: background-color 0.2s;
+}
+
+.notebook-delete-button:hover {
+    background-color: #c53030;
+}
+
+/* Close "X" at top-right */
+.notebook-modal-close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: transparent;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #666;
+    transition: color 0.2s;
+}
+
+.notebook-modal-close:hover {
+    color: #333;
+}
+
+body.dark-mode .notebook-modal-close {
+    color: #ddd;
+}
+
+body.dark-mode .notebook-modal-close:hover {
+    color: #fff;
+}
