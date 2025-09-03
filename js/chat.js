@@ -85,13 +85,13 @@ async function queryGeminiApi(question) {
   let contextPrompt = systemPrompt;
   if (conversationHistory.length > 0) {
     contextPrompt += "\n\nPrevious conversation context:";
-    // Include recent conversation history for context
+    // Include recent conversation history for context (full verbatim messages)
     const recentHistory = conversationHistory.slice(-appConfig.maxHistoryMessages);
     recentHistory.forEach(msg => {
       if (msg.role === 'user') {
         contextPrompt += `\nStudent: ${msg.content}`;
       } else if (msg.role === 'assistant') {
-        contextPrompt += `\nCerti: ${msg.content.substring(0, 200)}...`; // Truncate long responses
+        contextPrompt += `\nCerti: ${msg.content}`; // Full message, not truncated
       }
     });
     contextPrompt += "\n\nPlease continue the conversation naturally, building on the previous context.";
@@ -305,9 +305,6 @@ if (sendBtn && chatInput && chatMessages) {
 
     saveBtn.addEventListener("click", () => {
       window.saveNotebookEntry(answer, question);
-      const li = document.createElement("li");
-      li.textContent = answer;
-      savedResponses.appendChild(li);
     });
 
     botBubble.appendChild(saveBtn);

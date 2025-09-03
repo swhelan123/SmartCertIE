@@ -889,7 +889,7 @@ if (navChatLink) {
  *******************************************************/
 
 // We'll define a global function so we can call it from chat.js
-window.saveNotebookEntry = async function (answer) {
+window.saveNotebookEntry = async function (answer, question) {
   const user = auth.currentUser;
   if (!user) {
     customAlert("Please log in to save to your notebook!");
@@ -900,6 +900,7 @@ window.saveNotebookEntry = async function (answer) {
     // Create a new doc in /users/{uid}/notebook
     await addDoc(collection(db, "users", user.uid, "notebook"), {
       text: answer,
+      question: question || "", // Store the question as well
       topic: window.selectedTopic || "",
       createdAt: serverTimestamp(),
     });
