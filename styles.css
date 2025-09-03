@@ -380,6 +380,16 @@ body.dark-mode .chat-input-area input {
     background-color: #2563eb;
 }
 
+/* Clear History button styling */
+#clearHistoryBtn {
+    background-color: #6b7280;
+    font-size: 0.9rem;
+    padding: 0.8rem 1rem;
+}
+#clearHistoryBtn:hover {
+    background-color: #4b5563;
+}
+
 /* Notebook sections, hidden class, etc. */
 .hidden {
     display: none !important;

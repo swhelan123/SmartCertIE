@@ -64,6 +64,14 @@ node_modules/
 
 # dotenv environment variables file
 .env
+.env.local
+.env.production
+
+# API Keys and Secrets
+stripe_secret.txt
+*.key
+*_secret.txt
+*_private.txt
 
 # dataconnect generated files
 .dataconnect
