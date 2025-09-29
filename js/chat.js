@@ -16,7 +16,7 @@ async function queryAimlApi(question) {
   const apiUrl = "https://api.aimlapi.com/v1/chat/completions";
   const apiKey = "6f38c7556ee5413694304b0be2c3fa33"; // Consider moving API keys to a more secure location
 
-  let systemPrompt = "You are a friendly Leaving Certificate biology tutor named Certi...";
+  let systemPrompt = "You are a leaving cert biology chatbot helper. Answer the question with strict regard to the leaving cert biology syllabus. You will be provided with both a question and a context blog which relates to the topic of that question. Exam specific answers are priority.";
 
   // Fetch context from Firestore if a topicId is selected
   if (window.currentTopicId) {
