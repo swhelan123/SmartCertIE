@@ -7,72 +7,29 @@
 // For this to work, script.js should have: export const db = getFirestore(app);
 // And you might need to adjust the import path if script.js is not in the same directory or if it's not a module.
 // Assuming script.js exports db and firebase functions are available globally or via script.js
-import { db } from './script.js'; // Make sure script.js exports db
-import { doc, getDoc } from "https://www.gstatic.com/firebasejs/9.17.2/firebase-firestore.js";
+const ASK_CERTI_URL = "https://us-central1-smartcert-f1965.cloudfunctions.net/askCerti";
 
-
-// Query the AI
+// Query the AI via Cloud Function
 async function queryAimlApi(question) {
-  const apiUrl = "https://api.aimlapi.com/v1/chat/completions";
-  const apiKey = "6f38c7556ee5413694304b0be2c3fa33"; // Consider moving API keys to a more secure location
-
-  let systemPrompt = "You are a leaving cert biology chatbot helper. Answer the question with strict regard to the leaving cert biology syllabus. You will be provided with both a question and a context blog which relates to the topic of that question. Exam specific answers are priority.";
-
-  // Fetch context from Firestore if a topicId is selected
-  if (window.currentTopicId) {
-    try {
-      const topicDocRef = doc(db, "biology_context", window.currentTopicId);
-      const topicSnap = await getDoc(topicDocRef);
-
-      if (topicSnap.exists()) {
-        const firestoreContext = topicSnap.data().context; // Using 'context' field
-        if (firestoreContext) {
-          systemPrompt += "\nContext: " + firestoreContext;
-        }
-      } else {
-        console.log("No context document found for topicId:", window.currentTopicId);
-      }
-    } catch (error) {
-      console.error("Error fetching topic context from Firestore:", error);
-      // Decide if you want to inform the user or proceed without context
-    }
-  }
-
-  const messages = [
-    { role: "system", content: systemPrompt },
-    { role: "user", content: question },
-  ];
-
-  const payload = {
-    model: "mistralai/Mistral-7B-Instruct-v0.2",
-    messages: messages,
-    temperature: 0.7,
-    max_tokens: 512,
-  };
-
   try {
-    const response = await fetch(apiUrl, {
+    const response = await fetch(ASK_CERTI_URL, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${apiKey}`,
-      },
-      body: JSON.stringify(payload),
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({
+        question,
+        topicId: window.currentTopicId || "",
+      }),
     });
 
     if (!response.ok) {
-      throw new Error(`API returned status ${response.status}`);
+      throw new Error(`Function returned status ${response.status}`);
     }
 
     const data = await response.json();
-    if (data.choices && data.choices[0]?.message?.content) {
-      return data.choices[0].message.content;
-    } else {
-      return "Sorry, I didn't understand that.";
-    }
+    return data.answer || "Sorry, I didn't get a response.";
   } catch (error) {
-    console.error("oh no! aimlapi error:", error);
-    return "Daily credits are all gone!";
+    console.error("askCerti error:", error);
+    return "Something went wrong — please try again.";
   }
 }
 

@@ -24,9 +24,9 @@ import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstati
 // 2) Your Firebase configuration (replace with your real config)
 const firebaseConfig = {
   apiKey: "AIzaSyDe5pXEGR015hQbXvoSGyJc955hgXO8tio",
-  authDomain: "ExamEdge-f1965.firebaseapp.com",
-  projectId: "ExamEdge-f1965",
-  storageBucket: "ExamEdge-f1965.firebasestorage.app",
+  authDomain: "smartcert-f1965.firebaseapp.com",
+  projectId: "smartcert-f1965",
+  storageBucket: "smartcert-f1965.firebasestorage.app",
   messagingSenderId: "1075815326636",
   appId: "1:1075815326636:web:ffd63ed204d2832e295009",
   measurementId: "G-6CJR44Z4MK",

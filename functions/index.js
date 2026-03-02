@@ -51,8 +51,8 @@ exports.createCheckoutSession = onRequest(
           subscription_data: {
             trial_period_days: 28, // Length trial
           },
-          success_url: "https://ExamEdge.ie/success.html",
-          cancel_url: "https://ExamEdge.ie/success.html",
+          success_url: "https://smartcert.ie/success.html",
+          cancel_url: "https://smartcert.ie/pricing.html",
           metadata: {firebaseUserId: firebaseUserId},
         });
 
@@ -74,6 +74,67 @@ const admin = require("firebase-admin");
 if (admin.apps.length === 0) {
   admin.initializeApp();
 }
+
+exports.askCerti = onRequest(async (req, res) => {
+  res.set("Access-Control-Allow-Origin", "*");
+
+  if (req.method === "OPTIONS") {
+    res.set("Access-Control-Allow-Methods", "POST");
+    res.set("Access-Control-Allow-Headers", "Content-Type");
+    return res.status(204).send("");
+  }
+
+  if (req.method !== "POST") {
+    return res.status(405).send("Method Not Allowed");
+  }
+
+  const {question, topicId} = req.body;
+  if (!question) {
+    return res.status(400).json({error: "Missing question"});
+  }
+
+  let context = "";
+  if (topicId) {
+    try {
+      const topicDoc = await admin.firestore()
+          .collection("biology_context")
+          .doc(topicId)
+          .get();
+      if (topicDoc.exists) {
+        context = topicDoc.data().context || "";
+      }
+    } catch (e) {
+      console.error("Error fetching topic context:", e);
+    }
+  }
+
+  const {GoogleGenAI} = require("@google/genai");
+  const ai = new GoogleGenAI({
+    vertexai: true,
+    project: "smartcert-f1965",
+    location: "us-central1",
+  });
+
+  const basePrompt = "You are a Leaving Cert biology chatbot helper" +
+        " called Certi. Answer the question with strict regard to the" +
+        " Leaving Cert biology syllabus. Exam specific answers are priority.";
+  const systemInstruction = context ?
+        basePrompt + "\n\nContext:\n" + context :
+        basePrompt;
+
+  try {
+    const result = await ai.models.generateContent({
+      model: "gemini-2.0-flash",
+      contents: question,
+      config: {systemInstruction},
+    });
+    return res.status(200).json({answer: result.text});
+  } catch (e) {
+    console.error("Gemini error:", e);
+    return res.status(500).json({error: "Failed to get response"});
+  }
+},
+);
 
 exports.getSubscriptionDetails = onRequest(
     {secrets: ["STRIPE_SECRET_KEY"]}, // process.env.STRIPE_SECRET_KEY
