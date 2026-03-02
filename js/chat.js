@@ -39,9 +39,23 @@ clearConversationHistory();
 // Query Certi via Cloud Function
 async function queryGeminiApi(question) {
   try {
+    // Get Firebase auth token for server-side verification
+    const {getAuth} = await import(
+      "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js"
+    );
+    const auth = getAuth();
+    const user = auth.currentUser;
+    if (!user) {
+      return "You must be logged in to use the chat.";
+    }
+    const idToken = await user.getIdToken();
+
     const response = await fetch(ASK_CERTI_URL, {
       method: "POST",
-      headers: {"Content-Type": "application/json"},
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${idToken}`,
+      },
       body: JSON.stringify({
         question,
         topicId: window.currentTopicId || window.selectedTopic || "",

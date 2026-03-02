@@ -25,7 +25,7 @@ exports.createCheckoutSession = onRequest(
 
       // Only allow POST
       if (req.method !== "POST") {
-        res.set("Access-Control-Allow-Origin", "*"); // Also se
+        res.set("Access-Control-Allow-Origin", "*");
         return res.status(405).send("Method Not Allowed");
       }
 
@@ -45,7 +45,7 @@ exports.createCheckoutSession = onRequest(
           payment_method_types: ["card"],
           mode: "subscription",
           line_items: [{
-            price: "price_1Qy1kzGsigejaHFWZKqC600v", // Replace with
+            price: "price_1Qy1kzGsigejaHFWZKqC600v",
             quantity: 1,
           }],
           success_url: "https://smartcert.ie/success.html",
@@ -74,12 +74,40 @@ exports.askCerti = onRequest(async (req, res) => {
 
   if (req.method === "OPTIONS") {
     res.set("Access-Control-Allow-Methods", "POST");
-    res.set("Access-Control-Allow-Headers", "Content-Type");
+    res.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
     return res.status(204).send("");
   }
 
   if (req.method !== "POST") {
     return res.status(405).send("Method Not Allowed");
+  }
+
+  // Verify Firebase auth token
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return res.status(401).json({error: "Unauthorized — missing token"});
+  }
+
+  let uid;
+  try {
+    const idToken = authHeader.split("Bearer ")[1];
+    const decodedToken = await admin.auth().verifyIdToken(idToken);
+    uid = decodedToken.uid;
+  } catch (e) {
+    return res.status(401).json({error: "Unauthorized — invalid token"});
+  }
+
+  // Check that user has an active subscription
+  try {
+    const userDoc = await admin.firestore()
+        .collection("users").doc(uid).get();
+    if (!userDoc.exists ||
+        userDoc.data().subscriptionStatus !== "active") {
+      return res.status(403).json({error: "Active subscription required"});
+    }
+  } catch (e) {
+    console.error("Error checking subscription:", e);
+    return res.status(500).json({error: "Failed to verify subscription"});
   }
 
   const {question, topicId, conversationHistory} = req.body;
