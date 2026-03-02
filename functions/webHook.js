@@ -1,6 +1,6 @@
 const {onRequest} = require("firebase-functions/v2/https");
 const admin = require("firebase-admin");
-admin.initializeApp();
+if (!admin.apps.length) admin.initializeApp();
 
 exports.stripeWebhook = onRequest({
   secrets: ["STRIPE_SECRET_KEY", "STRIPE_WEBHOOK_SECRET"],

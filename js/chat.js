@@ -2,159 +2,65 @@
  * chat.js — typed-out fully formatted HTML
  **************************************/
 
-// Import configuration
-import { geminiConfig, appConfig } from './config.js';
+const ASK_CERTI_URL =
+  "https://us-central1-smartcert-f1965.cloudfunctions.net/askCerti";
+const MAX_HISTORY_MESSAGES = 10;
 
 // Conversation history storage
 let conversationHistory = [];
 
-// Load conversation history from localStorage on page load
-function loadConversationHistory() {
-  try {
-    const saved = localStorage.getItem('smartcert_conversation_history');
-    if (saved) {
-      conversationHistory = JSON.parse(saved);
-    }
-  } catch (error) {
-    console.warn('Failed to load conversation history:', error);
-    conversationHistory = [];
-  }
-}
-
 // Save conversation history to localStorage
 function saveConversationHistory() {
   try {
-    // Keep only the last maxHistoryMessages to prevent localStorage bloat
-    const trimmed = conversationHistory.slice(-appConfig.maxHistoryMessages);
-    localStorage.setItem('smartcert_conversation_history', JSON.stringify(trimmed));
+    const trimmed = conversationHistory.slice(-MAX_HISTORY_MESSAGES);
+    localStorage.setItem(
+        "smartcert_conversation_history", JSON.stringify(trimmed));
     conversationHistory = trimmed;
   } catch (error) {
-    console.warn('Failed to save conversation history:', error);
+    console.warn("Failed to save conversation history:", error);
   }
 }
 
 // Add message to conversation history
 function addToHistory(role, content) {
-  conversationHistory.push({ role, content });
+  conversationHistory.push({role, content});
   saveConversationHistory();
 }
 
 // Clear conversation history
 function clearConversationHistory() {
   conversationHistory = [];
-  localStorage.removeItem('smartcert_conversation_history');
+  localStorage.removeItem("smartcert_conversation_history");
 }
 
-// Clear conversation history on page load/refresh
+// Clear on page load
 clearConversationHistory();
 
-// --- Example topic context data ---
-const topicData = {
-  "The Scientific Method": "Context: Review key steps of the scientific method, including hypothesis formulation, experimentation, and analysis.",
-   "The Characteristics of Life": "Context: Cover cellular organization, metabolism, growth, reproduction, and homeostasis in living organisms.",
-   "Nutrition": "Context: Focus on the role of nutrients, digestion, absorption, and the importance of a balanced diet.",
-   "General Principles of Ecology": "Context: Emphasize ecosystems, energy flow, nutrient cycling, and population dynamics.",
-   "A Study of an Ecosystem": "Context: Consider real-life case studies of ecosystems, interactions among species, and environmental factors.",
-   "Cell Structure": "Context: Dive into the details of organelles, membrane structures, and the differences between prokaryotic and eukaryotic cells.",
-   "Cell Metabolism": "Context: Review key metabolic pathways, enzyme activity, and energy production within cells.",
-   "Cell Continuity": "Context: Explore cell cycle regulation, mitosis, meiosis, and mechanisms that ensure continuity of life.",
-   "Cell Diversity": "Context: Understand the variety of cell types and their specialized functions within an organism.",
-   "Genetics": "Context: Cover DNA structure, replication, gene expression, and basic genetic inheritance patterns.",
-   "Diversity of Organisms": "Context: Examine the classification, evolution, and diversity of life forms on Earth.",
-   "Organisation and the Vascular Structures": "Context: Focus on how organisms are organized, including tissue types and the role of vascular systems.",
-   "Transport and Nutrition": "Context: Explain mechanisms for nutrient and gas transport in organisms.",
-   "Breathing System and Excretion": "Context: Detail the processes of respiration and excretion, and how organisms maintain internal balance.",
-   "Responses to Stimuli": "Context: Review the ways organisms detect and respond to environmental changes.",
-   "Reproduction and Growth": "Context: Discuss sexual and asexual reproduction, developmental biology, and growth processes."
-};
-
-// Query the Google Gemini AI
+// Query Certi via Cloud Function
 async function queryGeminiApi(question) {
-  // Check if API key is configured
-  if (!geminiConfig.apiKey || geminiConfig.apiKey === "YOUR_GEMINI_API_KEY_HERE") {
-    return "Please configure your Google Gemini API key in the config.js file. You can get one from https://makersuite.google.com/app/apikey";
-  }
-
-  // Build system prompt with topic context
-  let systemPrompt = appConfig.systemPrompt;
-  if (window.selectedTopic && topicData[window.selectedTopic]) {
-    systemPrompt += "\n\n" + topicData[window.selectedTopic];
-  }
-
-  // Add conversation context if available
-  let contextPrompt = systemPrompt;
-  if (conversationHistory.length > 0) {
-    contextPrompt += "\n\nPrevious conversation context:";
-    // Include recent conversation history for context (full verbatim messages)
-    const recentHistory = conversationHistory.slice(-appConfig.maxHistoryMessages);
-    recentHistory.forEach(msg => {
-      if (msg.role === 'user') {
-        contextPrompt += `\nStudent: ${msg.content}`;
-      } else if (msg.role === 'assistant') {
-        contextPrompt += `\nCerti: ${msg.content}`; // Full message, not truncated
-      }
-    });
-    contextPrompt += "\n\nPlease continue the conversation naturally, building on the previous context.";
-  }
-
-  // Combine context and current question for Gemini
-  const fullPrompt = `${contextPrompt}\n\nCurrent Student Question: ${question}\n\nPlease provide a helpful, clear, and encouraging response:`;
-
-  // Gemini API payload format
-  const payload = {
-    contents: [
-      {
-        parts: [
-          {
-            text: fullPrompt
-          }
-        ]
-      }
-    ],
-    generationConfig: {
-      temperature: appConfig.temperature,
-      maxOutputTokens: appConfig.maxTokens,
-      topP: 0.8,
-      topK: 10
-    }
-  };
-
   try {
-    const response = await fetch(`${geminiConfig.apiUrl}?key=${geminiConfig.apiKey}`, {
+    const response = await fetch(ASK_CERTI_URL, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(payload),
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({
+        question,
+        topicId: window.currentTopicId || "",
+        conversationHistory: conversationHistory.slice(-MAX_HISTORY_MESSAGES),
+      }),
     });
 
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      throw new Error(`Gemini API returned status ${response.status}: ${errorData.error?.message || 'Unknown error'}`);
+      throw new Error(`Function returned status ${response.status}`);
     }
 
     const data = await response.json();
-    if (data.candidates && data.candidates[0]?.content?.parts[0]?.text) {
-      const answer = data.candidates[0].content.parts[0].text;
-      
-      // Add both question and answer to conversation history
-      addToHistory('user', question);
-      addToHistory('assistant', answer);
-      
-      return answer;
-    } else {
-      console.warn("Unexpected Gemini API response format:", data);
-      return "I'm having trouble processing your question right now. Please try again.";
-    }
+    const answer = data.answer || "Sorry, I didn't get a response.";
+    addToHistory("user", question);
+    addToHistory("assistant", answer);
+    return answer;
   } catch (error) {
-    console.error("Gemini API error:", error);
-    if (error.message.includes("API_KEY_INVALID")) {
-      return "Invalid API key. Please check your Gemini API key configuration.";
-    } else if (error.message.includes("QUOTA_EXCEEDED")) {
-      return "API quota exceeded. Please check your Gemini API usage limits.";
-    } else {
-      return "I'm experiencing technical difficulties. Please try again in a moment.";
-    }
+    console.error("askCerti error:", error);
+    return "Something went wrong — please try again.";
   }
 }
 
