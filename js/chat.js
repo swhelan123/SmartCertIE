@@ -44,7 +44,7 @@ async function queryGeminiApi(question) {
       headers: {"Content-Type": "application/json"},
       body: JSON.stringify({
         question,
-        topicId: window.currentTopicId || "",
+        topicId: window.currentTopicId || window.selectedTopic || "",
         conversationHistory: conversationHistory.slice(-MAX_HISTORY_MESSAGES),
       }),
     });

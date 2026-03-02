@@ -292,9 +292,28 @@ const changeTopicBtn = document.getElementById("changeTopicBtn");
 
 // Define chapters for each unit (A, B, C)
 const chapters = {
-  A: ["The Scientific Method", "The Characteristics of Life", "Nutrition", "General Principles of Ecology", "A Study of an Ecosystem"],
-  B: ["Cell Structure", "Cell Metabolism", "Cell Continuity", "Cell Diversity", "Genetics"],
-  C: ["Diversity of Organisms", "Organisation and the Vascular Structures", "Transport and Nutrition", "Breathing System and Excretion", "Responses to Stimuli", "Reproduction and Growth"],
+  A: [
+    {name: "The Scientific Method", id: "topic-1-the-scientific-method"},
+    {name: "The Characteristics of Life", id: "topic-2-characteristics-of-life"},
+    {name: "Nutrition", id: "topic-3-nutrition"},
+    {name: "General Principles of Ecology", id: "topic-5-general-principles-of-ecology"},
+    {name: "A Study of an Ecosystem", id: "topic-6-study-of-an-ecosystem"},
+  ],
+  B: [
+    {name: "Cell Structure", id: "topic-7-cell-structure"},
+    {name: "Cell Metabolism", id: "topic-8-cell-metabolism"},
+    {name: "Cell Continuity", id: "topic-9-cell-continuity"},
+    {name: "Cell Diversity", id: "topic-10-cell-diversity"},
+    {name: "Genetics", id: "topic-11-genetics"},
+  ],
+  C: [
+    {name: "Diversity of Organisms", id: "topic-12-diversity-of-organisms"},
+    {name: "Organisation and the Vascular Structures", id: "topic-13-organisation-and-the-vascular-structure"},
+    {name: "Transport and Nutrition", id: "topic-14-transport-and-nutrition"},
+    {name: "Breathing System and Excretion", id: "topic-15-breathing-system-and-excretion"},
+    {name: "Responses to Stimuli", id: "topic-16-responses-to-stimuli"},
+    {name: "Reproduction and Growth", id: "topic-17-reproduction-and-growth"},
+  ],
 };
 
 // Grab all unit buttons (A/B/C)
@@ -314,9 +333,9 @@ unitButtons.forEach((button) => {
 
     // 4) Create new buttons for each chapter in that unit
     if (chapters[unit]) {
-      chapters[unit].forEach((chapter) => {
+      chapters[unit].forEach((chapterObj) => {
         const chapterBtn = document.createElement("button");
-        chapterBtn.textContent = chapter;
+        chapterBtn.textContent = chapterObj.name;
         chapterBtn.classList.add("chapter-button");
 
         // Apply color styling based on the unit
@@ -333,10 +352,10 @@ unitButtons.forEach((button) => {
           // Hide the chapter container
           chapterContainer.classList.add("hidden");
           // Display the selected chapter name
-          selectedTopicLabel.textContent = chapter;
-          //New - set global selected topicd variable
-          selectedTopic = chapter;
-          window.selectedTopic = chapter;
+          selectedTopicLabel.textContent = chapterObj.name;
+          selectedTopic = chapterObj.name;
+          window.selectedTopic = chapterObj.name;
+          window.currentTopicId = chapterObj.id;
           // Show the container that holds the "Change Topic" button
           selectedTopicContainer.classList.remove("hidden");
         });
@@ -357,8 +376,9 @@ if (changeTopicBtn) {
     selectedTopicContainer.classList.add("hidden");
     // Clear the label
     selectedTopicLabel.textContent = "";
-    // --- NEW: Clear the global selectedTopic variable ---
     selectedTopic = "";
+    window.selectedTopic = "";
+    window.currentTopicId = "";
     // Show the unit container again so user can pick a new unit
     unitContainer.classList.remove("hidden");
     // Clear and hide the chapter container
