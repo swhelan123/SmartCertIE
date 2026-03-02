@@ -4,35 +4,124 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Manage Subscription - SmartCert</title>
+
+    <link rel="preconnect" href="https://fonts.gstatic.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet" />
+
     <link rel="stylesheet" href="styles.css" />
     <link rel="stylesheet" href="manageSubscription.css" />
+    <link rel="icon" type="image/png" href="assets/img/tab_icon.png" />
   </head>
   <body>
+    <div id="topRightContainer" class="pill-container">
+      <img id="modeIcon" class="mode-icon" src="assets/img/dark.png" alt="Toggle Theme" />
+    </div>
+
     <div class="manage-subscription">
       <h1>Manage Your Subscription</h1>
-      <div id="subscriptionDetails">
-        <p>Plan: <span id="planName">SmartCert Plan</span></p>
+
+      <div id="loadingMsg" style="text-align:center;color:#888;padding:2rem;">Loading subscription details...</div>
+
+      <div id="subscriptionDetails" style="display:none;">
+        <p>Plan: <span id="planName" style="font-weight:600;">Certi</span></p>
+        <p>Status: <span id="subStatus" style="font-weight:600;"></span></p>
         <p>Start Date: <span id="startDate"></span></p>
         <p>Next Billing Date: <span id="nextBillingDate"></span></p>
         <p>Payment Method: <span id="paymentMethod"></span></p>
       </div>
-      <!-- Button to let the user change card details via Stripe's portal -->
-      <button id="updatePaymentBtn">Update Payment Details</button>
-      <!-- Cancel Subscription button (visible only if the subscription is active) -->
-      <button id="cancelSubscriptionBtn">Cancel Subscription</button>
-    </div>
 
-    <!-- Modal Confirmation for cancellation -->
-    <div id="cancelModal" class="modal hidden">
-      <div class="modal-content">
-        <h2>Confirm Cancellation</h2>
-        <p>Your subscription will be cancelled at the end of the current billing period. You have access until <span id="accessUntil"></span>.</p>
-        <p>Are you sure you want to cancel?</p>
-        <button id="confirmCancelBtn">Yes, Cancel</button>
-        <button id="closeModalBtn">No, Keep Subscription</button>
+      <div id="actionButtons" style="display:none;margin-top:1.5rem;">
+        <button id="manageStripeBtn" style="width:100%;padding:0.8rem;border:none;border-radius:8px;background-color:#3b82f6;color:#fff;font-size:1rem;cursor:pointer;margin-bottom:0.75rem;">
+          Manage Billing & Cancel
+        </button>
       </div>
+
+      <div id="noSubMsg" style="display:none;text-align:center;padding:1rem;">
+        <p>You don't have an active subscription.</p>
+        <a href="pricing.html" style="color:#3b82f6;text-decoration:underline;">View pricing</a>
+      </div>
+
+      <p style="margin-top:1.5rem;text-align:center;">
+        <a href="account.html" class="click-link">&larr; Back to Account</a>
+      </p>
     </div>
 
-    <script src="js/manageSubscription.js"></script>
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+      import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+      const app = initializeApp({
+        apiKey: "AIzaSyDe5pXEGR015hQbXvoSGyJc955hgXO8tio",
+        authDomain: "smartcert-f1965.firebaseapp.com",
+        projectId: "smartcert-f1965",
+        storageBucket: "smartcert-f1965.firebasestorage.app",
+        messagingSenderId: "1075815326636",
+        appId: "1:1075815326636:web:ffd63ed204d2832e295009",
+      });
+      const auth = getAuth(app);
+
+      const DETAILS_URL = "https://us-central1-smartcert-f1965.cloudfunctions.net/getSubscriptionDetails";
+      const PORTAL_URL = "https://us-central1-smartcert-f1965.cloudfunctions.net/createBillingPortalSession";
+
+      onAuthStateChanged(auth, async (user) => {
+        const loading = document.getElementById("loadingMsg");
+        const details = document.getElementById("subscriptionDetails");
+        const actions = document.getElementById("actionButtons");
+        const noSub = document.getElementById("noSubMsg");
+
+        if (!user) {
+          loading.textContent = "You must be logged in.";
+          setTimeout(() => { window.location.href = "login.html"; }, 1500);
+          return;
+        }
+
+        try {
+          const res = await fetch(DETAILS_URL + "?uid=" + user.uid);
+          if (!res.ok) {
+            loading.style.display = "none";
+            noSub.style.display = "block";
+            return;
+          }
+
+          const data = await res.json();
+          loading.style.display = "none";
+          details.style.display = "block";
+          actions.style.display = "block";
+
+          document.getElementById("subStatus").textContent = data.isActive ? "Active" : "Inactive";
+          document.getElementById("subStatus").style.color = data.isActive ? "#16a34a" : "#e53e3e";
+          document.getElementById("startDate").textContent = data.startDate;
+          document.getElementById("nextBillingDate").textContent = data.nextBillingDate;
+          document.getElementById("paymentMethod").textContent = data.paymentMethod;
+
+          // Manage billing via Stripe portal
+          document.getElementById("manageStripeBtn").addEventListener("click", async () => {
+            try {
+              const idToken = await user.getIdToken();
+              const portalRes = await fetch(PORTAL_URL, {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  "Authorization": "Bearer " + idToken,
+                },
+              });
+              const portalData = await portalRes.json();
+              if (portalData.url) {
+                window.location.href = portalData.url;
+              } else {
+                alert("Could not open billing portal.");
+              }
+            } catch (err) {
+              console.error("Portal error:", err);
+              alert("Error opening billing portal.");
+            }
+          });
+        } catch (err) {
+          console.error("Error fetching subscription:", err);
+          loading.style.display = "none";
+          noSub.style.display = "block";
+        }
+      });
+    </script>
   </body>
 </html>

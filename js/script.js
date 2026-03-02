@@ -16,6 +16,8 @@ import {
   signOut,
   sendPasswordResetEmail,
   confirmPasswordReset,
+  sendEmailVerification,
+  deleteUser,
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 import { getFirestore } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 import { doc, getDoc, setDoc, serverTimestamp, addDoc, collection, query, orderBy, getDocs, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
@@ -193,6 +195,139 @@ if (chatLink) {
   chatLink.classList.add("active");
 }
 
+// --- Topic-to-unit mapping for notebook filters ---
+const topicToUnit = {};
+// We’ll populate this after chapters is defined (below), but define the
+// lookup here so the notebook code can use it. It gets filled in later.
+
+// --- Notebook rendering helpers ---
+let allNotebookEntries = []; // cache for filtering
+
+function getUnitForTopic(topicName) {
+  // Lazy-build the lookup from the chapters object (defined further down)
+  if (Object.keys(topicToUnit).length === 0 && typeof chapters !== "undefined") {
+    Object.entries(chapters).forEach(([unit, topics]) => {
+      topics.forEach((t) => { topicToUnit[t.name] = unit; });
+    });
+  }
+  return topicToUnit[topicName] || null;
+}
+
+function renderNotebookGrid(entries) {
+  const grid = document.getElementById("notebookGrid");
+  if (!grid) return;
+  grid.innerHTML = "";
+
+  if (entries.length === 0) {
+    grid.innerHTML = "<p style=\"text-align:center;color:#888;\">No saved entries yet. Save responses from the chat to see them here.</p>";
+    return;
+  }
+
+  entries.forEach((entry) => {
+    const card = document.createElement("div");
+    card.classList.add("notebook-card");
+
+    const heading = document.createElement("div");
+    heading.classList.add("notebook-card-heading");
+    heading.textContent = entry.question || "Saved response";
+
+    const preview = document.createElement("div");
+    preview.style.cssText = "font-size:0.85rem;color:#666;overflow:hidden;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;";
+    preview.textContent = (entry.text || "").substring(0, 150);
+
+    if (entry.topic) {
+      const tag = document.createElement("span");
+      tag.style.cssText = "display:inline-block;margin-top:0.5rem;font-size:0.75rem;background:#e0e7ff;color:#3b82f6;padding:2px 8px;border-radius:9999px;";
+      tag.textContent = entry.topic;
+      card.appendChild(heading);
+      card.appendChild(preview);
+      card.appendChild(tag);
+    } else {
+      card.appendChild(heading);
+      card.appendChild(preview);
+    }
+
+    // Click card to open modal
+    card.addEventListener("click", () => openNotebookModal(entry));
+    grid.appendChild(card);
+  });
+}
+
+function openNotebookModal(entry) {
+  const modal = document.getElementById("notebookModal");
+  const questionEl = document.getElementById("notebookModalQuestion");
+  const answerEl = document.getElementById("notebookModalAnswer");
+  const dateEl = document.getElementById("notebookModalDate");
+  const deleteBtn = document.getElementById("notebookModalDelete");
+  const closeBtn = document.getElementById("notebookModalClose");
+  if (!modal) return;
+
+  questionEl.textContent = entry.question || "Saved response";
+
+  // Render markdown if marked is available
+  if (typeof marked !== "undefined") {
+    answerEl.innerHTML = marked.parse(entry.text || "");
+  } else {
+    answerEl.textContent = entry.text || "";
+  }
+
+  // Format date
+  if (entry.createdAt && entry.createdAt.toDate) {
+    dateEl.textContent = entry.createdAt.toDate().toLocaleDateString("en-IE", {
+      day: "numeric", month: "short", year: "numeric",
+    });
+  } else {
+    dateEl.textContent = "";
+  }
+
+  // Wire delete button (clone to remove old listeners)
+  const newDeleteBtn = deleteBtn.cloneNode(true);
+  deleteBtn.parentNode.replaceChild(newDeleteBtn, deleteBtn);
+  newDeleteBtn.addEventListener("click", async () => {
+    const confirmed = await showCustomConfirm("Are you sure you want to delete this entry?");
+    if (!confirmed) return;
+    try {
+      await deleteDoc(doc(db, "users", auth.currentUser.uid, "notebook", entry.id));
+      modal.classList.add("hidden");
+      // Remove from cache and re-render
+      allNotebookEntries = allNotebookEntries.filter((e) => e.id !== entry.id);
+      renderNotebookGrid(allNotebookEntries);
+    } catch (err) {
+      console.error("Error deleting doc:", err);
+      customAlert("Could not delete entry");
+    }
+  });
+
+  // Wire close button
+  const newCloseBtn = closeBtn.cloneNode(true);
+  closeBtn.parentNode.replaceChild(newCloseBtn, closeBtn);
+  newCloseBtn.addEventListener("click", () => modal.classList.add("hidden"));
+
+  // Close on backdrop click
+  modal.onclick = (e) => {
+    if (e.target === modal) modal.classList.add("hidden");
+  };
+
+  modal.classList.remove("hidden");
+}
+
+// --- Notebook filter buttons ---
+const notebookUnitBtns = document.querySelectorAll("#notebookUnitContainer .unit-button");
+notebookUnitBtns.forEach((btn) => {
+  btn.addEventListener("click", () => {
+    const unit = btn.getAttribute("data-unit");
+    notebookUnitBtns.forEach((b) => b.classList.remove("active"));
+    btn.classList.add("active");
+
+    if (unit === "all") {
+      renderNotebookGrid(allNotebookEntries);
+    } else {
+      const filtered = allNotebookEntries.filter((e) => getUnitForTopic(e.topic) === unit);
+      renderNotebookGrid(filtered);
+    }
+  });
+});
+
 // --- Sidebar click event listeners ---
 if (sidebarLinks && chatSection && notebookSection) {
   sidebarLinks.forEach((link) => {
@@ -211,69 +346,22 @@ if (sidebarLinks && chatSection && notebookSection) {
       if (target === "notebookSection") {
         notebookSection.classList.remove("hidden");
 
-        // === Load the user’s notebook ===
-        const entries = await window.loadNotebookEntries();
+        // Load the user’s notebook and render as card grid
+        allNotebookEntries = await window.loadNotebookEntries();
+        renderNotebookGrid(allNotebookEntries);
 
-        // Clear the <ul> before we append new items
-        const savedResponses = document.getElementById("savedResponses");
-        if (savedResponses) {
-          savedResponses.innerHTML = "";
-
-          // Populate the <ul> with each doc
-          entries.forEach((entry) => {
-            // Create the <li> with the AI text
-            const li = document.createElement("li");
-            li.textContent = entry.text;
-
-            // Create a small "Delete" button
-            const delBtn = document.createElement("button");
-            delBtn.textContent = "Delete";
-            Object.assign(delBtn.style, {
-              marginLeft: "12px",
-              color: "#fff",
-              backgroundColor: "#e53e3e", // a less intense red
-              border: "none",
-              borderRadius: "6px",
-              cursor: "pointer",
-              fontSize: "14px",
-              padding: "4px 8px",
-              boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
-              transition: "background-color 0.2s",
-            });
-
-            // Add hover effects for the Delete button
-            delBtn.addEventListener("mouseover", () => {
-              delBtn.style.backgroundColor = "#c53030"; // darker red on hover
-            });
-            delBtn.addEventListener("mouseout", () => {
-              delBtn.style.backgroundColor = "#e53e3e"; // revert
-            });
-
-            // On click => delete from Firestore and remove from DOM
-            delBtn.addEventListener("click", async () => {
-              const confirmed = await showCustomConfirm("Are you sure you want to delete this entry?");
-              if (!confirmed) return;
-              try {
-                await deleteDoc(doc(db, "users", auth.currentUser.uid, "notebook", entry.id));
-                li.remove();
-              } catch (err) {
-                console.error("Error deleting doc:", err);
-                customAlert("Could not delete entry");
-              }
-            });
-
-            li.appendChild(delBtn);
-            savedResponses.appendChild(li);
-          });
-        }
+        // Reset filter to "All"
+        notebookUnitBtns.forEach((b) => b.classList.remove("active"));
+        const allBtn = document.querySelector("#notebookUnitContainer [data-unit=\"all\"]");
+        if (allBtn) allBtn.classList.add("active");
       }
 
-      // 3) Remove 'active' from all sidebar links
+      // 3) Remove ‘active’ from all sidebar links
       sidebarLinks.forEach((lnk) => {
         lnk.classList.remove("active");
       });
 
-      // 4) Add 'active' to the clicked link
+      // 4) Add ‘active’ to the clicked link
       link.classList.add("active");
     });
   });
@@ -419,6 +507,8 @@ if (loginForm) {
 const accountInfo = document.getElementById("accountInfo");
 const logoutBtn = document.getElementById("logoutBtn");
 // We'll check auth state to see if user is logged in
+const deleteAccountBtn = document.getElementById("deleteAccountBtn");
+
 onAuthStateChanged(auth, (user) => {
   if (accountInfo && logoutBtn) {
     if (!user) {
@@ -431,8 +521,45 @@ onAuthStateChanged(auth, (user) => {
       logoutBtn.addEventListener("click", async () => {
         await signOut(auth);
         customAlert("Logged out!");
-        // window.location.href = "index.html";
       });
+
+      // Delete account handler
+      if (deleteAccountBtn) {
+        deleteAccountBtn.addEventListener("click", async () => {
+          const confirmed = await showCustomConfirm(
+            "Are you sure you want to permanently delete your account and all your data? This cannot be undone."
+          );
+          if (!confirmed) return;
+
+          try {
+            const uid = user.uid;
+            // Delete notebook subcollection entries
+            const notebookRef = collection(db, "users", uid, "notebook");
+            const notebookSnap = await getDocs(notebookRef);
+            const deletePromises = [];
+            notebookSnap.forEach((docSnap) => {
+              deletePromises.push(deleteDoc(doc(db, "users", uid, "notebook", docSnap.id)));
+            });
+            await Promise.all(deletePromises);
+
+            // Delete user document
+            await deleteDoc(doc(db, "users", uid));
+
+            // Delete Firebase auth account
+            await deleteUser(user);
+
+            customAlert("Your account has been deleted.");
+            window.location.href = "index.html";
+          } catch (err) {
+            console.error("Error deleting account:", err);
+            if (err.code === "auth/requires-recent-login") {
+              customAlert("For security, please log out and log back in before deleting your account.");
+            } else {
+              customAlert("Error deleting account: " + err.message);
+            }
+          }
+        });
+      }
     }
   }
 });
@@ -461,8 +588,10 @@ if (signupForm) {
 
     try {
       // Create user with Firebase
-      await createUserWithEmailAndPassword(auth, emailVal, passVal);
-      customAlert("Account created successfully!");
+      const userCredential = await createUserWithEmailAndPassword(auth, emailVal, passVal);
+      // Send verification email
+      await sendEmailVerification(userCredential.user);
+      customAlert("Account created! Please check your email to verify your account.");
       window.location.href = "setup.html";
     } catch (err) {
       customAlert("Sign-up error: " + err.message);

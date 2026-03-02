@@ -69,6 +69,28 @@ const admin = require("firebase-admin");
 
 if (!admin.apps.length) admin.initializeApp();
 
+// Simple in-memory rate limiter: max 20 requests per user per hour
+const rateLimitMap = new Map();
+const RATE_LIMIT_MAX = 20;
+const RATE_LIMIT_WINDOW_MS = 60 * 60 * 1000; // 1 hour
+
+function checkRateLimit(uid) {
+  const now = Date.now();
+  const entry = rateLimitMap.get(uid);
+
+  if (!entry || now - entry.windowStart > RATE_LIMIT_WINDOW_MS) {
+    rateLimitMap.set(uid, {windowStart: now, count: 1});
+    return true;
+  }
+
+  if (entry.count >= RATE_LIMIT_MAX) {
+    return false;
+  }
+
+  entry.count++;
+  return true;
+}
+
 exports.askCerti = onRequest(async (req, res) => {
   res.set("Access-Control-Allow-Origin", "*");
 
@@ -108,6 +130,13 @@ exports.askCerti = onRequest(async (req, res) => {
   } catch (e) {
     console.error("Error checking subscription:", e);
     return res.status(500).json({error: "Failed to verify subscription"});
+  }
+
+  // Rate limit: max 20 requests per user per hour
+  if (!checkRateLimit(uid)) {
+    return res.status(429).json({
+      error: "Too many requests. Please wait a while before trying again.",
+    });
   }
 
   const {question, topicId, conversationHistory} = req.body;
@@ -164,6 +193,57 @@ exports.askCerti = onRequest(async (req, res) => {
     return res.status(500).json({error: "Failed to get response"});
   }
 });
+
+exports.createBillingPortalSession = onRequest(
+    {secrets: ["STRIPE_SECRET_KEY"]},
+    async (req, res) => {
+      res.set("Access-Control-Allow-Origin", "*");
+
+      if (req.method === "OPTIONS") {
+        res.set("Access-Control-Allow-Methods", "POST");
+        res.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
+        return res.status(204).send("");
+      }
+
+      if (req.method !== "POST") {
+        return res.status(405).send("Method Not Allowed");
+      }
+
+      // Verify Firebase auth token
+      const authHeader = req.headers.authorization;
+      if (!authHeader || !authHeader.startsWith("Bearer ")) {
+        return res.status(401).json({error: "Unauthorized"});
+      }
+
+      let uid;
+      try {
+        const idToken = authHeader.split("Bearer ")[1];
+        const decodedToken = await admin.auth().verifyIdToken(idToken);
+        uid = decodedToken.uid;
+      } catch (e) {
+        return res.status(401).json({error: "Invalid token"});
+      }
+
+      try {
+        const userDoc = await admin.firestore()
+            .collection("users").doc(uid).get();
+        if (!userDoc.exists || !userDoc.data().stripeCustomerId) {
+          return res.status(404).json({error: "No subscription found"});
+        }
+
+        const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
+        const session = await stripe.billingPortal.sessions.create({
+          customer: userDoc.data().stripeCustomerId,
+          return_url: "https://smartcert.ie/account.html",
+        });
+
+        return res.status(200).json({url: session.url});
+      } catch (error) {
+        console.error("Error creating portal session:", error);
+        return res.status(500).json({error: error.message});
+      }
+    },
+);
 
 exports.getSubscriptionDetails = onRequest(
     {secrets: ["STRIPE_SECRET_KEY"]},
