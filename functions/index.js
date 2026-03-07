@@ -74,6 +74,11 @@ const rateLimitMap = new Map();
 const RATE_LIMIT_MAX = 20;
 const RATE_LIMIT_WINDOW_MS = 60 * 60 * 1000; // 1 hour
 
+/**
+ * Checks if a user has exceeded the rate limit.
+ * @param {string} uid - The Firebase user ID.
+ * @return {boolean} True if the request is allowed, false if rate limited.
+ */
 function checkRateLimit(uid) {
   const now = Date.now();
   const entry = rateLimitMap.get(uid);

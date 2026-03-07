@@ -24,7 +24,7 @@
 
 body {
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     height: 100vh;
     background: linear-gradient(120deg, #ffffff 0%, var(--light-bg) 100%);
     color: var(--light-text);
@@ -134,16 +134,128 @@ body.dark-mode .pill-container {
     display: none !important;
 }
 
-/* Sidebar */
+/*******************************************************
+ * HORIZONTAL TOP BAR (desktop)
+ *******************************************************/
+.top-bar {
+    display: flex;
+    align-items: center;
+    height: 60px;
+    background-color: #fff;
+    padding: 0 2rem;
+    box-shadow: 0 1px 4px rgba(59, 130, 246, 0.1);
+    position: sticky;
+    top: 0;
+    z-index: 1001;
+    gap: 1.5rem;
+}
+body.dark-mode .top-bar {
+    background-color: var(--dark-sidebar);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+}
+
+.top-bar-left {
+    display: flex;
+    align-items: baseline;
+    gap: 0.6rem;
+    flex-shrink: 0;
+}
+.top-bar-brand {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--primary-color);
+    text-decoration: none;
+}
+.top-bar-subtitle {
+    font-size: 0.85rem;
+    color: #888;
+}
+body.dark-mode .top-bar-subtitle {
+    color: #aaa;
+}
+
+.top-bar-nav {
+    display: flex;
+    gap: 0.25rem;
+    margin-left: auto;
+}
+.top-bar-link {
+    padding: 0.5rem 1.2rem;
+    border-radius: 9999px;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.95rem;
+    color: var(--light-text);
+    transition: background-color 0.2s, color 0.2s;
+}
+.top-bar-link:hover {
+    background-color: #edf2fe;
+}
+.top-bar-link.active {
+    background-color: var(--primary-color);
+    color: #fff;
+}
+body.dark-mode .top-bar-link {
+    color: var(--dark-text);
+}
+body.dark-mode .top-bar-link:hover {
+    background-color: #3b3f44;
+}
+body.dark-mode .top-bar-link.active {
+    background-color: var(--primary-color);
+    color: #fff;
+}
+
+.top-bar-right {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-left: auto;
+}
+.top-bar-right .profile-pic {
+    width: 36px;
+    height: 36px;
+}
+
+/* Hide the mobile-only pill on desktop */
+.mobile-only-pill {
+    display: none !important;
+}
+
+/* Hide sidebar on desktop (default = top bar layout) */
 .sidebar {
     width: 260px;
     background-color: var(--light-sidebar);
     border-right: 1px solid rgba(0, 0, 0, 0.05);
-    display: flex;
+    display: none;
     flex-direction: column;
     box-shadow: var(--shadow-blue);
     transition: background-color 0.3s;
     position: relative;
+}
+
+/* Sidebar layout mode (desktop): show sidebar, hide top bar, row direction */
+body.layout-sidebar {
+    flex-direction: row;
+}
+body.layout-sidebar .top-bar {
+    display: none !important;
+}
+body.layout-sidebar .sidebar {
+    display: flex;
+    position: relative;
+    left: auto;
+}
+.sidebar-mode-toggle {
+    display: none;
+}
+body.layout-sidebar .sidebar-mode-toggle {
+    display: block;
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    z-index: 10;
+    cursor: pointer;
 }
 body.dark-mode .sidebar {
     background-color: var(--dark-sidebar);
@@ -636,6 +748,10 @@ body.dark-mode .account-welcome-text {
     margin: 1.5rem auto;
     width: 90%;
     max-width: 400px;
+}
+
+.topic-selector h3 {
+    margin-bottom: 1rem;
 }
 
 .unit-container {
@@ -1150,11 +1266,19 @@ code {
 }
 
 @media (max-width: 768px) {
+    /* Hide top bar on mobile, show sidebar + pills instead */
+    .top-bar {
+        display: none !important;
+    }
+    .mobile-only-pill {
+        display: flex !important;
+    }
     .pill-container.pill-left {
         display: flex;
     }
 
     .sidebar {
+        display: flex;
         position: fixed;
         top: 0;
         bottom: 0;
@@ -1227,6 +1351,7 @@ code {
 /* Container that holds the 3 (or 4) filter buttons */
 #notebookUnitContainer {
     display: flex;
+    flex-wrap: wrap;
     justify-content: center;
     gap: 1rem;
     margin-bottom: 1rem;
@@ -1360,4 +1485,96 @@ body.dark-mode #notebookModalDate {
 }
 body.dark-mode .notebook-modal-close {
     color: #ddd;
+}
+
+/*******************************************************
+ * SITE FOOTER
+ *******************************************************/
+.site-footer {
+    background-color: #1e293b;
+    color: #cbd5e1;
+    font-size: 0.9rem;
+    margin-top: auto;
+}
+.site-footer a {
+    color: #cbd5e1;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+.site-footer a:hover {
+    color: #fff;
+}
+.footer-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 2.5rem 2rem;
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: 2rem;
+}
+.footer-brand h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 0.75rem;
+}
+.footer-brand-logo {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+}
+.footer-brand p {
+    line-height: 1.5;
+    margin-bottom: 1rem;
+}
+.footer-tags {
+    display: flex;
+    gap: 1rem;
+    font-size: 0.8rem;
+    color: #94a3b8;
+}
+.footer-col h4 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 1rem;
+}
+.footer-col ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+.footer-col ul li {
+    margin-bottom: 0.5rem;
+}
+.footer-bottom {
+    border-top: 1px solid #334155;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 1.5rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+.footer-bottom-links {
+    display: flex;
+    gap: 1.5rem;
+    font-size: 0.85rem;
+}
+.footer-bottom-copy {
+    font-size: 0.85rem;
+    color: #94a3b8;
+}
+
+@media (max-width: 768px) {
+    .footer-inner {
+        grid-template-columns: 1fr;
+    }
+    .footer-bottom {
+        flex-direction: column;
+        text-align: center;
+    }
 }

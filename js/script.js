@@ -20,7 +20,7 @@ import {
   deleteUser,
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 import { getFirestore } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-import { doc, getDoc, setDoc, serverTimestamp, addDoc, collection, query, orderBy, getDocs, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { doc, getDoc, setDoc, updateDoc, serverTimestamp, addDoc, collection, query, orderBy, getDocs, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
 
 // 2) Your Firebase configuration - Replace with YOUR_GEMINI_API_KEY placeholder in config.js if needed
@@ -65,36 +65,87 @@ if ((window.location.pathname === "/" || window.location.pathname.endsWith("inde
 }
 
 /*******************************************************
- * DARK MODE ICON (SUN/MOON)
+ * DARK MODE ICON (SUN/MOON) — syncs desktop + mobile
  *******************************************************/
 const body = document.body;
 const modeIcon = document.getElementById("modeIcon");
+const modeIconMobile = document.getElementById("modeIconMobile");
+const modeIconSidebar = document.getElementById("modeIconSidebar");
+const allModeIcons = [modeIcon, modeIconMobile, modeIconSidebar].filter(Boolean);
 
-if (modeIcon) {
-  // On page load, see if theme is 'dark'
+function syncModeIcons(isDark) {
+  const src = isDark ? "assets/img/light.png" : "assets/img/dark.png";
+  allModeIcons.forEach((icon) => (icon.src = src));
+}
+
+if (allModeIcons.length) {
+  // On page load
   if (localStorage.getItem("theme") === "dark") {
     body.classList.add("dark-mode");
-    modeIcon.src = "assets/img/light.png"; // show sun
+    syncModeIcons(true);
   } else {
-    modeIcon.src = "assets/img/dark.png"; // show moon
+    syncModeIcons(false);
   }
 
-  // When icon is clicked
-  modeIcon.addEventListener("click", () => {
-    body.classList.toggle("dark-mode");
-    const isDark = body.classList.contains("dark-mode");
-    localStorage.setItem("theme", isDark ? "dark" : "light");
-    modeIcon.src = isDark ? "assets/img/light.png" : "assets/img/dark.png";
+  allModeIcons.forEach((icon) => {
+    icon.addEventListener("click", () => {
+      body.classList.toggle("dark-mode");
+      const isDark = body.classList.contains("dark-mode");
+      localStorage.setItem("theme", isDark ? "dark" : "light");
+      syncModeIcons(isDark);
+    });
+  });
+}
+
+/*******************************************************
+ * NAVIGATION LAYOUT PREFERENCE (top bar vs sidebar)
+ *******************************************************/
+const savedLayout = localStorage.getItem("smartcert_nav_layout") || "topbar";
+if (savedLayout === "sidebar") {
+  document.body.classList.add("layout-sidebar");
+}
+
+// Account page: layout toggle buttons
+const layoutToggle = document.getElementById("layoutToggle");
+if (layoutToggle) {
+  const layoutBtns = layoutToggle.querySelectorAll("button[data-layout]");
+
+  // Set initial active state from saved preference
+  layoutBtns.forEach((btn) => {
+    const isActive = btn.getAttribute("data-layout") === savedLayout;
+    btn.style.background = isActive ? "#3b82f6" : "#fff";
+    btn.style.color = isActive ? "#fff" : "#333";
+    btn.style.borderColor = isActive ? "#3b82f6" : "#ccc";
+  });
+
+  layoutBtns.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const layout = btn.getAttribute("data-layout");
+      localStorage.setItem("smartcert_nav_layout", layout);
+
+      // Update button styles
+      layoutBtns.forEach((b) => {
+        const active = b.getAttribute("data-layout") === layout;
+        b.style.background = active ? "#3b82f6" : "#fff";
+        b.style.color = active ? "#fff" : "#333";
+        b.style.borderColor = active ? "#3b82f6" : "#ccc";
+      });
+    });
   });
 }
 
 /*******************************************************
  * AUTH STATE & UI TOGGLING
  *******************************************************/
-// Elements for top-right container
+// Elements for desktop + mobile
 const loginBtn = document.getElementById("loginBtn");
+const loginBtnMobile = document.getElementById("loginBtnMobile");
 const profilePic = document.getElementById("profilePic");
+const profilePicMobile = document.getElementById("profilePicMobile");
+const sidebarPfp = document.getElementById("sidebarPfp");
 const accountLink = document.getElementById("accountLink");
+const allLoginBtns = [loginBtn, loginBtnMobile].filter(Boolean);
+const allProfilePics = [profilePic, profilePicMobile].filter(Boolean);
 
 // Listen for Firebase auth changes (logged in/out)
 onAuthStateChanged(auth, async (user) => {
@@ -102,9 +153,9 @@ onAuthStateChanged(auth, async (user) => {
   if (!chatContainer || !chatInput || !sendBtn || !chatMessages) return;
 
   if (user) {
-    loginBtn.classList.add("hidden");
-    profilePic.classList.remove("hidden");
-    accountLink.setAttribute("href", "account.html");
+    allLoginBtns.forEach((btn) => btn.classList.add("hidden"));
+    allProfilePics.forEach((pic) => pic.classList.remove("hidden"));
+    if (accountLink) accountLink.setAttribute("href", "account.html");
 
     const userDocRef = doc(db, "users", user.uid);
     const userSnap = await getDoc(userDocRef);
@@ -115,13 +166,20 @@ onAuthStateChanged(auth, async (user) => {
 
       // Set global userAvatarUrl using the user's profile photo or fallback
       window.userAvatarUrl = userData.photoURL || "assets/img/pfp.avif";
+      if (sidebarPfp) sidebarPfp.src = userData.photoURL || "assets/img/pfp.avif";
       if (userData.photoURL) {
-        profilePic.src = userData.photoURL;
-        // Add error handling for profile picture loading
-        profilePic.onerror = function() {
-          this.src = "assets/img/pfp.avif"; // Fallback to default if user image fails to load
-          window.userAvatarUrl = "assets/img/pfp.avif"; // Update global URL too
-        };
+        allProfilePics.forEach((pic) => {
+          pic.src = userData.photoURL;
+          pic.onerror = function() {
+            this.src = "assets/img/pfp.avif";
+            window.userAvatarUrl = "assets/img/pfp.avif";
+          };
+        });
+        if (sidebarPfp) {
+          sidebarPfp.onerror = function() { this.src = "assets/img/pfp.avif"; };
+        }
+      } else if (sidebarPfp) {
+        sidebarPfp.src = "assets/img/pfp.avif";
       }
 
       if (subscriptionStatus === "active") {
@@ -142,7 +200,8 @@ onAuthStateChanged(auth, async (user) => {
           subscribeBtn.id = "subscribeBtn";
           subscribeBtn.className = "login-button";
           subscribeBtn.textContent = "Subscribe";
-          document.getElementById("topRightContainer").appendChild(subscribeBtn);
+          const container = document.getElementById("topBar") || document.getElementById("topRightContainer");
+          if (container) container.appendChild(subscribeBtn);
         } else {
           subscribeBtn.classList.remove("hidden");
         }
@@ -159,29 +218,31 @@ onAuthStateChanged(auth, async (user) => {
         You must be logged in to use the chat.
         <a class="click-link" href="login.html">Log in here</a>.
       </div>`;
-    loginBtn.classList.remove("hidden");
+    allLoginBtns.forEach((btn) => btn.classList.remove("hidden"));
     const subscribeBtn = document.getElementById("subscribeBtn");
     if (subscribeBtn) subscribeBtn.classList.add("hidden");
   }
 });
 
-if (profilePic) {
-  profilePic.addEventListener("click", () => {
+allProfilePics.forEach((pic) => {
+  pic.addEventListener("click", () => {
     window.location.href = "account.html";
   });
-}
+});
 
-//Event listener for clicking login
-if (loginBtn) {
-  loginBtn.addEventListener("click", () => {
+// Event listener for clicking login (desktop + mobile)
+allLoginBtns.forEach((btn) => {
+  btn.addEventListener("click", () => {
     window.location.href = "login.html";
   });
-}
+});
 
 /*******************************************************
- * SIDEBAR NAV ON chat.html (Single-Page Sections)
+ * NAV ON chat.html (Top bar + Sidebar, Single-Page Sections)
  *******************************************************/
 const sidebarLinks = document.querySelectorAll(".sidebar-nav a[data-section]");
+const topBarLinks = document.querySelectorAll(".top-bar-link[data-section]");
+const allNavLinks = [...sidebarLinks, ...topBarLinks];
 const chatSection = document.getElementById("chatSection");
 const notebookSection = document.getElementById("notebookSection");
 
@@ -259,6 +320,7 @@ function openNotebookModal(entry) {
   const answerEl = document.getElementById("notebookModalAnswer");
   const dateEl = document.getElementById("notebookModalDate");
   const deleteBtn = document.getElementById("notebookModalDelete");
+  const editBtn = document.getElementById("notebookModalEdit");
   const closeBtn = document.getElementById("notebookModalClose");
   if (!modal) return;
 
@@ -280,6 +342,60 @@ function openNotebookModal(entry) {
     dateEl.textContent = "";
   }
 
+  // Wire edit button (clone to remove old listeners)
+  if (editBtn) {
+    const newEditBtn = editBtn.cloneNode(true);
+    editBtn.parentNode.replaceChild(newEditBtn, editBtn);
+    newEditBtn.addEventListener("click", () => {
+      // Switch answer area to editable textarea
+      const currentText = entry.text || "";
+      answerEl.innerHTML = "";
+      const textarea = document.createElement("textarea");
+      textarea.value = currentText;
+      textarea.style.cssText = "width:100%;height:100%;min-height:200px;font-family:inherit;font-size:0.95rem;padding:0.5rem;border:1px solid #ccc;border-radius:8px;resize:vertical;box-sizing:border-box;";
+      answerEl.appendChild(textarea);
+      textarea.focus();
+
+      // Change edit button to save button
+      newEditBtn.textContent = "Save";
+      newEditBtn.style.backgroundColor = "#16a34a";
+
+      // Clone again for save handler
+      const saveBtn = newEditBtn.cloneNode(true);
+      newEditBtn.parentNode.replaceChild(saveBtn, newEditBtn);
+      saveBtn.addEventListener("click", async () => {
+        const newText = textarea.value.trim();
+        if (!newText) {
+          customAlert("Note cannot be empty.");
+          return;
+        }
+
+        try {
+          await updateDoc(doc(db, "users", auth.currentUser.uid, "notebook", entry.id), {
+            text: newText,
+          });
+          // Update the cached entry
+          entry.text = newText;
+          // Re-render the modal in view mode
+          if (typeof marked !== "undefined") {
+            answerEl.innerHTML = marked.parse(newText);
+          } else {
+            answerEl.textContent = newText;
+          }
+          // Reset button
+          saveBtn.textContent = "Edit";
+          saveBtn.style.backgroundColor = "#3b82f6";
+          // Re-render grid to reflect changes
+          renderNotebookGrid(currentFilteredEntries());
+          customAlert("Note updated!");
+        } catch (err) {
+          console.error("Error updating note:", err);
+          customAlert("Could not save changes: " + err.message);
+        }
+      });
+    });
+  }
+
   // Wire delete button (clone to remove old listeners)
   const newDeleteBtn = deleteBtn.cloneNode(true);
   deleteBtn.parentNode.replaceChild(newDeleteBtn, deleteBtn);
@@ -289,9 +405,8 @@ function openNotebookModal(entry) {
     try {
       await deleteDoc(doc(db, "users", auth.currentUser.uid, "notebook", entry.id));
       modal.classList.add("hidden");
-      // Remove from cache and re-render
       allNotebookEntries = allNotebookEntries.filter((e) => e.id !== entry.id);
-      renderNotebookGrid(allNotebookEntries);
+      renderNotebookGrid(currentFilteredEntries());
     } catch (err) {
       console.error("Error deleting doc:", err);
       customAlert("Could not delete entry");
@@ -311,61 +426,127 @@ function openNotebookModal(entry) {
   modal.classList.remove("hidden");
 }
 
+// --- Notebook filter state ---
+let activeNotebookUnit = "all";
+let activeNotebookChapter = null;
+
+function currentFilteredEntries() {
+  if (activeNotebookUnit === "all") return allNotebookEntries;
+  const unitFiltered = allNotebookEntries.filter((e) => getUnitForTopic(e.topic) === activeNotebookUnit);
+  if (!activeNotebookChapter) return unitFiltered;
+  return unitFiltered.filter((e) => e.topic === activeNotebookChapter);
+}
+
 // --- Notebook filter buttons ---
 const notebookUnitBtns = document.querySelectorAll("#notebookUnitContainer .unit-button");
+const notebookChapterContainer = document.getElementById("notebookChapterContainer");
+
 notebookUnitBtns.forEach((btn) => {
   btn.addEventListener("click", () => {
     const unit = btn.getAttribute("data-unit");
     notebookUnitBtns.forEach((b) => b.classList.remove("active"));
     btn.classList.add("active");
 
-    if (unit === "all") {
-      renderNotebookGrid(allNotebookEntries);
-    } else {
-      const filtered = allNotebookEntries.filter((e) => getUnitForTopic(e.topic) === unit);
-      renderNotebookGrid(filtered);
+    activeNotebookUnit = unit;
+    activeNotebookChapter = null;
+
+    // Clear chapter sub-filters
+    if (notebookChapterContainer) {
+      notebookChapterContainer.innerHTML = "";
+      notebookChapterContainer.classList.add("hidden");
     }
+
+    if (unit !== "all" && typeof chapters !== "undefined" && chapters[unit]) {
+      // Show chapter sub-filter buttons
+      const allChapterBtn = document.createElement("button");
+      allChapterBtn.textContent = "All " + (unit === "A" ? "Unit 1" : unit === "B" ? "Unit 2" : "Unit 3");
+      allChapterBtn.classList.add("chapter-button", "active");
+      if (unit === "A") allChapterBtn.classList.add("unit-green");
+      else if (unit === "B") allChapterBtn.classList.add("unit-purple");
+      else if (unit === "C") allChapterBtn.classList.add("unit-red");
+
+      allChapterBtn.addEventListener("click", () => {
+        activeNotebookChapter = null;
+        notebookChapterContainer.querySelectorAll(".chapter-button").forEach((b) => b.classList.remove("active"));
+        allChapterBtn.classList.add("active");
+        renderNotebookGrid(currentFilteredEntries());
+      });
+      notebookChapterContainer.appendChild(allChapterBtn);
+
+      chapters[unit].forEach((ch) => {
+        const chBtn = document.createElement("button");
+        chBtn.textContent = ch.name;
+        chBtn.classList.add("chapter-button");
+        if (unit === "A") chBtn.classList.add("unit-green");
+        else if (unit === "B") chBtn.classList.add("unit-purple");
+        else if (unit === "C") chBtn.classList.add("unit-red");
+
+        chBtn.addEventListener("click", () => {
+          activeNotebookChapter = ch.name;
+          notebookChapterContainer.querySelectorAll(".chapter-button").forEach((b) => b.classList.remove("active"));
+          chBtn.classList.add("active");
+          renderNotebookGrid(currentFilteredEntries());
+        });
+        notebookChapterContainer.appendChild(chBtn);
+      });
+
+      notebookChapterContainer.classList.remove("hidden");
+    }
+
+    renderNotebookGrid(currentFilteredEntries());
   });
 });
 
-// --- Sidebar click event listeners ---
-if (sidebarLinks && chatSection && notebookSection) {
-  sidebarLinks.forEach((link) => {
-    link.addEventListener("click", async (e) => {
-      e.preventDefault();
-      const target = link.getAttribute("data-section");
+// --- Shared section-switching handler (works for both top bar + sidebar) ---
+async function switchSection(target) {
+  if (!chatSection || !notebookSection) return;
 
-      // 1) Hide both sections
-      chatSection.classList.add("hidden");
-      notebookSection.classList.add("hidden");
+  // 1) Hide both sections
+  chatSection.classList.add("hidden");
+  notebookSection.classList.add("hidden");
 
-      // 2) Show the chosen section
-      if (target === "chatSection") {
-        chatSection.classList.remove("hidden");
-      }
-      if (target === "notebookSection") {
-        notebookSection.classList.remove("hidden");
+  // 2) Show the chosen section
+  if (target === "chatSection") {
+    chatSection.classList.remove("hidden");
+  }
+  if (target === "notebookSection") {
+    notebookSection.classList.remove("hidden");
 
-        // Load the user’s notebook and render as card grid
-        allNotebookEntries = await window.loadNotebookEntries();
-        renderNotebookGrid(allNotebookEntries);
+    // Load the user’s notebook and render as card grid
+    allNotebookEntries = await window.loadNotebookEntries();
+    activeNotebookUnit = "all";
+    activeNotebookChapter = null;
+    renderNotebookGrid(allNotebookEntries);
 
-        // Reset filter to "All"
-        notebookUnitBtns.forEach((b) => b.classList.remove("active"));
-        const allBtn = document.querySelector("#notebookUnitContainer [data-unit=\"all\"]");
-        if (allBtn) allBtn.classList.add("active");
-      }
+    // Reset filter to "All"
+    notebookUnitBtns.forEach((b) => b.classList.remove("active"));
+    const allBtn = document.querySelector("#notebookUnitContainer [data-unit=\"all\"]");
+    if (allBtn) allBtn.classList.add("active");
 
-      // 3) Remove ‘active’ from all sidebar links
-      sidebarLinks.forEach((lnk) => {
-        lnk.classList.remove("active");
-      });
+    // Clear chapter sub-filters
+    if (notebookChapterContainer) {
+      notebookChapterContainer.innerHTML = "";
+      notebookChapterContainer.classList.add("hidden");
+    }
+  }
 
-      // 4) Add ‘active’ to the clicked link
-      link.classList.add("active");
-    });
+  // 3) Sync ‘active’ state across ALL nav links (sidebar + top bar)
+  allNavLinks.forEach((lnk) => lnk.classList.remove("active"));
+  // Highlight matching links in both navs
+  allNavLinks.forEach((lnk) => {
+    if (lnk.getAttribute("data-section") === target) {
+      lnk.classList.add("active");
+    }
   });
 }
+
+// Attach handler to all nav links (sidebar + top bar)
+allNavLinks.forEach((link) => {
+  link.addEventListener("click", (e) => {
+    e.preventDefault();
+    switchSection(link.getAttribute("data-section"));
+  });
+});
 
 /*******************************************************
  * Dropdown topic menu
@@ -404,8 +585,8 @@ const chapters = {
   ],
 };
 
-// Grab all unit buttons (A/B/C)
-const unitButtons = document.querySelectorAll(".unit-button");
+// Grab only chat topic unit buttons (not notebook filter buttons)
+const unitButtons = document.querySelectorAll("#unitContainer .unit-button");
 
 // For each unit button, when clicked:
 unitButtons.forEach((button) => {
@@ -896,7 +1077,8 @@ onAuthStateChanged(auth, async (user) => {
           subscribeBtn.id = "subscribeBtn";
           subscribeBtn.className = "login-button"; // Use your desired styling class
           subscribeBtn.textContent = "Subscribe";
-          document.getElementById("topRightContainer").appendChild(subscribeBtn);
+          const container = document.getElementById("topBar") || document.getElementById("topRightContainer");
+          if (container) container.appendChild(subscribeBtn);
         } else {
           subscribeBtn.classList.remove("hidden");
         }

@@ -19,29 +19,51 @@
     <link rel="icon" type="image/png" href="assets/img/tab_icon.png" />
   </head>
   <body>
-    <!-- PILL CONTAINER at top-right -->
-    <div id="topRightContainer" class="pill-container">
-      <!-- Login button (hidden if user is logged in) -->
-      <button id="loginBtn" class="login-button hidden">Login/Signup</button>
+    <!-- HORIZONTAL TOP BAR (desktop only) -->
+    <header class="top-bar" id="topBar">
+      <div class="top-bar-left">
+        <a href="index.html?showLanding" class="top-bar-brand">SmartCert</a>
+        <span class="top-bar-subtitle">Leaving Cert Biology</span>
+      </div>
+      <nav class="top-bar-nav">
+        <a href="#" data-section="chatSection" class="top-bar-link active">Chat</a>
+        <a href="#" data-section="notebookSection" class="top-bar-link">Notebook</a>
+      </nav>
+      <div class="top-bar-right">
+        <button id="loginBtn" class="login-button hidden">Login/Signup</button>
+        <img
+          id="modeIcon"
+          class="mode-icon"
+          src="assets/img/dark.png"
+          alt="Toggle Theme"
+        />
+        <img
+          id="profilePic"
+          class="profile-pic hidden"
+          src="assets/img/pfp.avif"
+          alt="Profile"
+        />
+      </div>
+    </header>
 
-      <!-- Profile pic (hidden if user is logged out) -->
+    <!-- PILL CONTAINER at top-right (mobile only, kept for mobile) -->
+    <div id="topRightContainer" class="pill-container mobile-only-pill">
+      <button id="loginBtnMobile" class="login-button hidden">Login/Signup</button>
       <img
-        id="profilePic"
+        id="profilePicMobile"
         class="profile-pic hidden"
         src="assets/img/pfp.avif"
         alt="Profile"
       />
-
-      <!-- Theme toggle icon (sun/moon) -->
       <img
-        id="modeIcon"
+        id="modeIconMobile"
         class="mode-icon"
         src="assets/img/dark.png"
         alt="Toggle Theme"
       />
     </div>
 
-    <!-- HAMBURGER PILL (TOP-LEFT) -->
+    <!-- HAMBURGER PILL (TOP-LEFT, mobile only) -->
     <div id="hamburgerContainer" class="pill-container pill-left">
       <div id="hamburgerBtnChat" class="hamburgerChat">
         <span></span>
@@ -50,7 +72,7 @@
       </div>
     </div>
 
-    <!-- Sidebar -->
+    <!-- Sidebar (mobile only) -->
     <aside class="sidebar" id="sidebar">
       <div class="sidebar-header">
         <h1 style="margin: 0">
@@ -64,13 +86,16 @@
         <p>Leaving Cert Biology</p>
       </div>
       <nav class="sidebar-nav">
-        <a href="#" data-section="chatSection">💬 Chat</a>
-        <a href="#" data-section="notebookSection">📓 Notebook</a>
+        <a href="#" data-section="chatSection">Chat</a>
+        <a href="#" data-section="notebookSection">Notebook</a>
       </nav>
 
       <!-- Account link at bottom -->
       <div class="sidebar-footer">
-        <a href="#" id="accountLink">👤 Account</a>
+        <a href="#" id="accountLink">
+          <img id="sidebarPfp" src="" alt="" style="width:24px;height:24px;border-radius:50%;object-fit:cover;vertical-align:middle;margin-right:6px;">
+          Account
+        </a>
       </div>
     </aside>
 
@@ -79,6 +104,13 @@
 
     <!-- Main Content -->
     <div class="main-content">
+      <!-- Dark mode toggle for sidebar layout (top-right of chat area) -->
+      <img
+        id="modeIconSidebar"
+        class="mode-icon sidebar-mode-toggle"
+        src="assets/img/dark.png"
+        alt="Toggle Theme"
+      />
       <!-- Chat Section (single container) -->
       <section id="chatSection" class="chat-container">
         <!-- Topic Selector (Group -> Chapter -> Selected Topic) -->
@@ -159,6 +191,9 @@
           </button>
         </div>
 
+        <!-- Chapter sub-filter buttons (shown when a unit is selected) -->
+        <div id="notebookChapterContainer" class="chapter-container hidden"></div>
+
         <!-- Grid of cards -->
         <div id="notebookGrid" class="notebook-grid"></div>
       </section>
@@ -186,9 +221,12 @@
           <div id="notebookModalAnswer"></div>
           <div class="notebook-modal-footer">
             <span id="notebookModalDate"></span>
-            <button id="notebookModalDelete" class="notebook-delete-button">
-              Delete
-            </button>
+            <div>
+              <button id="notebookModalEdit" style="background-color:#3b82f6;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:0.9rem;padding:6px 12px;margin-right:8px;">Edit</button>
+              <button id="notebookModalDelete" class="notebook-delete-button">
+                Delete
+              </button>
+            </div>
           </div>
         </div>
       </div>
