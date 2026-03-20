@@ -630,6 +630,10 @@ unitButtons.forEach((button) => {
           window.currentTopicId = chapterObj.id;
           // Show the container that holds the "Change Topic" button
           selectedTopicContainer.classList.remove("hidden");
+          // Update chat history if in "By Topic" mode
+          if (panelViewMode === "byTopic") {
+            rerenderFilteredHistory();
+          }
         });
 
         chapterContainer.appendChild(chapterBtn);
@@ -1295,9 +1299,8 @@ window.loadNotebookEntries = async function () {
 window.currentSessionId = null;
 window.currentSessionMessages = [];
 
-// Topic filter state for chat history panel
-let panelFilterUnit = "all";
-let panelFilterChapter = null;
+// Chat history view mode: "recent" (all) or "byTopic" (filtered by selected topic)
+let panelViewMode = "recent";
 let allChatSessions = []; // cached for filtering
 
 // Load all chat sessions for the current user
@@ -1444,18 +1447,22 @@ function renderChatHistory(sessions) {
   addGroup("Older", groups.older);
 }
 
-// Filter sessions based on current panel filter state
+// Filter sessions based on current view mode + selected topic
 function getFilteredSessions() {
-  if (panelFilterUnit === "all") return allChatSessions;
+  if (panelViewMode === "recent") return allChatSessions;
 
-  const unitFiltered = allChatSessions.filter((s) => {
-    const unit = getUnitForTopic(s.topicName);
-    return unit === panelFilterUnit;
+  // "byTopic" mode — filter by the currently selected topic in the main chat area
+  const currentTopic = window.selectedTopic || "";
+  const currentTopicId = window.currentTopicId || "";
+
+  if (!currentTopic && !currentTopicId) return allChatSessions;
+
+  return allChatSessions.filter((s) => {
+    // Match by topic name or topic ID
+    if (currentTopic && s.topicName === currentTopic) return true;
+    if (currentTopicId && s.topicId === currentTopicId) return true;
+    return false;
   });
-
-  if (!panelFilterChapter) return unitFiltered;
-
-  return unitFiltered.filter((s) => s.topicName === panelFilterChapter);
 }
 
 // Load and render chat history
@@ -1655,47 +1662,16 @@ if (panelAccountLinkEl) {
   });
 }
 
-// --- Panel topic filter buttons ---
-const panelFilterBtns = document.querySelectorAll("#panelFilterButtons .panel-filter-btn");
-const panelChapterFilter = document.getElementById("panelChapterFilter");
+// --- Panel view toggle (Recent / By Topic) ---
+const panelViewBtns = document.querySelectorAll(".panel-view-btn");
 
-panelFilterBtns.forEach((btn) => {
+panelViewBtns.forEach((btn) => {
   btn.addEventListener("click", () => {
-    const filter = btn.getAttribute("data-filter");
+    const view = btn.getAttribute("data-view");
+    panelViewMode = view;
 
-    // Update active state
-    panelFilterBtns.forEach((b) => b.classList.remove("active"));
+    panelViewBtns.forEach((b) => b.classList.remove("active"));
     btn.classList.add("active");
-
-    panelFilterUnit = filter;
-    panelFilterChapter = null;
-
-    // Clear chapter sub-filter
-    if (panelChapterFilter) {
-      panelChapterFilter.innerHTML = "";
-    }
-
-    // Show chapter sub-filters if a unit is selected
-    if (filter !== "all" && typeof chapters !== "undefined" && chapters[filter]) {
-      chapters[filter].forEach((ch) => {
-        const chBtn = document.createElement("button");
-        chBtn.textContent = ch.name;
-        chBtn.className = "panel-chapter-btn";
-        chBtn.addEventListener("click", () => {
-          // Toggle: click same chapter again to deselect
-          if (panelFilterChapter === ch.name) {
-            panelFilterChapter = null;
-            panelChapterFilter.querySelectorAll(".panel-chapter-btn").forEach((b) => b.classList.remove("active"));
-          } else {
-            panelFilterChapter = ch.name;
-            panelChapterFilter.querySelectorAll(".panel-chapter-btn").forEach((b) => b.classList.remove("active"));
-            chBtn.classList.add("active");
-          }
-          rerenderFilteredHistory();
-        });
-        panelChapterFilter.appendChild(chBtn);
-      });
-    }
 
     rerenderFilteredHistory();
   });
