@@ -641,19 +641,20 @@ unitButtons.forEach((button) => {
   });
 });
 
-// Handle the "Change Topic" button (reset selection)
+// Handle the "Change Topic" button — starts a new chat
 if (changeTopicBtn) {
   changeTopicBtn.addEventListener("click", () => {
-    // Hide the selected topic container
+    // Start a new chat first (clears session + messages)
+    if (typeof window.startNewChat === "function") {
+      window.startNewChat();
+    }
+    // Reset topic selector UI so they can pick a new topic
     selectedTopicContainer.classList.add("hidden");
-    // Clear the label
     selectedTopicLabel.textContent = "";
     selectedTopic = "";
     window.selectedTopic = "";
     window.currentTopicId = "";
-    // Show the unit container again so user can pick a new unit
     unitContainer.classList.remove("hidden");
-    // Clear and hide the chapter container
     chapterContainer.innerHTML = "";
     chapterContainer.classList.add("hidden");
   });
@@ -1294,6 +1295,11 @@ window.loadNotebookEntries = async function () {
 window.currentSessionId = null;
 window.currentSessionMessages = [];
 
+// Topic filter state for chat history panel
+let panelFilterUnit = "all";
+let panelFilterChapter = null;
+let allChatSessions = []; // cached for filtering
+
 // Load all chat sessions for the current user
 async function loadChatSessions() {
   const user = auth.currentUser;
@@ -1438,12 +1444,31 @@ function renderChatHistory(sessions) {
   addGroup("Older", groups.older);
 }
 
+// Filter sessions based on current panel filter state
+function getFilteredSessions() {
+  if (panelFilterUnit === "all") return allChatSessions;
+
+  const unitFiltered = allChatSessions.filter((s) => {
+    const unit = getUnitForTopic(s.topicName);
+    return unit === panelFilterUnit;
+  });
+
+  if (!panelFilterChapter) return unitFiltered;
+
+  return unitFiltered.filter((s) => s.topicName === panelFilterChapter);
+}
+
 // Load and render chat history
 async function loadAndRenderChatHistory() {
-  const sessions = await loadChatSessions();
-  renderChatHistory(sessions);
+  allChatSessions = await loadChatSessions();
+  renderChatHistory(getFilteredSessions());
 }
 window.loadAndRenderChatHistory = loadAndRenderChatHistory;
+
+// Re-render with current filter (no re-fetch)
+function rerenderFilteredHistory() {
+  renderChatHistory(getFilteredSessions());
+}
 
 // Create a new chat session
 window.createChatSession = async function (title) {
@@ -1629,6 +1654,52 @@ if (panelAccountLinkEl) {
     closeChatHistoryPanel();
   });
 }
+
+// --- Panel topic filter buttons ---
+const panelFilterBtns = document.querySelectorAll("#panelFilterButtons .panel-filter-btn");
+const panelChapterFilter = document.getElementById("panelChapterFilter");
+
+panelFilterBtns.forEach((btn) => {
+  btn.addEventListener("click", () => {
+    const filter = btn.getAttribute("data-filter");
+
+    // Update active state
+    panelFilterBtns.forEach((b) => b.classList.remove("active"));
+    btn.classList.add("active");
+
+    panelFilterUnit = filter;
+    panelFilterChapter = null;
+
+    // Clear chapter sub-filter
+    if (panelChapterFilter) {
+      panelChapterFilter.innerHTML = "";
+    }
+
+    // Show chapter sub-filters if a unit is selected
+    if (filter !== "all" && typeof chapters !== "undefined" && chapters[filter]) {
+      chapters[filter].forEach((ch) => {
+        const chBtn = document.createElement("button");
+        chBtn.textContent = ch.name;
+        chBtn.className = "panel-chapter-btn";
+        chBtn.addEventListener("click", () => {
+          // Toggle: click same chapter again to deselect
+          if (panelFilterChapter === ch.name) {
+            panelFilterChapter = null;
+            panelChapterFilter.querySelectorAll(".panel-chapter-btn").forEach((b) => b.classList.remove("active"));
+          } else {
+            panelFilterChapter = ch.name;
+            panelChapterFilter.querySelectorAll(".panel-chapter-btn").forEach((b) => b.classList.remove("active"));
+            chBtn.classList.add("active");
+          }
+          rerenderFilteredHistory();
+        });
+        panelChapterFilter.appendChild(chBtn);
+      });
+    }
+
+    rerenderFilteredHistory();
+  });
+});
 
 /**************************************
  * custom alerts

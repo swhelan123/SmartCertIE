@@ -337,6 +337,106 @@ body.dark-mode .panel-nav-link.active {
     color: #fff;
 }
 
+/* Panel topic filter */
+.panel-topic-filter {
+    padding: 0.5rem 0.75rem;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+body.dark-mode .panel-topic-filter {
+    border-bottom-color: rgba(255, 255, 255, 0.08);
+}
+.panel-filter-buttons {
+    display: flex;
+    gap: 0.3rem;
+    flex-wrap: wrap;
+}
+.panel-filter-btn {
+    padding: 0.3rem 0.6rem;
+    border: none;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    cursor: pointer;
+    background-color: #e5e7eb;
+    color: #374151;
+    transition: background-color 0.2s, transform 0.1s;
+}
+.panel-filter-btn:hover {
+    opacity: 0.85;
+}
+.panel-filter-btn.active {
+    background-color: var(--primary-color);
+    color: #fff;
+}
+.panel-filter-btn.filter-green {
+    background-color: #d1fae5;
+    color: #065f46;
+}
+.panel-filter-btn.filter-green.active {
+    background-color: #a8e6a3;
+    color: #1f1f1f;
+}
+.panel-filter-btn.filter-purple {
+    background-color: #ede9fe;
+    color: #5b21b6;
+}
+.panel-filter-btn.filter-purple.active {
+    background-color: #d3b3e5;
+    color: #1f1f1f;
+}
+.panel-filter-btn.filter-red {
+    background-color: #fee2e2;
+    color: #991b1b;
+}
+.panel-filter-btn.filter-red.active {
+    background-color: #f7a1a1;
+    color: #1f1f1f;
+}
+body.dark-mode .panel-filter-btn {
+    background-color: #374151;
+    color: #d1d5db;
+}
+body.dark-mode .panel-filter-btn.filter-green {
+    background-color: #064e3b;
+    color: #a7f3d0;
+}
+body.dark-mode .panel-filter-btn.filter-purple {
+    background-color: #4c1d95;
+    color: #ddd6fe;
+}
+body.dark-mode .panel-filter-btn.filter-red {
+    background-color: #7f1d1d;
+    color: #fecaca;
+}
+.panel-chapter-filter {
+    display: flex;
+    gap: 0.3rem;
+    flex-wrap: wrap;
+    margin-top: 0.4rem;
+}
+.panel-chapter-btn {
+    padding: 0.25rem 0.5rem;
+    border: none;
+    border-radius: 9999px;
+    font-size: 0.7rem;
+    font-weight: 500;
+    cursor: pointer;
+    background-color: #f3f4f6;
+    color: #374151;
+    transition: background-color 0.2s;
+}
+.panel-chapter-btn:hover {
+    opacity: 0.85;
+}
+.panel-chapter-btn.active {
+    background-color: var(--primary-color);
+    color: #fff;
+}
+body.dark-mode .panel-chapter-btn {
+    background-color: #4b5563;
+    color: #d1d5db;
+}
+
 /* Chat history list */
 .chat-history-list {
     flex: 1;
