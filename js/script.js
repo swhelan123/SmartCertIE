@@ -648,19 +648,7 @@ unitButtons.forEach((button) => {
 // Handle the "Change Topic" button — starts a new chat
 if (changeTopicBtn) {
   changeTopicBtn.addEventListener("click", () => {
-    // Start a new chat first (clears session + messages)
-    if (typeof window.startNewChat === "function") {
-      window.startNewChat();
-    }
-    // Reset topic selector UI so they can pick a new topic
-    selectedTopicContainer.classList.add("hidden");
-    selectedTopicLabel.textContent = "";
-    selectedTopic = "";
-    window.selectedTopic = "";
-    window.currentTopicId = "";
-    unitContainer.classList.remove("hidden");
-    chapterContainer.innerHTML = "";
-    chapterContainer.classList.add("hidden");
+    window.startNewChat();
   });
 }
 
@@ -1651,6 +1639,22 @@ window.startNewChat = function () {
 
   if (typeof window.clearConversationHistoryFn === "function") {
     window.clearConversationHistoryFn();
+  }
+
+  // Reset topic selection
+  selectedTopic = "";
+  window.selectedTopic = "";
+  window.currentTopicId = "";
+  const topicLabel = document.getElementById("selectedTopicLabel");
+  const topicContainer = document.getElementById("selectedTopicContainer");
+  const unitCont = document.getElementById("unitContainer");
+  const chapCont = document.getElementById("chapterContainer");
+  if (topicLabel) topicLabel.textContent = "";
+  if (topicContainer) topicContainer.classList.add("hidden");
+  if (unitCont) unitCont.classList.remove("hidden");
+  if (chapCont) {
+    chapCont.innerHTML = "";
+    chapCont.classList.add("hidden");
   }
 
   const chatMsgs = document.getElementById("chatMessages");
