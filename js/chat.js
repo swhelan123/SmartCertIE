@@ -84,6 +84,29 @@ window.displaySessionMessages = function (messages) {
       } else {
         botBubble.textContent = msg.content;
       }
+
+      // Add "Save to Notebook" button
+      const saveBtn = document.createElement("button");
+      saveBtn.textContent = "Save to Notebook";
+      Object.assign(saveBtn.style, {
+        marginLeft: "10px",
+        padding: "2px 6px",
+        fontSize: "0.8rem",
+        cursor: "pointer",
+        borderRadius: "6px",
+        border: "none",
+        backgroundColor: "var(--primary-color)",
+        color: "#fff",
+      });
+      // Find the matching user question (previous message)
+      const msgIndex = messages.indexOf(msg);
+      const prevMsg = msgIndex > 0 ? messages[msgIndex - 1] : null;
+      const question = prevMsg && prevMsg.role === "user" ? prevMsg.content : "";
+      saveBtn.addEventListener("click", () => {
+        window.saveNotebookEntry(msg.content, question);
+      });
+      botBubble.appendChild(saveBtn);
+
       botBubbleContainer.appendChild(botAvatar);
       botBubbleContainer.appendChild(botBubble);
       botRow.appendChild(botBubbleContainer);
