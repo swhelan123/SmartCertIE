@@ -253,6 +253,14 @@ exports.createBillingPortalSession = onRequest(
 exports.getSubscriptionDetails = onRequest(
     {secrets: ["STRIPE_SECRET_KEY"]},
     async (req, res) => {
+      res.set("Access-Control-Allow-Origin", "*");
+
+      if (req.method === "OPTIONS") {
+        res.set("Access-Control-Allow-Methods", "GET");
+        res.set("Access-Control-Allow-Headers", "Content-Type");
+        return res.status(204).send("");
+      }
+
       const uid = req.query.uid;
       if (!uid) {
         return res.status(400).json({error: "Missing uid parameter"});
@@ -266,30 +274,265 @@ exports.getSubscriptionDetails = onRequest(
         }
         const userData = userDoc.data();
 
-        const subscription = userData.subscription;
-        if (!subscription) {
+        if (!userData.stripeSubscriptionId) {
           return res.status(404).json({
             error: "Subscription data not found",
           });
         }
 
-        const startDate = subscription.startDate
-            .toDate().toISOString().split("T")[0];
-        const nextBillingDate = subscription.nextBillingDate
-            .toDate().toISOString().split("T")[0];
-        const paymentMethod =
-            subscription.paymentMethod || "Card info unavailable";
-        const isActive = subscription.isActive === true;
+        const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
+        const sub = await stripe.subscriptions.retrieve(
+            userData.stripeSubscriptionId,
+        );
+
+        const startDate = new Date(sub.start_date * 1000)
+            .toISOString().split("T")[0];
+        const currentPeriodEnd = new Date(sub.current_period_end * 1000)
+            .toISOString().split("T")[0];
+
+        // Get payment method info
+        let paymentMethod = "Card info unavailable";
+        if (sub.default_payment_method) {
+          const pm = await stripe.paymentMethods.retrieve(
+              sub.default_payment_method,
+          );
+          if (pm.card) {
+            paymentMethod = `${pm.card.brand.toUpperCase()} ****${pm.card.last4}`;
+          }
+        }
+
+        // Determine status
+        const isActive = sub.status === "active" || sub.status === "trialing";
+        const isPaused = sub.pause_collection !== null;
+        const isCanceling = sub.cancel_at_period_end === true;
 
         return res.json({
           startDate,
-          nextBillingDate,
+          nextBillingDate: currentPeriodEnd,
           paymentMethod,
           isActive,
+          isPaused,
+          isCanceling,
+          status: sub.status,
+          planName: "Certi",
         });
       } catch (error) {
         console.error("Error fetching subscription details:", error);
         return res.status(500).json({error: "Internal Server Error"});
+      }
+    },
+);
+
+exports.pauseSubscription = onRequest(
+    {secrets: ["STRIPE_SECRET_KEY"]},
+    async (req, res) => {
+      res.set("Access-Control-Allow-Origin", "*");
+
+      if (req.method === "OPTIONS") {
+        res.set("Access-Control-Allow-Methods", "POST");
+        res.set("Access-Control-Allow-Headers",
+            "Content-Type, Authorization");
+        return res.status(204).send("");
+      }
+
+      if (req.method !== "POST") {
+        return res.status(405).send("Method Not Allowed");
+      }
+
+      const authHeader = req.headers.authorization;
+      if (!authHeader || !authHeader.startsWith("Bearer ")) {
+        return res.status(401).json({error: "Unauthorized"});
+      }
+
+      let uid;
+      try {
+        const idToken = authHeader.split("Bearer ")[1];
+        const decodedToken = await admin.auth().verifyIdToken(idToken);
+        uid = decodedToken.uid;
+      } catch (e) {
+        return res.status(401).json({error: "Invalid token"});
+      }
+
+      try {
+        const userDoc = await admin.firestore()
+            .collection("users").doc(uid).get();
+        if (!userDoc.exists || !userDoc.data().stripeSubscriptionId) {
+          return res.status(404).json({error: "No subscription found"});
+        }
+
+        const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
+        await stripe.subscriptions.update(
+            userDoc.data().stripeSubscriptionId,
+            {pause_collection: {behavior: "void"}},
+        );
+
+        await admin.firestore().collection("users").doc(uid).update({
+          subscriptionStatus: "paused",
+          updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+        });
+
+        return res.json({success: true});
+      } catch (error) {
+        console.error("Error pausing subscription:", error);
+        return res.status(500).json({error: error.message});
+      }
+    },
+);
+
+exports.resumeSubscription = onRequest(
+    {secrets: ["STRIPE_SECRET_KEY"]},
+    async (req, res) => {
+      res.set("Access-Control-Allow-Origin", "*");
+
+      if (req.method === "OPTIONS") {
+        res.set("Access-Control-Allow-Methods", "POST");
+        res.set("Access-Control-Allow-Headers",
+            "Content-Type, Authorization");
+        return res.status(204).send("");
+      }
+
+      if (req.method !== "POST") {
+        return res.status(405).send("Method Not Allowed");
+      }
+
+      const authHeader = req.headers.authorization;
+      if (!authHeader || !authHeader.startsWith("Bearer ")) {
+        return res.status(401).json({error: "Unauthorized"});
+      }
+
+      let uid;
+      try {
+        const idToken = authHeader.split("Bearer ")[1];
+        const decodedToken = await admin.auth().verifyIdToken(idToken);
+        uid = decodedToken.uid;
+      } catch (e) {
+        return res.status(401).json({error: "Invalid token"});
+      }
+
+      try {
+        const userDoc = await admin.firestore()
+            .collection("users").doc(uid).get();
+        if (!userDoc.exists || !userDoc.data().stripeSubscriptionId) {
+          return res.status(404).json({error: "No subscription found"});
+        }
+
+        const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
+        await stripe.subscriptions.update(
+            userDoc.data().stripeSubscriptionId,
+            {pause_collection: null},
+        );
+
+        await admin.firestore().collection("users").doc(uid).update({
+          subscriptionStatus: "active",
+          updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+        });
+
+        return res.json({success: true});
+      } catch (error) {
+        console.error("Error resuming subscription:", error);
+        return res.status(500).json({error: error.message});
+      }
+    },
+);
+
+exports.cancelSubscription = onRequest(
+    {secrets: ["STRIPE_SECRET_KEY"]},
+    async (req, res) => {
+      res.set("Access-Control-Allow-Origin", "*");
+
+      if (req.method === "OPTIONS") {
+        res.set("Access-Control-Allow-Methods", "POST");
+        res.set("Access-Control-Allow-Headers",
+            "Content-Type, Authorization");
+        return res.status(204).send("");
+      }
+
+      if (req.method !== "POST") {
+        return res.status(405).send("Method Not Allowed");
+      }
+
+      const authHeader = req.headers.authorization;
+      if (!authHeader || !authHeader.startsWith("Bearer ")) {
+        return res.status(401).json({error: "Unauthorized"});
+      }
+
+      let uid;
+      try {
+        const idToken = authHeader.split("Bearer ")[1];
+        const decodedToken = await admin.auth().verifyIdToken(idToken);
+        uid = decodedToken.uid;
+      } catch (e) {
+        return res.status(401).json({error: "Invalid token"});
+      }
+
+      try {
+        const userDoc = await admin.firestore()
+            .collection("users").doc(uid).get();
+        if (!userDoc.exists || !userDoc.data().stripeSubscriptionId) {
+          return res.status(404).json({error: "No subscription found"});
+        }
+
+        const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
+        await stripe.subscriptions.update(
+            userDoc.data().stripeSubscriptionId,
+            {cancel_at_period_end: true},
+        );
+
+        return res.json({success: true});
+      } catch (error) {
+        console.error("Error canceling subscription:", error);
+        return res.status(500).json({error: error.message});
+      }
+    },
+);
+
+exports.reactivateSubscription = onRequest(
+    {secrets: ["STRIPE_SECRET_KEY"]},
+    async (req, res) => {
+      res.set("Access-Control-Allow-Origin", "*");
+
+      if (req.method === "OPTIONS") {
+        res.set("Access-Control-Allow-Methods", "POST");
+        res.set("Access-Control-Allow-Headers",
+            "Content-Type, Authorization");
+        return res.status(204).send("");
+      }
+
+      if (req.method !== "POST") {
+        return res.status(405).send("Method Not Allowed");
+      }
+
+      const authHeader = req.headers.authorization;
+      if (!authHeader || !authHeader.startsWith("Bearer ")) {
+        return res.status(401).json({error: "Unauthorized"});
+      }
+
+      let uid;
+      try {
+        const idToken = authHeader.split("Bearer ")[1];
+        const decodedToken = await admin.auth().verifyIdToken(idToken);
+        uid = decodedToken.uid;
+      } catch (e) {
+        return res.status(401).json({error: "Invalid token"});
+      }
+
+      try {
+        const userDoc = await admin.firestore()
+            .collection("users").doc(uid).get();
+        if (!userDoc.exists || !userDoc.data().stripeSubscriptionId) {
+          return res.status(404).json({error: "No subscription found"});
+        }
+
+        const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
+        await stripe.subscriptions.update(
+            userDoc.data().stripeSubscriptionId,
+            {cancel_at_period_end: false},
+        );
+
+        return res.json({success: true});
+      } catch (error) {
+        console.error("Error reactivating subscription:", error);
+        return res.status(500).json({error: error.message});
       }
     },
 );

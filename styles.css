@@ -904,6 +904,14 @@ body .standalone-page.form-page {
     border: 1px solid #ccc;
     border-radius: var(--border-radius);
     font-size: 1rem;
+    background-color: #fff;
+    color: #333;
+    transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+}
+body.dark-mode .login-form input {
+    background-color: #2a2a2a;
+    color: #eee;
+    border-color: #555;
 }
 .login-form button {
     background-color: var(--primary-color);
@@ -962,6 +970,72 @@ body.dark-mode .account-card {
 }
 body.dark-mode .account-welcome-text {
     color: #eee;
+}
+
+.muted-text {
+    color: #666;
+}
+body.dark-mode .muted-text {
+    color: #aaa;
+}
+
+.layout-btn {
+    flex: 1;
+    padding: 0.6rem 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.2s;
+}
+.layout-btn-active {
+    border: 2px solid #3b82f6;
+    background: #3b82f6;
+    color: #fff;
+}
+.layout-btn-inactive {
+    border: 2px solid #ccc;
+    background: #fff;
+    color: #333;
+}
+body.dark-mode .layout-btn-inactive {
+    border-color: #555;
+    background: #2a2a2a;
+    color: #eee;
+}
+
+.file-upload-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+.file-upload-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.5rem 1rem;
+    background-color: transparent;
+    color: var(--primary-color);
+    border: 2px solid var(--primary-color);
+    border-radius: var(--border-radius);
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s, color 0.2s;
+    white-space: nowrap;
+}
+.file-upload-btn:hover {
+    background-color: var(--primary-color);
+    color: #fff;
+}
+.file-name-display {
+    font-size: 0.85rem;
+    color: #888;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+body.dark-mode .file-name-display {
+    color: #aaa;
 }
 
 .logout-button {

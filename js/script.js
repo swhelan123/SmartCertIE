@@ -40,7 +40,6 @@ let analytics;
 try {
   app = initializeApp(firebaseConfig);
   analytics = getAnalytics(app);
-  console.log("Firebase initialized successfully");
 } catch (error) {
   console.error("Firebase initialization error:", error);
 }
@@ -99,41 +98,9 @@ if (allModeIcons.length) {
 }
 
 /*******************************************************
- * NAVIGATION LAYOUT PREFERENCE (top bar vs sidebar)
+ * NAVIGATION LAYOUT — always sidebar
  *******************************************************/
-const savedLayout = localStorage.getItem("smartcert_nav_layout") || "topbar";
-if (savedLayout === "sidebar") {
-  document.body.classList.add("layout-sidebar");
-}
-
-// Account page: layout toggle buttons
-const layoutToggle = document.getElementById("layoutToggle");
-if (layoutToggle) {
-  const layoutBtns = layoutToggle.querySelectorAll("button[data-layout]");
-
-  // Set initial active state from saved preference
-  layoutBtns.forEach((btn) => {
-    const isActive = btn.getAttribute("data-layout") === savedLayout;
-    btn.style.background = isActive ? "#3b82f6" : "#fff";
-    btn.style.color = isActive ? "#fff" : "#333";
-    btn.style.borderColor = isActive ? "#3b82f6" : "#ccc";
-  });
-
-  layoutBtns.forEach((btn) => {
-    btn.addEventListener("click", () => {
-      const layout = btn.getAttribute("data-layout");
-      localStorage.setItem("smartcert_nav_layout", layout);
-
-      // Update button styles
-      layoutBtns.forEach((b) => {
-        const active = b.getAttribute("data-layout") === layout;
-        b.style.background = active ? "#3b82f6" : "#fff";
-        b.style.color = active ? "#fff" : "#333";
-        b.style.borderColor = active ? "#3b82f6" : "#ccc";
-      });
-    });
-  });
-}
+document.body.classList.add("layout-sidebar");
 
 /*******************************************************
  * AUTH STATE & UI TOGGLING
@@ -244,8 +211,7 @@ allLoginBtns.forEach((btn) => {
  * NAV ON chat.html (Top bar + Sidebar, Single-Page Sections)
  *******************************************************/
 const sidebarLinks = document.querySelectorAll(".panel-nav-link[data-section]");
-const topBarLinks = document.querySelectorAll(".top-bar-link[data-section]");
-const allNavLinks = [...sidebarLinks, ...topBarLinks];
+const allNavLinks = [...sidebarLinks];
 const chatSection = document.getElementById("chatSection");
 const notebookSection = document.getElementById("notebookSection");
 
