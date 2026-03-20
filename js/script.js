@@ -1414,6 +1414,45 @@ function renderChatHistory(sessions) {
       const actions = document.createElement("div");
       actions.className = "session-actions";
 
+      const renameBtn = document.createElement("button");
+      renameBtn.className = "session-rename-btn";
+      renameBtn.innerHTML = "&#9998;";
+      renameBtn.title = "Rename chat";
+      renameBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        // Turn title into an editable input
+        const input = document.createElement("input");
+        input.type = "text";
+        input.className = "session-rename-input";
+        input.value = session.title || "";
+        input.maxLength = 60;
+
+        titleSpan.replaceWith(input);
+        input.focus();
+        input.select();
+
+        const saveRename = async () => {
+          const newTitle = input.value.trim();
+          if (newTitle && newTitle !== session.title) {
+            await window.renameSession(session.id, newTitle);
+          } else {
+            // Revert if empty or unchanged
+            input.replaceWith(titleSpan);
+          }
+        };
+
+        input.addEventListener("keydown", (ev) => {
+          if (ev.key === "Enter") {
+            ev.preventDefault();
+            saveRename();
+          }
+          if (ev.key === "Escape") {
+            input.replaceWith(titleSpan);
+          }
+        });
+        input.addEventListener("blur", saveRename);
+      });
+
       const favBtn = document.createElement("button");
       favBtn.className = "session-fav-btn" + (session.favourited ? " favourited" : "");
       favBtn.innerHTML = session.favourited ? "&#9733;" : "&#9734;";
@@ -1433,6 +1472,7 @@ function renderChatHistory(sessions) {
         if (confirmed) window.deleteChatSession(session.id);
       });
 
+      actions.appendChild(renameBtn);
       actions.appendChild(favBtn);
       actions.appendChild(delBtn);
       item.appendChild(titleSpan);
@@ -1510,6 +1550,21 @@ window.saveSessionMessages = async function (messages) {
     });
   } catch (err) {
     console.error("Error saving session messages:", err);
+  }
+};
+
+// Rename a chat session
+window.renameSession = async function (sessionId, newTitle) {
+  const user = auth.currentUser;
+  if (!user) return;
+
+  try {
+    await updateDoc(doc(db, "users", user.uid, "chatSessions", sessionId), {
+      title: newTitle.substring(0, 60),
+    });
+    await loadAndRenderChatHistory();
+  } catch (err) {
+    console.error("Error renaming session:", err);
   }
 };
 
