@@ -314,15 +314,10 @@ body.dark-mode .new-chat-btn:hover {
     background-color: rgba(255, 255, 255, 0.1);
 }
 
-/* Panel nav links */
+/* Panel nav links (now inside panel-header) */
 .panel-nav-links {
     display: flex;
     gap: 0.25rem;
-    padding: 0.75rem 1rem;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-}
-body.dark-mode .panel-nav-links {
-    border-bottom-color: rgba(255, 255, 255, 0.08);
 }
 .panel-nav-link {
     padding: 0.4rem 0.8rem;
@@ -388,6 +383,20 @@ body.dark-mode .panel-view-btn:hover {
 body.dark-mode .panel-view-btn.active {
     background-color: var(--primary-color);
     color: #fff;
+}
+
+.panel-view-fav {
+    font-size: 1.1rem;
+    line-height: 1;
+    padding: 0.3rem 0.6rem;
+    color: #9ca3af;
+}
+.panel-view-fav.active {
+    color: #f59e0b;
+    background-color: rgba(245, 158, 11, 0.15);
+}
+body.dark-mode .panel-view-fav.active {
+    background-color: rgba(245, 158, 11, 0.2);
 }
 
 /* Chat history list */
@@ -1055,6 +1064,13 @@ body.dark-mode .account-welcome-text {
     justify-content: center;
     gap: 0.5rem;
     margin-top: 1rem;
+}
+.selected-topic-label {
+    border-radius: 9999px;
+    padding: 0.6rem 1rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+    box-shadow: var(--shadow-blue);
 }
 .change-topic-button {
     background-color: var(--primary-color);

@@ -623,8 +623,12 @@ unitButtons.forEach((button) => {
         chapterBtn.addEventListener("click", () => {
           // Hide the chapter container
           chapterContainer.classList.add("hidden");
-          // Display the selected chapter name
+          // Display the selected chapter name with unit color
           selectedTopicLabel.textContent = chapterObj.name;
+          selectedTopicLabel.classList.remove("unit-green", "unit-purple", "unit-red");
+          if (unit === "A") selectedTopicLabel.classList.add("unit-green");
+          else if (unit === "B") selectedTopicLabel.classList.add("unit-purple");
+          else if (unit === "C") selectedTopicLabel.classList.add("unit-red");
           selectedTopic = chapterObj.name;
           window.selectedTopic = chapterObj.name;
           window.currentTopicId = chapterObj.id;
@@ -1479,6 +1483,10 @@ function renderChatHistory(sessions) {
 function getFilteredSessions() {
   if (panelViewMode === "recent") return allChatSessions;
 
+  if (panelViewMode === "favourites") {
+    return allChatSessions.filter((s) => s.favourited);
+  }
+
   // "byTopic" mode — filter by the currently selected topic in the main chat area
   const currentTopic = window.selectedTopic || "";
   const currentTopicId = window.currentTopicId || "";
@@ -1606,6 +1614,17 @@ window.loadChatSession = async function (sessionId) {
     const chapCont = document.getElementById("chapterContainer");
     if (topicLabel && data.topicName) {
       topicLabel.textContent = data.topicName;
+      // Apply unit color based on topicId
+      topicLabel.classList.remove("unit-green", "unit-purple", "unit-red");
+      const topicUnit = Object.entries(chapters).find(([, chs]) =>
+        chs.some((ch) => ch.id === data.topicId)
+      );
+      if (topicUnit) {
+        const unitKey = topicUnit[0];
+        if (unitKey === "A") topicLabel.classList.add("unit-green");
+        else if (unitKey === "B") topicLabel.classList.add("unit-purple");
+        else if (unitKey === "C") topicLabel.classList.add("unit-red");
+      }
       if (topicContainer) topicContainer.classList.remove("hidden");
       if (unitCont) unitCont.classList.add("hidden");
       if (chapCont) chapCont.classList.add("hidden");
