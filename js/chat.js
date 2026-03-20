@@ -173,7 +173,6 @@ async function typeMarkdownAsHtml(markdownString, container, speed = 20) {
 const sendBtn = document.getElementById("sendBtn");
 const chatInput = document.getElementById("chatInput");
 const chatMessages = document.getElementById("chatMessages");
-const savedResponses = document.getElementById("savedResponses");
 const clearHistoryBtn = document.getElementById("clearHistoryBtn");
 
 // New Chat button functionality (was Clear History)
