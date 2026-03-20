@@ -222,116 +222,253 @@ body.dark-mode .top-bar-link.active {
     display: none !important;
 }
 
-/* Hide sidebar on desktop (default = top bar layout) */
+/* Legacy sidebar - hidden, replaced by chat history panel */
 .sidebar {
-    width: 260px;
-    background-color: var(--light-sidebar);
-    border-right: 1px solid rgba(0, 0, 0, 0.05);
-    display: none;
-    flex-direction: column;
-    box-shadow: var(--shadow-blue);
-    transition: background-color 0.3s;
-    position: relative;
-}
-
-/* Sidebar layout mode (desktop): show sidebar, hide top bar, row direction */
-body.layout-sidebar {
-    flex-direction: row;
-}
-body.layout-sidebar .top-bar {
     display: none !important;
 }
-body.layout-sidebar .sidebar {
-    display: flex;
-    position: relative;
-    left: auto;
-}
+
 .sidebar-mode-toggle {
     display: none;
 }
-body.layout-sidebar .sidebar-mode-toggle {
-    display: block;
-    position: absolute;
-    top: 1rem;
-    right: 1rem;
-    z-index: 10;
-    cursor: pointer;
-}
-body.dark-mode .sidebar {
-    background-color: var(--dark-sidebar);
+
+/*******************************************************
+ * APP BODY (panel + main content row)
+ *******************************************************/
+.app-body {
+    flex: 1;
+    display: flex;
+    flex-direction: row;
+    overflow: hidden;
 }
 
-.sidebar-header {
-    padding: 2rem 1.5rem;
+/*******************************************************
+ * CHAT HISTORY PANEL
+ *******************************************************/
+.chat-history-panel {
+    width: 280px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    background-color: #f9fafb;
+    border-right: 1px solid rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    transition: background-color 0.3s;
+}
+body.dark-mode .chat-history-panel {
+    background-color: #1a1a1a;
+    border-right-color: rgba(255, 255, 255, 0.08);
+}
+
+/* Panel header */
+.panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 1.25rem;
     border-bottom: 1px solid rgba(0, 0, 0, 0.05);
 }
-body.dark-mode .sidebar-header {
-    border-color: rgba(255, 255, 255, 0.1);
+body.dark-mode .panel-header {
+    border-bottom-color: rgba(255, 255, 255, 0.08);
 }
-.sidebar-header h1 {
-    font-size: 1.8rem;
+.panel-brand {
+    font-size: 1.3rem;
     font-weight: 600;
     color: var(--primary-color);
-    margin-bottom: 0.3rem;
+    text-decoration: none;
 }
-.sidebar-header p {
-    font-size: 1rem;
-    color: #666;
+.new-chat-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border: 1px solid rgba(0, 0, 0, 0.15);
+    border-radius: 8px;
+    background: transparent;
+    cursor: pointer;
+    color: var(--light-text);
+    transition: background-color 0.2s;
 }
-body.dark-mode .sidebar-header p {
-    color: #aaa;
+.new-chat-btn:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+body.dark-mode .new-chat-btn {
+    border-color: rgba(255, 255, 255, 0.15);
+    color: var(--dark-text);
+}
+body.dark-mode .new-chat-btn:hover {
+    background-color: rgba(255, 255, 255, 0.1);
 }
 
-.sidebar-nav {
-    padding: 1rem 1.5rem;
+/* Panel nav links */
+.panel-nav-links {
+    display: flex;
+    gap: 0.25rem;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+body.dark-mode .panel-nav-links {
+    border-bottom-color: rgba(255, 255, 255, 0.08);
+}
+.panel-nav-link {
+    padding: 0.4rem 0.8rem;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.9rem;
+    color: var(--light-text);
+    transition: background-color 0.2s, color 0.2s;
+}
+.panel-nav-link:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+.panel-nav-link.active {
+    background-color: var(--primary-color);
+    color: #fff;
+}
+body.dark-mode .panel-nav-link {
+    color: var(--dark-text);
+}
+body.dark-mode .panel-nav-link:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+body.dark-mode .panel-nav-link.active {
+    background-color: var(--primary-color);
+    color: #fff;
+}
+
+/* Chat history list */
+.chat-history-list {
     flex: 1;
+    overflow-y: auto;
+    padding: 0.5rem;
 }
-.sidebar-nav a {
-    display: block;
-    padding: 0.8rem 1rem;
-    margin-bottom: 0.5rem;
-    border-radius: var(--border-radius);
+.chat-history-empty {
+    text-align: center;
+    color: #888;
+    padding: 2rem 1rem;
+    font-size: 0.9rem;
+}
+.chat-history-group-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #888;
+    padding: 0.75rem 0.75rem 0.25rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+.chat-session-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.6rem 0.75rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.15s;
+    gap: 0.5rem;
+}
+.chat-session-item:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+.chat-session-item.active {
+    background-color: rgba(59, 130, 246, 0.1);
+}
+body.dark-mode .chat-session-item:hover {
+    background-color: rgba(255, 255, 255, 0.08);
+}
+body.dark-mode .chat-session-item.active {
+    background-color: rgba(59, 130, 246, 0.2);
+}
+.session-title {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 0.9rem;
     color: var(--light-text);
-    text-decoration: none;
-    font-weight: 500;
-    font-size: 1rem;
-    transition:
-        background-color 0.2s,
-        color 0.2s;
 }
-.sidebar-nav a:hover {
-    background-color: var(--primary-color);
-    color: #fff;
-}
-body.dark-mode .sidebar-nav a {
+body.dark-mode .session-title {
     color: var(--dark-text);
+}
+.session-actions {
+    display: flex;
+    gap: 0.25rem;
+    opacity: 0;
+    transition: opacity 0.15s;
+    flex-shrink: 0;
+}
+.chat-session-item:hover .session-actions,
+.chat-session-item .session-actions:has(.favourited) {
+    opacity: 1;
+}
+.session-fav-btn,
+.session-delete-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border: none;
+    border-radius: 6px;
+    background: transparent;
+    cursor: pointer;
+    font-size: 1rem;
+    color: #888;
+    transition: background-color 0.15s, color 0.15s;
+}
+.session-fav-btn:hover {
+    background-color: rgba(59, 130, 246, 0.1);
+    color: #f59e0b;
+}
+.session-fav-btn.favourited {
+    color: #f59e0b;
+    opacity: 1;
+}
+.chat-session-item .session-fav-btn.favourited {
+    opacity: 1;
+}
+.session-delete-btn:hover {
+    background-color: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
 }
 
-/* Sidebar footer for account link at bottom */
-.sidebar-footer {
+/* Panel footer */
+.panel-footer {
     border-top: 1px solid rgba(0, 0, 0, 0.05);
-    padding: 1rem 1.5rem;
+    padding: 0.75rem 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }
-body.dark-mode .sidebar-footer {
-    border-color: rgba(255, 255, 255, 0.1);
+body.dark-mode .panel-footer {
+    border-top-color: rgba(255, 255, 255, 0.08);
 }
-.sidebar-footer a {
-    display: block;
-    padding: 0.8rem 1rem;
-    border-radius: var(--border-radius);
-    color: var(--light-text);
+.panel-account-link {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
     text-decoration: none;
+    color: var(--light-text);
     font-weight: 500;
-    transition:
-        background-color 0.2s,
-        color 0.2s;
+    font-size: 0.9rem;
+    padding: 0.4rem 0.5rem;
+    border-radius: 8px;
+    transition: background-color 0.2s;
 }
-.sidebar-footer a:hover {
-    background-color: var(--primary-color);
-    color: #fff;
+.panel-account-link:hover {
+    background-color: rgba(0, 0, 0, 0.05);
 }
-body.dark-mode .sidebar-footer a {
+body.dark-mode .panel-account-link {
     color: var(--dark-text);
+}
+body.dark-mode .panel-account-link:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+.panel-pfp {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    object-fit: cover;
 }
 
 /* Main content area (on chat.html) */
@@ -492,7 +629,7 @@ body.dark-mode .chat-input-area input {
     background-color: #2563eb;
 }
 
-/* Clear History button styling */
+/* New Chat button in input area */
 #clearHistoryBtn {
     background-color: #6b7280;
     font-size: 0.9rem;
@@ -568,6 +705,11 @@ body.dark-mode .standalone-page {
     body {
         flex-direction: column;
         height: auto; /* so content can extend downward */
+    }
+
+    .app-body {
+        flex-direction: column;
+        overflow: visible;
     }
 
     /* Remove the card-like styling from the main content/chat container */
@@ -963,7 +1105,7 @@ body.dark-mode .about-column {
     box-shadow: none;
 }
 
-/* Highlight the active link in the sidebar */
+/* Highlight the active link in the sidebar (legacy, kept for other pages) */
 .sidebar-nav a.active {
     background-color: #edf2fe;
     color: #000;
@@ -1266,7 +1408,7 @@ code {
 }
 
 @media (max-width: 768px) {
-    /* Hide top bar on mobile, show sidebar + pills instead */
+    /* Hide top bar on mobile, show pills instead */
     .top-bar {
         display: none !important;
     }
@@ -1277,19 +1419,22 @@ code {
         display: flex;
     }
 
-    .sidebar {
-        display: flex;
+    /* Chat history panel: slide-in overlay on mobile */
+    .chat-history-panel {
         position: fixed;
         top: 0;
+        left: -280px;
         bottom: 0;
-        left: -260px;
-        width: 260px;
+        width: 280px;
         z-index: 1100;
         transition: left 0.3s ease;
+        box-shadow: none;
     }
-    .sidebar.show {
+    .chat-history-panel.show {
         left: 0;
+        box-shadow: 4px 0 20px rgba(0, 0, 0, 0.15);
     }
+
     .hamburgerChat {
         display: flex;
         width: 2rem;

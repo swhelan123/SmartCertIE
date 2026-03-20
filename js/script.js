@@ -71,7 +71,8 @@ const body = document.body;
 const modeIcon = document.getElementById("modeIcon");
 const modeIconMobile = document.getElementById("modeIconMobile");
 const modeIconSidebar = document.getElementById("modeIconSidebar");
-const allModeIcons = [modeIcon, modeIconMobile, modeIconSidebar].filter(Boolean);
+const modeIconPanel = document.getElementById("modeIconPanel");
+const allModeIcons = [modeIcon, modeIconMobile, modeIconSidebar, modeIconPanel].filter(Boolean);
 
 function syncModeIcons(isDark) {
   const src = isDark ? "assets/img/light.png" : "assets/img/dark.png";
@@ -142,8 +143,8 @@ const loginBtn = document.getElementById("loginBtn");
 const loginBtnMobile = document.getElementById("loginBtnMobile");
 const profilePic = document.getElementById("profilePic");
 const profilePicMobile = document.getElementById("profilePicMobile");
-const sidebarPfp = document.getElementById("sidebarPfp");
-const accountLink = document.getElementById("accountLink");
+const sidebarPfp = document.getElementById("panelPfp");
+const accountLink = document.getElementById("panelAccountLink");
 const allLoginBtns = [loginBtn, loginBtnMobile].filter(Boolean);
 const allProfilePics = [profilePic, profilePicMobile].filter(Boolean);
 
@@ -187,6 +188,8 @@ onAuthStateChanged(auth, async (user) => {
         sendBtn.disabled = false;
         const subscribeBtn = document.getElementById("subscribeBtn");
         if (subscribeBtn) subscribeBtn.classList.add("hidden");
+        // Load chat history
+        cleanupOldSessions().then(() => loadAndRenderChatHistory());
       } else {
         chatInput.disabled = true;
         sendBtn.disabled = true;
@@ -240,7 +243,7 @@ allLoginBtns.forEach((btn) => {
 /*******************************************************
  * NAV ON chat.html (Top bar + Sidebar, Single-Page Sections)
  *******************************************************/
-const sidebarLinks = document.querySelectorAll(".sidebar-nav a[data-section]");
+const sidebarLinks = document.querySelectorAll(".panel-nav-link[data-section]");
 const topBarLinks = document.querySelectorAll(".top-bar-link[data-section]");
 const allNavLinks = [...sidebarLinks, ...topBarLinks];
 const chatSection = document.getElementById("chatSection");
@@ -251,7 +254,7 @@ if (chatSection && notebookSection) {
   chatSection.classList.remove("hidden");
   notebookSection.classList.add("hidden");
 }
-const chatLink = document.querySelector(".sidebar-nav a[data-section='chatSection']");
+const chatLink = document.querySelector(".panel-nav-link[data-section='chatSection']");
 if (chatLink) {
   chatLink.classList.add("active");
 }
@@ -721,6 +724,14 @@ onAuthStateChanged(auth, (user) => {
             notebookSnap.forEach((docSnap) => {
               deletePromises.push(deleteDoc(doc(db, "users", uid, "notebook", docSnap.id)));
             });
+
+            // Delete chat sessions subcollection entries
+            const sessionsRef = collection(db, "users", uid, "chatSessions");
+            const sessionsSnap = await getDocs(sessionsRef);
+            sessionsSnap.forEach((docSnap) => {
+              deletePromises.push(deleteDoc(doc(db, "users", uid, "chatSessions", docSnap.id)));
+            });
+
             await Promise.all(deletePromises);
 
             // Delete user document
@@ -1276,6 +1287,349 @@ window.loadNotebookEntries = async function () {
   return entries;
 };
 
+/*******************************************************
+ * CHAT HISTORY / SESSIONS
+ *******************************************************/
+
+window.currentSessionId = null;
+window.currentSessionMessages = [];
+
+// Load all chat sessions for the current user
+async function loadChatSessions() {
+  const user = auth.currentUser;
+  if (!user) return [];
+
+  const sessionsRef = collection(db, "users", user.uid, "chatSessions");
+  const q = query(sessionsRef, orderBy("updatedAt", "desc"));
+  const snapshot = await getDocs(q);
+
+  const sessions = [];
+  snapshot.forEach((docSnap) => {
+    sessions.push({ id: docSnap.id, ...docSnap.data() });
+  });
+  return sessions;
+}
+
+// Clean up sessions older than 7 days that aren't favourited
+async function cleanupOldSessions() {
+  const user = auth.currentUser;
+  if (!user) return;
+
+  try {
+    const sessions = await loadChatSessions();
+    const now = Date.now();
+    const sevenDays = 7 * 24 * 60 * 60 * 1000;
+
+    for (const session of sessions) {
+      if (session.favourited) continue;
+
+      let createdAt;
+      if (session.createdAt && session.createdAt.toDate) {
+        createdAt = session.createdAt.toDate().getTime();
+      } else if (session.createdAt && session.createdAt.seconds) {
+        createdAt = session.createdAt.seconds * 1000;
+      } else {
+        continue;
+      }
+
+      if (now - createdAt > sevenDays) {
+        await deleteDoc(doc(db, "users", user.uid, "chatSessions", session.id));
+      }
+    }
+  } catch (err) {
+    console.error("Error cleaning up old sessions:", err);
+  }
+}
+
+// Render chat history in the panel
+function renderChatHistory(sessions) {
+  const listEl = document.getElementById("chatHistoryList");
+  if (!listEl) return;
+
+  listEl.innerHTML = "";
+
+  if (sessions.length === 0) {
+    listEl.innerHTML = '<p class="chat-history-empty">No previous chats</p>';
+    return;
+  }
+
+  // Group by time period
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const yesterday = new Date(today.getTime() - 86400000);
+  const sevenDaysAgo = new Date(today.getTime() - 7 * 86400000);
+
+  const groups = { today: [], yesterday: [], week: [], older: [] };
+
+  sessions.forEach((session) => {
+    let sessionDate;
+    if (session.updatedAt && session.updatedAt.toDate) {
+      sessionDate = session.updatedAt.toDate();
+    } else if (session.createdAt && session.createdAt.toDate) {
+      sessionDate = session.createdAt.toDate();
+    } else {
+      sessionDate = new Date(0);
+    }
+
+    if (sessionDate >= today) {
+      groups.today.push(session);
+    } else if (sessionDate >= yesterday) {
+      groups.yesterday.push(session);
+    } else if (sessionDate >= sevenDaysAgo) {
+      groups.week.push(session);
+    } else {
+      groups.older.push(session);
+    }
+  });
+
+  function addGroup(label, items) {
+    if (items.length === 0) return;
+
+    const groupLabel = document.createElement("div");
+    groupLabel.className = "chat-history-group-label";
+    groupLabel.textContent = label;
+    listEl.appendChild(groupLabel);
+
+    items.forEach((session) => {
+      const item = document.createElement("div");
+      item.className = "chat-session-item";
+      if (session.id === window.currentSessionId) {
+        item.classList.add("active");
+      }
+
+      const titleSpan = document.createElement("span");
+      titleSpan.className = "session-title";
+      titleSpan.textContent = session.title || "New Chat";
+      titleSpan.addEventListener("click", () => window.loadChatSession(session.id));
+
+      const actions = document.createElement("div");
+      actions.className = "session-actions";
+
+      const favBtn = document.createElement("button");
+      favBtn.className = "session-fav-btn" + (session.favourited ? " favourited" : "");
+      favBtn.innerHTML = session.favourited ? "&#9733;" : "&#9734;";
+      favBtn.title = session.favourited ? "Unfavourite" : "Favourite";
+      favBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        window.toggleFavourite(session.id);
+      });
+
+      const delBtn = document.createElement("button");
+      delBtn.className = "session-delete-btn";
+      delBtn.innerHTML = "&times;";
+      delBtn.title = "Delete chat";
+      delBtn.addEventListener("click", async (e) => {
+        e.stopPropagation();
+        const confirmed = await showCustomConfirm("Delete this chat?");
+        if (confirmed) window.deleteChatSession(session.id);
+      });
+
+      actions.appendChild(favBtn);
+      actions.appendChild(delBtn);
+      item.appendChild(titleSpan);
+      item.appendChild(actions);
+      listEl.appendChild(item);
+    });
+  }
+
+  addGroup("Today", groups.today);
+  addGroup("Yesterday", groups.yesterday);
+  addGroup("Previous 7 Days", groups.week);
+  addGroup("Older", groups.older);
+}
+
+// Load and render chat history
+async function loadAndRenderChatHistory() {
+  const sessions = await loadChatSessions();
+  renderChatHistory(sessions);
+}
+window.loadAndRenderChatHistory = loadAndRenderChatHistory;
+
+// Create a new chat session
+window.createChatSession = async function (title) {
+  const user = auth.currentUser;
+  if (!user) return null;
+
+  const sessionRef = await addDoc(collection(db, "users", user.uid, "chatSessions"), {
+    title: (title || "New Chat").substring(0, 60),
+    messages: [],
+    topicId: window.currentTopicId || "",
+    topicName: window.selectedTopic || "",
+    createdAt: serverTimestamp(),
+    updatedAt: serverTimestamp(),
+    favourited: false,
+  });
+
+  window.currentSessionId = sessionRef.id;
+  window.currentSessionMessages = [];
+  await loadAndRenderChatHistory();
+  return sessionRef.id;
+};
+
+// Save messages to current session
+window.saveSessionMessages = async function (messages) {
+  const user = auth.currentUser;
+  if (!user || !window.currentSessionId) return;
+
+  try {
+    await updateDoc(doc(db, "users", user.uid, "chatSessions", window.currentSessionId), {
+      messages: messages,
+      updatedAt: serverTimestamp(),
+    });
+  } catch (err) {
+    console.error("Error saving session messages:", err);
+  }
+};
+
+// Toggle favourite status
+window.toggleFavourite = async function (sessionId) {
+  const user = auth.currentUser;
+  if (!user) return;
+
+  const ref = doc(db, "users", user.uid, "chatSessions", sessionId);
+  const snap = await getDoc(ref);
+  if (snap.exists()) {
+    const current = snap.data().favourited || false;
+    await updateDoc(ref, { favourited: !current });
+    await loadAndRenderChatHistory();
+  }
+};
+
+// Delete a chat session
+window.deleteChatSession = async function (sessionId) {
+  const user = auth.currentUser;
+  if (!user) return;
+
+  await deleteDoc(doc(db, "users", user.uid, "chatSessions", sessionId));
+
+  if (window.currentSessionId === sessionId) {
+    window.startNewChat();
+  }
+  await loadAndRenderChatHistory();
+};
+
+// Load a specific chat session
+window.loadChatSession = async function (sessionId) {
+  const user = auth.currentUser;
+  if (!user) return;
+
+  const ref = doc(db, "users", user.uid, "chatSessions", sessionId);
+  const snap = await getDoc(ref);
+  if (!snap.exists()) return;
+
+  const data = snap.data();
+  window.currentSessionId = sessionId;
+  window.currentSessionMessages = data.messages || [];
+
+  // Set topic if the session has one
+  if (data.topicId) {
+    window.currentTopicId = data.topicId;
+    window.selectedTopic = data.topicName || "";
+    const topicLabel = document.getElementById("selectedTopicLabel");
+    const topicContainer = document.getElementById("selectedTopicContainer");
+    const unitCont = document.getElementById("unitContainer");
+    const chapCont = document.getElementById("chapterContainer");
+    if (topicLabel && data.topicName) {
+      topicLabel.textContent = data.topicName;
+      if (topicContainer) topicContainer.classList.remove("hidden");
+      if (unitCont) unitCont.classList.add("hidden");
+      if (chapCont) chapCont.classList.add("hidden");
+    }
+  }
+
+  // Switch to chat section
+  switchSection("chatSection");
+
+  // Display the messages in the chat
+  if (typeof window.displaySessionMessages === "function") {
+    window.displaySessionMessages(data.messages || []);
+  }
+
+  // Set conversation history for API context
+  if (typeof window.setConversationHistory === "function") {
+    window.setConversationHistory(data.messages || []);
+  }
+
+  // Update active highlighting
+  await loadAndRenderChatHistory();
+
+  // Close panel on mobile
+  closeChatHistoryPanel();
+};
+
+// Start a new chat
+window.startNewChat = function () {
+  window.currentSessionId = null;
+  window.currentSessionMessages = [];
+
+  if (typeof window.clearConversationHistoryFn === "function") {
+    window.clearConversationHistoryFn();
+  }
+
+  const chatMsgs = document.getElementById("chatMessages");
+  if (chatMsgs) {
+    chatMsgs.innerHTML = `
+      <div class="chat-message message-bot overlay-row">
+        <div class="bubble-container">
+          <img class="chat-avatar" src="assets/img/certi.png" alt="Bot Avatar" />
+          <div class="chat-bubble">
+            Hi there, I'm Certi, your personal Leaving Cert biology tutor!
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  // Switch to chat section
+  switchSection("chatSection");
+  loadAndRenderChatHistory();
+  closeChatHistoryPanel();
+};
+
+// Panel toggle functions
+function openChatHistoryPanel() {
+  const panel = document.getElementById("chatHistoryPanel");
+  const overlay = document.getElementById("chatHistoryOverlay");
+  if (panel) panel.classList.add("show");
+  if (overlay) overlay.classList.add("show");
+}
+
+function closeChatHistoryPanel() {
+  const panel = document.getElementById("chatHistoryPanel");
+  const overlay = document.getElementById("chatHistoryOverlay");
+  if (panel) panel.classList.remove("show");
+  if (overlay) overlay.classList.remove("show");
+}
+
+// Wire up New Chat button
+const newChatBtn = document.getElementById("newChatBtn");
+if (newChatBtn) {
+  newChatBtn.addEventListener("click", () => {
+    window.startNewChat();
+  });
+}
+
+// Wire up chat history overlay close
+const chatHistoryOverlay = document.getElementById("chatHistoryOverlay");
+if (chatHistoryOverlay) {
+  chatHistoryOverlay.addEventListener("click", closeChatHistoryPanel);
+}
+
+// Close panel when panel nav links are clicked (for mobile)
+document.querySelectorAll(".panel-nav-link").forEach((link) => {
+  link.addEventListener("click", () => {
+    closeChatHistoryPanel();
+  });
+});
+
+// Close panel when account link is clicked
+const panelAccountLinkEl = document.getElementById("panelAccountLink");
+if (panelAccountLinkEl) {
+  panelAccountLinkEl.addEventListener("click", () => {
+    closeChatHistoryPanel();
+  });
+}
+
 /**************************************
  * custom alerts
  **************************************/
@@ -1377,34 +1731,34 @@ document.addEventListener("DOMContentLoaded", () => {
 
 document.addEventListener("DOMContentLoaded", () => {
   const hamburgerBtnChat = document.getElementById("hamburgerBtnChat");
-  const sidebar = document.getElementById("sidebar");
-  const sidebarOverlay = document.getElementById("sidebarOverlay");
+  const panel = document.getElementById("chatHistoryPanel");
+  const panelOverlay = document.getElementById("chatHistoryOverlay");
 
-  if (hamburgerBtnChat && sidebar && sidebarOverlay) {
+  if (hamburgerBtnChat && panel && panelOverlay) {
     hamburgerBtnChat.addEventListener("click", () => {
-      // Toggle the 'show' class on the sidebar
-      sidebar.classList.toggle("show");
-      sidebarOverlay.classList.toggle("show");
-      // Also toggle the overlay
-      if (sidebar.classList.contains("show")) {
-        sidebarOverlay.classList.add("show");
+      // Toggle the 'show' class on the chat history panel
+      const isOpen = panel.classList.contains("show");
+      if (isOpen) {
+        panel.classList.remove("show");
+        panelOverlay.classList.remove("show");
       } else {
-        sidebarOverlay.classList.remove("show");
+        panel.classList.add("show");
+        panelOverlay.classList.add("show");
       }
     });
 
-    // Clicking the overlay also closes the sidebar
-    sidebarOverlay.addEventListener("click", () => {
-      sidebar.classList.remove("show");
-      sidebarOverlay.classList.remove("show");
+    // Clicking the overlay also closes the panel
+    panelOverlay.addEventListener("click", () => {
+      panel.classList.remove("show");
+      panelOverlay.classList.remove("show");
     });
 
-    // Also auto-close the sidebar if a link is clicked
-    const sidebarLinks = sidebar.querySelectorAll("a");
-    sidebarLinks.forEach((link) => {
+    // Auto-close the panel if a link is clicked
+    const panelLinks = panel.querySelectorAll("a");
+    panelLinks.forEach((link) => {
       link.addEventListener("click", () => {
-        sidebar.classList.remove("show");
-        sidebarOverlay.classList.remove("show");
+        panel.classList.remove("show");
+        panelOverlay.classList.remove("show");
       });
     });
   }
