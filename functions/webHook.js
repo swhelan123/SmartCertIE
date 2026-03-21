@@ -23,7 +23,11 @@ exports.stripeWebhook = onRequest({
 
   const db = admin.firestore();
 
-  // Helper to find Firebase user by Stripe customer ID
+  /**
+   * Finds a Firebase user document by their Stripe customer ID.
+   * @param {string} customerId - The Stripe customer ID.
+   * @return {Object|null} The user document or null.
+   */
   async function findUserByCustomerId(customerId) {
     const snapshot = await db.collection("users")
         .where("stripeCustomerId", "==", customerId)

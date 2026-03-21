@@ -770,6 +770,9 @@ if (setupForm) {
     }
 
     // 2) Gather form inputs
+    const firstName = document.getElementById("firstName").value.trim();
+    const lastName = document.getElementById("lastName").value.trim();
+    const phone = document.getElementById("phoneNumber").value.trim();
     const file = document.getElementById("profilePicInput").files[0];
     let photoURL = "";
 
@@ -784,13 +787,14 @@ if (setupForm) {
       photoURL = await getDownloadURL(storageRef);
     }
 
-    // 4) Save user profile data to Firestore (including photoURL)
+    // 4) Save user profile data to Firestore
+    const profileData = { firstName, lastName, phone };
+    if (photoURL) {
+      profileData.photoURL = photoURL;
+    }
     await setDoc(
       doc(db, "users", user.uid),
-      {
-        photoURL,
-        // plus any other fields: name, phone, etc.
-      },
+      profileData,
       { merge: true },
     );
 
@@ -898,9 +902,12 @@ if (updateAccountForm) {
     }
 
     try {
-      // 1) Check if user selected a new file
+      // 1) Gather form inputs
+      const firstName = document.getElementById("updateFirstName").value.trim();
+      const lastName = document.getElementById("updateLastName").value.trim();
+      const phone = document.getElementById("updatePhone").value.trim();
       const file = document.getElementById("newProfilePic").files[0];
-      let newPhotoURL = ""; // fallback or existing photo
+      let newPhotoURL = "";
 
       if (file) {
         // 2) Upload to Storage
@@ -910,13 +917,14 @@ if (updateAccountForm) {
         newPhotoURL = await getDownloadURL(storageRef);
       }
 
-      // 3) Merge new photoURL into Firestore
+      // 3) Merge updated fields into Firestore
+      const updateData = { firstName, lastName, phone };
+      if (newPhotoURL) {
+        updateData.photoURL = newPhotoURL;
+      }
       await setDoc(
         doc(db, "users", user.uid),
-        {
-          photoURL: newPhotoURL,
-          // plus any other updated fields
-        },
+        updateData,
         { merge: true },
       );
 

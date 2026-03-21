@@ -140,7 +140,10 @@
         }
 
         try {
-          const res = await fetch(DETAILS_URL + "?uid=" + user.uid);
+          const idToken = await user.getIdToken();
+          const res = await fetch(DETAILS_URL, {
+            headers: { "Authorization": "Bearer " + idToken },
+          });
           if (!res.ok) {
             loading.style.display = "none";
             noSub.style.display = "block";

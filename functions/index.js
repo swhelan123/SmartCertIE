@@ -17,7 +17,7 @@ exports.createCheckoutSession = onRequest(
     async (req, res) => {
       // Handle CORS preflight requests
       if (req.method === "OPTIONS") {
-        res.set("Access-Control-Allow-Origin", "*");
+        res.set("Access-Control-Allow-Origin", "https://smartcert.ie");
         res.set("Access-Control-Allow-Methods", "POST");
         res.set("Access-Control-Allow-Headers", "Content-Type");
         return res.status(204).send("");
@@ -25,7 +25,7 @@ exports.createCheckoutSession = onRequest(
 
       // Only allow POST
       if (req.method !== "POST") {
-        res.set("Access-Control-Allow-Origin", "*");
+        res.set("Access-Control-Allow-Origin", "https://smartcert.ie");
         return res.status(405).send("Method Not Allowed");
       }
 
@@ -35,7 +35,7 @@ exports.createCheckoutSession = onRequest(
       // Parse firebaseUserId from request body
       const {firebaseUserId} = req.body;
       if (!firebaseUserId) {
-        res.set("Access-Control-Allow-Origin", "*");
+        res.set("Access-Control-Allow-Origin", "https://smartcert.ie");
         return res.status(400).json({error: "Missing firebaseUserId"});
       }
 
@@ -54,11 +54,11 @@ exports.createCheckoutSession = onRequest(
         });
 
         // Set the CORS header on the successful response as well
-        res.set("Access-Control-Allow-Origin", "*");
+        res.set("Access-Control-Allow-Origin", "https://smartcert.ie");
         return res.status(200).json({sessionId: session.id, url: session.url});
       } catch (error) {
         console.error("Error creating checkout session:", error);
-        res.set("Access-Control-Allow-Origin", "*");
+        res.set("Access-Control-Allow-Origin", "https://smartcert.ie");
         return res.status(500).json({error: error.message});
       }
     },
@@ -97,7 +97,7 @@ function checkRateLimit(uid) {
 }
 
 exports.askCerti = onRequest(async (req, res) => {
-  res.set("Access-Control-Allow-Origin", "*");
+  res.set("Access-Control-Allow-Origin", "https://smartcert.ie");
 
   if (req.method === "OPTIONS") {
     res.set("Access-Control-Allow-Methods", "POST");
@@ -202,7 +202,7 @@ exports.askCerti = onRequest(async (req, res) => {
 exports.createBillingPortalSession = onRequest(
     {secrets: ["STRIPE_SECRET_KEY"]},
     async (req, res) => {
-      res.set("Access-Control-Allow-Origin", "*");
+      res.set("Access-Control-Allow-Origin", "https://smartcert.ie");
 
       if (req.method === "OPTIONS") {
         res.set("Access-Control-Allow-Methods", "POST");
@@ -253,17 +253,30 @@ exports.createBillingPortalSession = onRequest(
 exports.getSubscriptionDetails = onRequest(
     {secrets: ["STRIPE_SECRET_KEY"]},
     async (req, res) => {
-      res.set("Access-Control-Allow-Origin", "*");
+      res.set("Access-Control-Allow-Origin", "https://smartcert.ie");
 
       if (req.method === "OPTIONS") {
         res.set("Access-Control-Allow-Methods", "GET");
-        res.set("Access-Control-Allow-Headers", "Content-Type");
+        res.set(
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization",
+        );
         return res.status(204).send("");
       }
 
-      const uid = req.query.uid;
-      if (!uid) {
-        return res.status(400).json({error: "Missing uid parameter"});
+      // Verify Firebase auth token
+      const authHeader = req.headers.authorization;
+      if (!authHeader || !authHeader.startsWith("Bearer ")) {
+        return res.status(401).json({error: "Unauthorized — missing token"});
+      }
+
+      let uid;
+      try {
+        const idToken = authHeader.split("Bearer ")[1];
+        const decodedToken = await admin.auth().verifyIdToken(idToken);
+        uid = decodedToken.uid;
+      } catch (e) {
+        return res.status(401).json({error: "Unauthorized — invalid token"});
       }
 
       try {
@@ -297,7 +310,8 @@ exports.getSubscriptionDetails = onRequest(
               sub.default_payment_method,
           );
           if (pm.card) {
-            paymentMethod = `${pm.card.brand.toUpperCase()} ****${pm.card.last4}`;
+            const brand = pm.card.brand.toUpperCase();
+            paymentMethod = `${brand} ****${pm.card.last4}`;
           }
         }
 
@@ -326,7 +340,7 @@ exports.getSubscriptionDetails = onRequest(
 exports.pauseSubscription = onRequest(
     {secrets: ["STRIPE_SECRET_KEY"]},
     async (req, res) => {
-      res.set("Access-Control-Allow-Origin", "*");
+      res.set("Access-Control-Allow-Origin", "https://smartcert.ie");
 
       if (req.method === "OPTIONS") {
         res.set("Access-Control-Allow-Methods", "POST");
@@ -382,7 +396,7 @@ exports.pauseSubscription = onRequest(
 exports.resumeSubscription = onRequest(
     {secrets: ["STRIPE_SECRET_KEY"]},
     async (req, res) => {
-      res.set("Access-Control-Allow-Origin", "*");
+      res.set("Access-Control-Allow-Origin", "https://smartcert.ie");
 
       if (req.method === "OPTIONS") {
         res.set("Access-Control-Allow-Methods", "POST");
@@ -438,7 +452,7 @@ exports.resumeSubscription = onRequest(
 exports.cancelSubscription = onRequest(
     {secrets: ["STRIPE_SECRET_KEY"]},
     async (req, res) => {
-      res.set("Access-Control-Allow-Origin", "*");
+      res.set("Access-Control-Allow-Origin", "https://smartcert.ie");
 
       if (req.method === "OPTIONS") {
         res.set("Access-Control-Allow-Methods", "POST");
@@ -489,7 +503,7 @@ exports.cancelSubscription = onRequest(
 exports.reactivateSubscription = onRequest(
     {secrets: ["STRIPE_SECRET_KEY"]},
     async (req, res) => {
-      res.set("Access-Control-Allow-Origin", "*");
+      res.set("Access-Control-Allow-Origin", "https://smartcert.ie");
 
       if (req.method === "OPTIONS") {
         res.set("Access-Control-Allow-Methods", "POST");
