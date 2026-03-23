@@ -1,32 +1,157 @@
 .manage-subscription {
-    max-width: 600px;
-    margin: 2rem auto;
-    padding: 2rem;
-    background-color: #fff;
-    border-radius: var(--border-radius);
-    box-shadow: var(--shadow-blue);
-  }
-  
-  .modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0,0,0,0.6);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  
-  .modal-content {
-    background: #fff;
-    padding: 1.5rem;
-    border-radius: var(--border-radius);
-    box-shadow: var(--shadow-blue);
-  }
-  
-  .hidden {
-    display: none;
-  }
-  
+  max-width: 600px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background-color: #fff;
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-blue);
+}
+
+.sub-detail-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.6rem 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.sub-label {
+  color: #666;
+  font-size: 0.95rem;
+}
+
+.sub-value {
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.status-banner {
+  margin-top: 1rem;
+  padding: 1rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.warning-banner {
+  background-color: #fef3c7;
+  border: 1px solid #f59e0b;
+  color: #92400e;
+}
+
+.info-banner {
+  background-color: #dbeafe;
+  border: 1px solid #3b82f6;
+  color: #1e40af;
+}
+
+.btn-link {
+  background: none;
+  border: none;
+  color: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.9rem;
+  padding: 0;
+  margin-top: 0.5rem;
+  display: block;
+}
+
+.action-btn {
+  width: 100%;
+  padding: 0.8rem;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  margin-bottom: 0.75rem;
+  font-weight: 500;
+  transition: opacity 0.2s;
+}
+
+.action-btn:hover {
+  opacity: 0.9;
+}
+
+.action-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.upgrade-btn {
+  background-color: #3b82f6;
+  color: #fff;
+}
+
+.pause-btn {
+  background-color: #f59e0b;
+  color: #fff;
+}
+
+.resume-btn {
+  background-color: #16a34a;
+  color: #fff;
+}
+
+.cancel-btn {
+  background-color: #fff;
+  color: #e53e3e;
+  border: 1px solid #e53e3e;
+}
+
+.cancel-btn:hover {
+  background-color: #fef2f2;
+}
+
+.secondary-btn {
+  background-color: #f3f4f6;
+  color: #374151;
+}
+
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: #fff;
+  padding: 2rem;
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-blue);
+  max-width: 420px;
+  width: 90%;
+}
+
+.modal-content h3 {
+  margin-bottom: 0.75rem;
+  font-size: 1.2rem;
+}
+
+.modal-content p {
+  color: #555;
+  margin-bottom: 1.5rem;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.modal-actions .action-btn {
+  flex: 1;
+  margin-bottom: 0;
+}
+
+.hidden {
+  display: none !important;
+}

@@ -40,7 +40,6 @@ let analytics;
 try {
   app = initializeApp(firebaseConfig);
   analytics = getAnalytics(app);
-  console.log("Firebase initialized successfully");
 } catch (error) {
   console.error("Firebase initialization error:", error);
 }
@@ -71,7 +70,8 @@ const body = document.body;
 const modeIcon = document.getElementById("modeIcon");
 const modeIconMobile = document.getElementById("modeIconMobile");
 const modeIconSidebar = document.getElementById("modeIconSidebar");
-const allModeIcons = [modeIcon, modeIconMobile, modeIconSidebar].filter(Boolean);
+const modeIconPanel = document.getElementById("modeIconPanel");
+const allModeIcons = [modeIcon, modeIconMobile, modeIconSidebar, modeIconPanel].filter(Boolean);
 
 function syncModeIcons(isDark) {
   const src = isDark ? "assets/img/light.png" : "assets/img/dark.png";
@@ -98,41 +98,9 @@ if (allModeIcons.length) {
 }
 
 /*******************************************************
- * NAVIGATION LAYOUT PREFERENCE (top bar vs sidebar)
+ * NAVIGATION LAYOUT — always sidebar
  *******************************************************/
-const savedLayout = localStorage.getItem("smartcert_nav_layout") || "topbar";
-if (savedLayout === "sidebar") {
-  document.body.classList.add("layout-sidebar");
-}
-
-// Account page: layout toggle buttons
-const layoutToggle = document.getElementById("layoutToggle");
-if (layoutToggle) {
-  const layoutBtns = layoutToggle.querySelectorAll("button[data-layout]");
-
-  // Set initial active state from saved preference
-  layoutBtns.forEach((btn) => {
-    const isActive = btn.getAttribute("data-layout") === savedLayout;
-    btn.style.background = isActive ? "#3b82f6" : "#fff";
-    btn.style.color = isActive ? "#fff" : "#333";
-    btn.style.borderColor = isActive ? "#3b82f6" : "#ccc";
-  });
-
-  layoutBtns.forEach((btn) => {
-    btn.addEventListener("click", () => {
-      const layout = btn.getAttribute("data-layout");
-      localStorage.setItem("smartcert_nav_layout", layout);
-
-      // Update button styles
-      layoutBtns.forEach((b) => {
-        const active = b.getAttribute("data-layout") === layout;
-        b.style.background = active ? "#3b82f6" : "#fff";
-        b.style.color = active ? "#fff" : "#333";
-        b.style.borderColor = active ? "#3b82f6" : "#ccc";
-      });
-    });
-  });
-}
+document.body.classList.add("layout-sidebar");
 
 /*******************************************************
  * AUTH STATE & UI TOGGLING
@@ -142,8 +110,8 @@ const loginBtn = document.getElementById("loginBtn");
 const loginBtnMobile = document.getElementById("loginBtnMobile");
 const profilePic = document.getElementById("profilePic");
 const profilePicMobile = document.getElementById("profilePicMobile");
-const sidebarPfp = document.getElementById("sidebarPfp");
-const accountLink = document.getElementById("accountLink");
+const sidebarPfp = document.getElementById("panelPfp");
+const accountLink = document.getElementById("panelAccountLink");
 const allLoginBtns = [loginBtn, loginBtnMobile].filter(Boolean);
 const allProfilePics = [profilePic, profilePicMobile].filter(Boolean);
 
@@ -187,6 +155,8 @@ onAuthStateChanged(auth, async (user) => {
         sendBtn.disabled = false;
         const subscribeBtn = document.getElementById("subscribeBtn");
         if (subscribeBtn) subscribeBtn.classList.add("hidden");
+        // Load chat history
+        cleanupOldSessions().then(() => loadAndRenderChatHistory());
       } else {
         chatInput.disabled = true;
         sendBtn.disabled = true;
@@ -240,9 +210,8 @@ allLoginBtns.forEach((btn) => {
 /*******************************************************
  * NAV ON chat.html (Top bar + Sidebar, Single-Page Sections)
  *******************************************************/
-const sidebarLinks = document.querySelectorAll(".sidebar-nav a[data-section]");
-const topBarLinks = document.querySelectorAll(".top-bar-link[data-section]");
-const allNavLinks = [...sidebarLinks, ...topBarLinks];
+const sidebarLinks = document.querySelectorAll(".panel-nav-link[data-section]");
+const allNavLinks = [...sidebarLinks];
 const chatSection = document.getElementById("chatSection");
 const notebookSection = document.getElementById("notebookSection");
 
@@ -251,7 +220,7 @@ if (chatSection && notebookSection) {
   chatSection.classList.remove("hidden");
   notebookSection.classList.add("hidden");
 }
-const chatLink = document.querySelector(".sidebar-nav a[data-section='chatSection']");
+const chatLink = document.querySelector(".panel-nav-link[data-section='chatSection']");
 if (chatLink) {
   chatLink.classList.add("active");
 }
@@ -620,13 +589,21 @@ unitButtons.forEach((button) => {
         chapterBtn.addEventListener("click", () => {
           // Hide the chapter container
           chapterContainer.classList.add("hidden");
-          // Display the selected chapter name
+          // Display the selected chapter name with unit color
           selectedTopicLabel.textContent = chapterObj.name;
+          selectedTopicLabel.classList.remove("unit-green", "unit-purple", "unit-red");
+          if (unit === "A") selectedTopicLabel.classList.add("unit-green");
+          else if (unit === "B") selectedTopicLabel.classList.add("unit-purple");
+          else if (unit === "C") selectedTopicLabel.classList.add("unit-red");
           selectedTopic = chapterObj.name;
           window.selectedTopic = chapterObj.name;
           window.currentTopicId = chapterObj.id;
           // Show the container that holds the "Change Topic" button
           selectedTopicContainer.classList.remove("hidden");
+          // Update chat history if in "By Topic" mode
+          if (panelViewMode === "byTopic") {
+            rerenderFilteredHistory();
+          }
         });
 
         chapterContainer.appendChild(chapterBtn);
@@ -638,21 +615,10 @@ unitButtons.forEach((button) => {
   });
 });
 
-// Handle the "Change Topic" button (reset selection)
+// Handle the "Change Topic" button — starts a new chat
 if (changeTopicBtn) {
   changeTopicBtn.addEventListener("click", () => {
-    // Hide the selected topic container
-    selectedTopicContainer.classList.add("hidden");
-    // Clear the label
-    selectedTopicLabel.textContent = "";
-    selectedTopic = "";
-    window.selectedTopic = "";
-    window.currentTopicId = "";
-    // Show the unit container again so user can pick a new unit
-    unitContainer.classList.remove("hidden");
-    // Clear and hide the chapter container
-    chapterContainer.innerHTML = "";
-    chapterContainer.classList.add("hidden");
+    window.startNewChat();
   });
 }
 
@@ -721,6 +687,14 @@ onAuthStateChanged(auth, (user) => {
             notebookSnap.forEach((docSnap) => {
               deletePromises.push(deleteDoc(doc(db, "users", uid, "notebook", docSnap.id)));
             });
+
+            // Delete chat sessions subcollection entries
+            const sessionsRef = collection(db, "users", uid, "chatSessions");
+            const sessionsSnap = await getDocs(sessionsRef);
+            sessionsSnap.forEach((docSnap) => {
+              deletePromises.push(deleteDoc(doc(db, "users", uid, "chatSessions", docSnap.id)));
+            });
+
             await Promise.all(deletePromises);
 
             // Delete user document
@@ -796,6 +770,9 @@ if (setupForm) {
     }
 
     // 2) Gather form inputs
+    const firstName = document.getElementById("firstName").value.trim();
+    const lastName = document.getElementById("lastName").value.trim();
+    const phone = document.getElementById("phoneNumber").value.trim();
     const file = document.getElementById("profilePicInput").files[0];
     let photoURL = "";
 
@@ -810,13 +787,14 @@ if (setupForm) {
       photoURL = await getDownloadURL(storageRef);
     }
 
-    // 4) Save user profile data to Firestore (including photoURL)
+    // 4) Save user profile data to Firestore
+    const profileData = { firstName, lastName, phone };
+    if (photoURL) {
+      profileData.photoURL = photoURL;
+    }
     await setDoc(
       doc(db, "users", user.uid),
-      {
-        photoURL,
-        // plus any other fields: name, phone, etc.
-      },
+      profileData,
       { merge: true },
     );
 
@@ -924,9 +902,12 @@ if (updateAccountForm) {
     }
 
     try {
-      // 1) Check if user selected a new file
+      // 1) Gather form inputs
+      const firstName = document.getElementById("updateFirstName").value.trim();
+      const lastName = document.getElementById("updateLastName").value.trim();
+      const phone = document.getElementById("updatePhone").value.trim();
       const file = document.getElementById("newProfilePic").files[0];
-      let newPhotoURL = ""; // fallback or existing photo
+      let newPhotoURL = "";
 
       if (file) {
         // 2) Upload to Storage
@@ -936,13 +917,14 @@ if (updateAccountForm) {
         newPhotoURL = await getDownloadURL(storageRef);
       }
 
-      // 3) Merge new photoURL into Firestore
+      // 3) Merge updated fields into Firestore
+      const updateData = { firstName, lastName, phone };
+      if (newPhotoURL) {
+        updateData.photoURL = newPhotoURL;
+      }
       await setDoc(
         doc(db, "users", user.uid),
-        {
-          photoURL: newPhotoURL,
-          // plus any other updated fields
-        },
+        updateData,
         { merge: true },
       );
 
@@ -1276,6 +1258,477 @@ window.loadNotebookEntries = async function () {
   return entries;
 };
 
+/*******************************************************
+ * CHAT HISTORY / SESSIONS
+ *******************************************************/
+
+window.currentSessionId = null;
+window.currentSessionMessages = [];
+
+// Chat history view mode: "recent" (all) or "byTopic" (filtered by selected topic)
+let panelViewMode = "recent";
+let allChatSessions = []; // cached for filtering
+
+// Load all chat sessions for the current user
+async function loadChatSessions() {
+  const user = auth.currentUser;
+  if (!user) return [];
+
+  const sessionsRef = collection(db, "users", user.uid, "chatSessions");
+  const q = query(sessionsRef, orderBy("updatedAt", "desc"));
+  const snapshot = await getDocs(q);
+
+  const sessions = [];
+  snapshot.forEach((docSnap) => {
+    sessions.push({ id: docSnap.id, ...docSnap.data() });
+  });
+  return sessions;
+}
+
+// Clean up sessions older than 7 days that aren't favourited
+async function cleanupOldSessions() {
+  const user = auth.currentUser;
+  if (!user) return;
+
+  try {
+    const sessions = await loadChatSessions();
+    const now = Date.now();
+    const sevenDays = 7 * 24 * 60 * 60 * 1000;
+
+    for (const session of sessions) {
+      if (session.favourited) continue;
+
+      let createdAt;
+      if (session.createdAt && session.createdAt.toDate) {
+        createdAt = session.createdAt.toDate().getTime();
+      } else if (session.createdAt && session.createdAt.seconds) {
+        createdAt = session.createdAt.seconds * 1000;
+      } else {
+        continue;
+      }
+
+      if (now - createdAt > sevenDays) {
+        await deleteDoc(doc(db, "users", user.uid, "chatSessions", session.id));
+      }
+    }
+  } catch (err) {
+    console.error("Error cleaning up old sessions:", err);
+  }
+}
+
+// Render chat history in the panel
+function renderChatHistory(sessions) {
+  const listEl = document.getElementById("chatHistoryList");
+  if (!listEl) return;
+
+  listEl.innerHTML = "";
+
+  if (sessions.length === 0) {
+    listEl.innerHTML = '<p class="chat-history-empty">No previous chats</p>';
+    return;
+  }
+
+  // Group by time period
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const yesterday = new Date(today.getTime() - 86400000);
+  const sevenDaysAgo = new Date(today.getTime() - 7 * 86400000);
+
+  const groups = { today: [], yesterday: [], week: [], older: [] };
+
+  sessions.forEach((session) => {
+    let sessionDate;
+    if (session.updatedAt && session.updatedAt.toDate) {
+      sessionDate = session.updatedAt.toDate();
+    } else if (session.createdAt && session.createdAt.toDate) {
+      sessionDate = session.createdAt.toDate();
+    } else {
+      sessionDate = new Date(0);
+    }
+
+    if (sessionDate >= today) {
+      groups.today.push(session);
+    } else if (sessionDate >= yesterday) {
+      groups.yesterday.push(session);
+    } else if (sessionDate >= sevenDaysAgo) {
+      groups.week.push(session);
+    } else {
+      groups.older.push(session);
+    }
+  });
+
+  function addGroup(label, items) {
+    if (items.length === 0) return;
+
+    const groupLabel = document.createElement("div");
+    groupLabel.className = "chat-history-group-label";
+    groupLabel.textContent = label;
+    listEl.appendChild(groupLabel);
+
+    items.forEach((session) => {
+      const item = document.createElement("div");
+      item.className = "chat-session-item";
+      if (session.id === window.currentSessionId) {
+        item.classList.add("active");
+      }
+
+      const titleSpan = document.createElement("span");
+      titleSpan.className = "session-title";
+      titleSpan.textContent = session.title || "New Chat";
+      titleSpan.addEventListener("click", () => window.loadChatSession(session.id));
+
+      const actions = document.createElement("div");
+      actions.className = "session-actions";
+
+      const renameBtn = document.createElement("button");
+      renameBtn.className = "session-rename-btn";
+      renameBtn.innerHTML = "&#9998;";
+      renameBtn.title = "Rename chat";
+      renameBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        // Turn title into an editable input
+        const input = document.createElement("input");
+        input.type = "text";
+        input.className = "session-rename-input";
+        input.value = session.title || "";
+        input.maxLength = 60;
+
+        titleSpan.replaceWith(input);
+        input.focus();
+        input.select();
+
+        const saveRename = async () => {
+          const newTitle = input.value.trim();
+          if (newTitle && newTitle !== session.title) {
+            await window.renameSession(session.id, newTitle);
+          } else {
+            // Revert if empty or unchanged
+            input.replaceWith(titleSpan);
+          }
+        };
+
+        input.addEventListener("keydown", (ev) => {
+          if (ev.key === "Enter") {
+            ev.preventDefault();
+            saveRename();
+          }
+          if (ev.key === "Escape") {
+            input.replaceWith(titleSpan);
+          }
+        });
+        input.addEventListener("blur", saveRename);
+      });
+
+      const favBtn = document.createElement("button");
+      favBtn.className = "session-fav-btn" + (session.favourited ? " favourited" : "");
+      favBtn.innerHTML = session.favourited ? "&#9733;" : "&#9734;";
+      favBtn.title = session.favourited ? "Unfavourite" : "Favourite";
+      favBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        window.toggleFavourite(session.id);
+      });
+
+      const delBtn = document.createElement("button");
+      delBtn.className = "session-delete-btn";
+      delBtn.innerHTML = "&times;";
+      delBtn.title = "Delete chat";
+      delBtn.addEventListener("click", async (e) => {
+        e.stopPropagation();
+        const confirmed = await showCustomConfirm("Delete this chat?");
+        if (confirmed) window.deleteChatSession(session.id);
+      });
+
+      actions.appendChild(renameBtn);
+      actions.appendChild(favBtn);
+      actions.appendChild(delBtn);
+      item.appendChild(titleSpan);
+      item.appendChild(actions);
+      listEl.appendChild(item);
+    });
+  }
+
+  addGroup("Today", groups.today);
+  addGroup("Yesterday", groups.yesterday);
+  addGroup("Previous 7 Days", groups.week);
+  addGroup("Older", groups.older);
+}
+
+// Filter sessions based on current view mode + selected topic
+function getFilteredSessions() {
+  if (panelViewMode === "recent") return allChatSessions;
+
+  if (panelViewMode === "favourites") {
+    return allChatSessions.filter((s) => s.favourited);
+  }
+
+  // "byTopic" mode — filter by the currently selected topic in the main chat area
+  const currentTopic = window.selectedTopic || "";
+  const currentTopicId = window.currentTopicId || "";
+
+  if (!currentTopic && !currentTopicId) return allChatSessions;
+
+  return allChatSessions.filter((s) => {
+    // Match by topic name or topic ID
+    if (currentTopic && s.topicName === currentTopic) return true;
+    if (currentTopicId && s.topicId === currentTopicId) return true;
+    return false;
+  });
+}
+
+// Load and render chat history
+async function loadAndRenderChatHistory() {
+  allChatSessions = await loadChatSessions();
+  renderChatHistory(getFilteredSessions());
+}
+window.loadAndRenderChatHistory = loadAndRenderChatHistory;
+
+// Re-render with current filter (no re-fetch)
+function rerenderFilteredHistory() {
+  renderChatHistory(getFilteredSessions());
+}
+
+// Create a new chat session
+window.createChatSession = async function (title) {
+  const user = auth.currentUser;
+  if (!user) return null;
+
+  const sessionRef = await addDoc(collection(db, "users", user.uid, "chatSessions"), {
+    title: (title || "New Chat").substring(0, 60),
+    messages: [],
+    topicId: window.currentTopicId || "",
+    topicName: window.selectedTopic || "",
+    createdAt: serverTimestamp(),
+    updatedAt: serverTimestamp(),
+    favourited: false,
+  });
+
+  window.currentSessionId = sessionRef.id;
+  window.currentSessionMessages = [];
+  await loadAndRenderChatHistory();
+  return sessionRef.id;
+};
+
+// Save messages to current session
+window.saveSessionMessages = async function (messages) {
+  const user = auth.currentUser;
+  if (!user || !window.currentSessionId) return;
+
+  try {
+    await updateDoc(doc(db, "users", user.uid, "chatSessions", window.currentSessionId), {
+      messages: messages,
+      updatedAt: serverTimestamp(),
+    });
+  } catch (err) {
+    console.error("Error saving session messages:", err);
+  }
+};
+
+// Rename a chat session
+window.renameSession = async function (sessionId, newTitle) {
+  const user = auth.currentUser;
+  if (!user) return;
+
+  try {
+    await updateDoc(doc(db, "users", user.uid, "chatSessions", sessionId), {
+      title: newTitle.substring(0, 60),
+    });
+    await loadAndRenderChatHistory();
+  } catch (err) {
+    console.error("Error renaming session:", err);
+  }
+};
+
+// Toggle favourite status
+window.toggleFavourite = async function (sessionId) {
+  const user = auth.currentUser;
+  if (!user) return;
+
+  const ref = doc(db, "users", user.uid, "chatSessions", sessionId);
+  const snap = await getDoc(ref);
+  if (snap.exists()) {
+    const current = snap.data().favourited || false;
+    await updateDoc(ref, { favourited: !current });
+    await loadAndRenderChatHistory();
+  }
+};
+
+// Delete a chat session
+window.deleteChatSession = async function (sessionId) {
+  const user = auth.currentUser;
+  if (!user) return;
+
+  await deleteDoc(doc(db, "users", user.uid, "chatSessions", sessionId));
+
+  if (window.currentSessionId === sessionId) {
+    window.startNewChat();
+  }
+  await loadAndRenderChatHistory();
+};
+
+// Load a specific chat session
+window.loadChatSession = async function (sessionId) {
+  const user = auth.currentUser;
+  if (!user) return;
+
+  const ref = doc(db, "users", user.uid, "chatSessions", sessionId);
+  const snap = await getDoc(ref);
+  if (!snap.exists()) return;
+
+  const data = snap.data();
+  window.currentSessionId = sessionId;
+  window.currentSessionMessages = data.messages || [];
+
+  // Set topic if the session has one
+  if (data.topicId) {
+    window.currentTopicId = data.topicId;
+    window.selectedTopic = data.topicName || "";
+    const topicLabel = document.getElementById("selectedTopicLabel");
+    const topicContainer = document.getElementById("selectedTopicContainer");
+    const unitCont = document.getElementById("unitContainer");
+    const chapCont = document.getElementById("chapterContainer");
+    if (topicLabel && data.topicName) {
+      topicLabel.textContent = data.topicName;
+      // Apply unit color based on topicId
+      topicLabel.classList.remove("unit-green", "unit-purple", "unit-red");
+      const topicUnit = Object.entries(chapters).find(([, chs]) =>
+        chs.some((ch) => ch.id === data.topicId)
+      );
+      if (topicUnit) {
+        const unitKey = topicUnit[0];
+        if (unitKey === "A") topicLabel.classList.add("unit-green");
+        else if (unitKey === "B") topicLabel.classList.add("unit-purple");
+        else if (unitKey === "C") topicLabel.classList.add("unit-red");
+      }
+      if (topicContainer) topicContainer.classList.remove("hidden");
+      if (unitCont) unitCont.classList.add("hidden");
+      if (chapCont) chapCont.classList.add("hidden");
+    }
+  }
+
+  // Switch to chat section
+  switchSection("chatSection");
+
+  // Display the messages in the chat
+  if (typeof window.displaySessionMessages === "function") {
+    window.displaySessionMessages(data.messages || []);
+  }
+
+  // Set conversation history for API context
+  if (typeof window.setConversationHistory === "function") {
+    window.setConversationHistory(data.messages || []);
+  }
+
+  // Update active highlighting
+  await loadAndRenderChatHistory();
+
+  // Close panel on mobile
+  closeChatHistoryPanel();
+};
+
+// Start a new chat
+window.startNewChat = function () {
+  window.currentSessionId = null;
+  window.currentSessionMessages = [];
+
+  if (typeof window.clearConversationHistoryFn === "function") {
+    window.clearConversationHistoryFn();
+  }
+
+  // Reset topic selection
+  selectedTopic = "";
+  window.selectedTopic = "";
+  window.currentTopicId = "";
+  const topicLabel = document.getElementById("selectedTopicLabel");
+  const topicContainer = document.getElementById("selectedTopicContainer");
+  const unitCont = document.getElementById("unitContainer");
+  const chapCont = document.getElementById("chapterContainer");
+  if (topicLabel) topicLabel.textContent = "";
+  if (topicContainer) topicContainer.classList.add("hidden");
+  if (unitCont) unitCont.classList.remove("hidden");
+  if (chapCont) {
+    chapCont.innerHTML = "";
+    chapCont.classList.add("hidden");
+  }
+
+  const chatMsgs = document.getElementById("chatMessages");
+  if (chatMsgs) {
+    chatMsgs.innerHTML = `
+      <div class="chat-message message-bot overlay-row">
+        <div class="bubble-container">
+          <img class="chat-avatar" src="assets/img/certi.png" alt="Bot Avatar" />
+          <div class="chat-bubble">
+            Hi there, I'm Certi, your personal Leaving Cert biology tutor!
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  // Switch to chat section
+  switchSection("chatSection");
+  loadAndRenderChatHistory();
+  closeChatHistoryPanel();
+};
+
+// Panel toggle functions
+function openChatHistoryPanel() {
+  const panel = document.getElementById("chatHistoryPanel");
+  const overlay = document.getElementById("chatHistoryOverlay");
+  if (panel) panel.classList.add("show");
+  if (overlay) overlay.classList.add("show");
+}
+
+function closeChatHistoryPanel() {
+  const panel = document.getElementById("chatHistoryPanel");
+  const overlay = document.getElementById("chatHistoryOverlay");
+  if (panel) panel.classList.remove("show");
+  if (overlay) overlay.classList.remove("show");
+}
+
+// Wire up New Chat button
+const newChatBtn = document.getElementById("newChatBtn");
+if (newChatBtn) {
+  newChatBtn.addEventListener("click", () => {
+    window.startNewChat();
+  });
+}
+
+// Wire up chat history overlay close
+const chatHistoryOverlay = document.getElementById("chatHistoryOverlay");
+if (chatHistoryOverlay) {
+  chatHistoryOverlay.addEventListener("click", closeChatHistoryPanel);
+}
+
+// Close panel when panel nav links are clicked (for mobile)
+document.querySelectorAll(".panel-nav-link").forEach((link) => {
+  link.addEventListener("click", () => {
+    closeChatHistoryPanel();
+  });
+});
+
+// Close panel when account link is clicked
+const panelAccountLinkEl = document.getElementById("panelAccountLink");
+if (panelAccountLinkEl) {
+  panelAccountLinkEl.addEventListener("click", () => {
+    closeChatHistoryPanel();
+  });
+}
+
+// --- Panel view toggle (Recent / By Topic) ---
+const panelViewBtns = document.querySelectorAll(".panel-view-btn");
+
+panelViewBtns.forEach((btn) => {
+  btn.addEventListener("click", () => {
+    const view = btn.getAttribute("data-view");
+    panelViewMode = view;
+
+    panelViewBtns.forEach((b) => b.classList.remove("active"));
+    btn.classList.add("active");
+
+    rerenderFilteredHistory();
+  });
+});
+
 /**************************************
  * custom alerts
  **************************************/
@@ -1377,34 +1830,34 @@ document.addEventListener("DOMContentLoaded", () => {
 
 document.addEventListener("DOMContentLoaded", () => {
   const hamburgerBtnChat = document.getElementById("hamburgerBtnChat");
-  const sidebar = document.getElementById("sidebar");
-  const sidebarOverlay = document.getElementById("sidebarOverlay");
+  const panel = document.getElementById("chatHistoryPanel");
+  const panelOverlay = document.getElementById("chatHistoryOverlay");
 
-  if (hamburgerBtnChat && sidebar && sidebarOverlay) {
+  if (hamburgerBtnChat && panel && panelOverlay) {
     hamburgerBtnChat.addEventListener("click", () => {
-      // Toggle the 'show' class on the sidebar
-      sidebar.classList.toggle("show");
-      sidebarOverlay.classList.toggle("show");
-      // Also toggle the overlay
-      if (sidebar.classList.contains("show")) {
-        sidebarOverlay.classList.add("show");
+      // Toggle the 'show' class on the chat history panel
+      const isOpen = panel.classList.contains("show");
+      if (isOpen) {
+        panel.classList.remove("show");
+        panelOverlay.classList.remove("show");
       } else {
-        sidebarOverlay.classList.remove("show");
+        panel.classList.add("show");
+        panelOverlay.classList.add("show");
       }
     });
 
-    // Clicking the overlay also closes the sidebar
-    sidebarOverlay.addEventListener("click", () => {
-      sidebar.classList.remove("show");
-      sidebarOverlay.classList.remove("show");
+    // Clicking the overlay also closes the panel
+    panelOverlay.addEventListener("click", () => {
+      panel.classList.remove("show");
+      panelOverlay.classList.remove("show");
     });
 
-    // Also auto-close the sidebar if a link is clicked
-    const sidebarLinks = sidebar.querySelectorAll("a");
-    sidebarLinks.forEach((link) => {
+    // Auto-close the panel if a link is clicked
+    const panelLinks = panel.querySelectorAll("a");
+    panelLinks.forEach((link) => {
       link.addEventListener("click", () => {
-        sidebar.classList.remove("show");
-        sidebarOverlay.classList.remove("show");
+        panel.classList.remove("show");
+        panelOverlay.classList.remove("show");
       });
     });
   }

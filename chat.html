@@ -25,10 +25,6 @@
         <a href="index.html?showLanding" class="top-bar-brand">SmartCert</a>
         <span class="top-bar-subtitle">Leaving Cert Biology</span>
       </div>
-      <nav class="top-bar-nav">
-        <a href="#" data-section="chatSection" class="top-bar-link active">Chat</a>
-        <a href="#" data-section="notebookSection" class="top-bar-link">Notebook</a>
-      </nav>
       <div class="top-bar-right">
         <button id="loginBtn" class="login-button hidden">Login/Signup</button>
         <img
@@ -46,7 +42,7 @@
       </div>
     </header>
 
-    <!-- PILL CONTAINER at top-right (mobile only, kept for mobile) -->
+    <!-- PILL CONTAINER at top-right (mobile only) -->
     <div id="topRightContainer" class="pill-container mobile-only-pill">
       <button id="loginBtnMobile" class="login-button hidden">Login/Signup</button>
       <img
@@ -72,170 +68,181 @@
       </div>
     </div>
 
-    <!-- Sidebar (mobile only) -->
-    <aside class="sidebar" id="sidebar">
-      <div class="sidebar-header">
-        <h1 style="margin: 0">
-          <a
-            href="index.html?showLanding"
-            style="color: inherit; text-decoration: none"
-          >
-            SmartCert
+    <!-- BACKDROP OVERLAY for chat history panel (mobile) -->
+    <div id="chatHistoryOverlay" class="sidebar-overlay"></div>
+
+    <!-- App Body: Chat History Panel + Main Content -->
+    <div class="app-body">
+      <!-- Chat History Panel (desktop: permanent left panel, mobile: slide-in) -->
+      <aside class="chat-history-panel" id="chatHistoryPanel">
+        <div class="panel-header">
+          <div class="panel-nav-links">
+            <a href="#" data-section="chatSection" class="panel-nav-link active">Chat</a>
+            <a href="#" data-section="notebookSection" class="panel-nav-link">Notebook</a>
+          </div>
+          <button id="newChatBtn" class="new-chat-btn" title="New Chat">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 5v14M5 12h14"/>
+            </svg>
+          </button>
+        </div>
+        <div class="panel-view-toggle">
+          <button class="panel-view-btn active" data-view="recent">Recent</button>
+          <button class="panel-view-btn" data-view="byTopic">By Topic</button>
+          <button class="panel-view-btn panel-view-fav" data-view="favourites">&#9733;</button>
+        </div>
+        <div class="chat-history-list" id="chatHistoryList">
+          <p class="chat-history-empty">No previous chats</p>
+        </div>
+        <div class="panel-footer">
+          <a href="account.html" id="panelAccountLink" class="panel-account-link">
+            <img id="panelPfp" src="assets/img/pfp.avif" alt="" class="panel-pfp">
+            <span>Account</span>
           </a>
-        </h1>
-        <p>Leaving Cert Biology</p>
-      </div>
-      <nav class="sidebar-nav">
-        <a href="#" data-section="chatSection">Chat</a>
-        <a href="#" data-section="notebookSection">Notebook</a>
-      </nav>
+          <img
+            id="modeIconPanel"
+            class="mode-icon"
+            src="assets/img/dark.png"
+            alt="Toggle Theme"
+          />
+        </div>
+      </aside>
 
-      <!-- Account link at bottom -->
-      <div class="sidebar-footer">
-        <a href="#" id="accountLink">
-          <img id="sidebarPfp" src="" alt="" style="width:24px;height:24px;border-radius:50%;object-fit:cover;vertical-align:middle;margin-right:6px;">
-          Account
-        </a>
-      </div>
-    </aside>
+      <!-- Main Content -->
+      <div class="main-content">
+        <!-- Dark mode toggle for sidebar layout (top-right of chat area) -->
+        <img
+          id="modeIconSidebar"
+          class="mode-icon sidebar-mode-toggle"
+          src="assets/img/dark.png"
+          alt="Toggle Theme"
+        />
+        <!-- Chat Section (single container) -->
+        <section id="chatSection" class="chat-container">
+          <!-- Topic Selector (Group -> Chapter -> Selected Topic) -->
+          <div class="topic-selector" id="topicSelector">
+            <h3>Choose a topic to give Certi some context</h3>
+            <!-- Unit Buttons Container (initially visible) -->
+            <div id="unitContainer" class="unit-container">
+              <button class="unit-button unit-green" data-unit="A">
+                Unit 1: The Study of Life
+              </button>
+              <button class="unit-button unit-purple" data-unit="B">
+                Unit 2: The Cell
+              </button>
+              <button class="unit-button unit-red" data-unit="C">
+                Unit 3: The Organism
+              </button>
+            </div>
 
-    <!-- BACKDROP OVERLAY for dimming the background -->
-    <div id="sidebarOverlay" class="sidebar-overlay"></div>
+            <!-- Chapter Buttons Container (initially hidden) -->
+            <div id="chapterContainer" class="chapter-container hidden"></div>
 
-    <!-- Main Content -->
-    <div class="main-content">
-      <!-- Dark mode toggle for sidebar layout (top-right of chat area) -->
-      <img
-        id="modeIconSidebar"
-        class="mode-icon sidebar-mode-toggle"
-        src="assets/img/dark.png"
-        alt="Toggle Theme"
-      />
-      <!-- Chat Section (single container) -->
-      <section id="chatSection" class="chat-container">
-        <!-- Topic Selector (Group -> Chapter -> Selected Topic) -->
-        <div class="topic-selector" id="topicSelector">
-          <h3>Choose a topic to give Certi some context</h3>
-          <!-- Unit Buttons Container (initially visible) -->
-          <div id="unitContainer" class="unit-container">
-            <button class="unit-button unit-green" data-unit="A">
+            <!-- Selected Topic Display (initially hidden) -->
+            <div
+              id="selectedTopicContainer"
+              class="selected-topic-container hidden"
+            >
+              <span id="selectedTopicLabel" class="selected-topic-label"></span>
+              <button id="changeTopicBtn" class="change-topic-button">
+                Change Topic
+              </button>
+            </div>
+          </div>
+
+          <!-- Chat Window -->
+          <div class="chat-messages" id="chatMessages">
+            <!-- Example initial bot message -->
+            <div class="chat-message message-bot overlay-row">
+              <div class="bubble-container">
+                <img
+                  class="chat-avatar"
+                  src="assets/img/certi.png"
+                  alt="Bot Avatar"
+                />
+                <div class="chat-bubble">
+                  Hi there, I'm Certi, your personal Leaving Cert biology tutor!
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Chat Input -->
+          <div class="chat-input-area">
+            <input
+              type="text"
+              id="chatInput"
+              placeholder="Ask a Biology question..."
+            />
+            <button id="sendBtn">Send</button>
+            <button id="clearHistoryBtn" title="Start a new chat">New Chat</button>
+          </div>
+        </section>
+
+        <!-- Notebook Section -->
+        <section id="notebookSection" class="section-content hidden">
+          <h2>Filter Topics</h2>
+
+          <!-- Filter Buttons (A/B/C) in a "pill" style container -->
+          <div id="notebookUnitContainer" class="unit-container">
+            <button data-unit="all" class="unit-button unit-gray">All</button>
+            <button data-unit="A" class="unit-button unit-green">
               Unit 1: The Study of Life
             </button>
-            <button class="unit-button unit-purple" data-unit="B">
+            <button data-unit="B" class="unit-button unit-purple">
               Unit 2: The Cell
             </button>
-            <button class="unit-button unit-red" data-unit="C">
+            <button data-unit="C" class="unit-button unit-red">
               Unit 3: The Organism
             </button>
           </div>
 
-          <!-- Chapter Buttons Container (initially hidden) -->
-          <div id="chapterContainer" class="chapter-container hidden"></div>
+          <!-- Chapter sub-filter buttons (shown when a unit is selected) -->
+          <div id="notebookChapterContainer" class="chapter-container hidden"></div>
 
-          <!-- Selected Topic Display (initially hidden) -->
-          <div
-            id="selectedTopicContainer"
-            class="selected-topic-container hidden"
-          >
-            <span id="selectedTopicLabel" class="selected-topic-label"></span>
-            <button id="changeTopicBtn" class="change-topic-button">
-              Change Topic
+          <!-- Grid of cards -->
+          <div id="notebookGrid" class="notebook-grid"></div>
+        </section>
+
+        <!-- Modal for viewing a single notebook entry in detail -->
+        <div id="notebookModal" class="notebook-modal hidden">
+          <div class="notebook-modal-content">
+            <button id="notebookModalClose" class="notebook-modal-close">
+              <!-- Simple SVG close icon (24x24) -->
+              <svg
+                width="24"
+                height="24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
             </button>
-          </div>
-        </div>
 
-        <!-- Chat Window -->
-        <div class="chat-messages" id="chatMessages">
-          <!-- Example initial bot message -->
-          <div class="chat-message message-bot overlay-row">
-            <div class="bubble-container">
-              <img
-                class="chat-avatar"
-                src="assets/img/certi.png"
-                alt="Bot Avatar"
-              />
-              <div class="chat-bubble">
-                Hi there, I'm Certi, your personal Leaving Cert biology tutor!
+            <h3 id="notebookModalQuestion"></h3>
+            <div id="notebookModalAnswer"></div>
+            <div class="notebook-modal-footer">
+              <span id="notebookModalDate"></span>
+              <div>
+                <button id="notebookModalEdit" style="background-color:#3b82f6;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:0.9rem;padding:6px 12px;margin-right:8px;">Edit</button>
+                <button id="notebookModalDelete" class="notebook-delete-button">
+                  Delete
+                </button>
               </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Chat Input -->
-        <div class="chat-input-area">
-          <input
-            type="text"
-            id="chatInput"
-            placeholder="Ask a Biology question..."
-          />
-          <button id="sendBtn">Send</button>
-          <button id="clearHistoryBtn" title="Clear conversation history">Clear History</button>
-        </div>
-      </section>
-
-      <!-- Notebook Section -->
-      <section id="notebookSection" class="section-content hidden">
-        <h2>Filter Topics</h2>
-
-        <!-- Filter Buttons (A/B/C) in a "pill" style container -->
-        <div id="notebookUnitContainer" class="unit-container">
-          <button data-unit="all" class="unit-button unit-gray">All</button>
-          <button data-unit="A" class="unit-button unit-green">
-            Unit 1: The Study of Life
-          </button>
-          <button data-unit="B" class="unit-button unit-purple">
-            Unit 2: The Cell
-          </button>
-          <button data-unit="C" class="unit-button unit-red">
-            Unit 3: The Organism
-          </button>
-        </div>
-
-        <!-- Chapter sub-filter buttons (shown when a unit is selected) -->
-        <div id="notebookChapterContainer" class="chapter-container hidden"></div>
-
-        <!-- Grid of cards -->
-        <div id="notebookGrid" class="notebook-grid"></div>
-      </section>
-
-      <!-- Modal for viewing a single notebook entry in detail -->
-      <div id="notebookModal" class="notebook-modal hidden">
-        <div class="notebook-modal-content">
-          <button id="notebookModalClose" class="notebook-modal-close">
-            <!-- Simple SVG close icon (24x24) -->
-            <svg
-              width="24"
-              height="24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <line x1="18" y1="6" x2="6" y2="18"></line>
-              <line x1="6" y1="6" x2="18" y2="18"></line>
-            </svg>
-          </button>
-
-          <h3 id="notebookModalQuestion"></h3>
-          <div id="notebookModalAnswer"></div>
-          <div class="notebook-modal-footer">
-            <span id="notebookModalDate"></span>
-            <div>
-              <button id="notebookModalEdit" style="background-color:#3b82f6;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:0.9rem;padding:6px 12px;margin-right:8px;">Edit</button>
-              <button id="notebookModalDelete" class="notebook-delete-button">
-                Delete
-              </button>
             </div>
           </div>
         </div>
       </div>
     </div>
     <!-- Link to our main JS (Firebase logic + chat + chatbot integration) -->
+    <!-- Marked (Markdown parser) — must load before chat.js -->
+    <script src="https://cdn.jsdelivr.net/npm/marked@4.3.0/marked.min.js"></script>
+
     <script type="module" src="js/script.js"></script>
     <script type="module" src="js/chat.js"></script>
-
-    <!-- Marked (Markdown parser) -->
-    <script src="https://cdn.jsdelivr.net/npm/marked@4.3.0/marked.min.js"></script>
   </body>
 </html>

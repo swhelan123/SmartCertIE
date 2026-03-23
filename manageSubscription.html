@@ -23,16 +23,52 @@
       <div id="loadingMsg" style="text-align:center;color:#888;padding:2rem;">Loading subscription details...</div>
 
       <div id="subscriptionDetails" style="display:none;">
-        <p>Plan: <span id="planName" style="font-weight:600;">Certi</span></p>
-        <p>Status: <span id="subStatus" style="font-weight:600;"></span></p>
-        <p>Start Date: <span id="startDate"></span></p>
-        <p>Next Billing Date: <span id="nextBillingDate"></span></p>
-        <p>Payment Method: <span id="paymentMethod"></span></p>
+        <div class="sub-detail-row">
+          <span class="sub-label">Plan</span>
+          <span id="planName" class="sub-value">Certi</span>
+        </div>
+        <div class="sub-detail-row">
+          <span class="sub-label">Status</span>
+          <span id="subStatus" class="sub-value"></span>
+        </div>
+        <div class="sub-detail-row">
+          <span class="sub-label">Start Date</span>
+          <span id="startDate" class="sub-value"></span>
+        </div>
+        <div class="sub-detail-row">
+          <span class="sub-label">Next Billing Date</span>
+          <span id="nextBillingDate" class="sub-value"></span>
+        </div>
+        <div class="sub-detail-row">
+          <span class="sub-label">Payment Method</span>
+          <span id="paymentMethod" class="sub-value"></span>
+        </div>
+      </div>
+
+      <!-- Canceling banner -->
+      <div id="cancelingBanner" class="status-banner warning-banner" style="display:none;">
+        Your subscription will be cancelled at the end of your current billing period. You'll keep access until then.
+        <button id="reactivateBtn" class="btn-link">Undo cancellation</button>
+      </div>
+
+      <!-- Paused banner -->
+      <div id="pausedBanner" class="status-banner info-banner" style="display:none;">
+        Your subscription is paused. You won't be charged until you resume.
+        <button id="resumeFromBannerBtn" class="btn-link">Resume subscription</button>
       </div>
 
       <div id="actionButtons" style="display:none;margin-top:1.5rem;">
-        <button id="manageStripeBtn" style="width:100%;padding:0.8rem;border:none;border-radius:8px;background-color:#3b82f6;color:#fff;font-size:1rem;cursor:pointer;margin-bottom:0.75rem;">
-          Manage Billing & Cancel
+        <button id="upgradeBtn" class="action-btn upgrade-btn">
+          View Plans & Upgrade
+        </button>
+        <button id="pauseBtn" class="action-btn pause-btn">
+          Pause Subscription
+        </button>
+        <button id="resumeBtn" class="action-btn resume-btn" style="display:none;">
+          Resume Subscription
+        </button>
+        <button id="cancelBtn" class="action-btn cancel-btn">
+          Cancel Subscription
         </button>
       </div>
 
@@ -44,6 +80,30 @@
       <p style="margin-top:1.5rem;text-align:center;">
         <a href="account.html" class="click-link">&larr; Back to Account</a>
       </p>
+    </div>
+
+    <!-- Pause Confirmation Modal -->
+    <div id="pauseModal" class="modal hidden">
+      <div class="modal-content">
+        <h3>Pause your subscription?</h3>
+        <p>Your subscription will be paused and you won't be charged until you resume. You can resume anytime from this page.</p>
+        <div class="modal-actions">
+          <button id="pauseConfirmBtn" class="action-btn pause-btn">Yes, pause</button>
+          <button id="pauseCancelBtn" class="action-btn secondary-btn">Go back</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Cancel Confirmation Modal -->
+    <div id="cancelModal" class="modal hidden">
+      <div class="modal-content">
+        <h3>Cancel your subscription?</h3>
+        <p>You'll keep access to all features until the end of your current billing period. After that, your subscription will end.</p>
+        <div class="modal-actions">
+          <button id="cancelConfirmBtn" class="action-btn cancel-btn">Yes, cancel</button>
+          <button id="cancelCancelBtn" class="action-btn secondary-btn">Go back</button>
+        </div>
+      </div>
     </div>
 
     <script type="module">
@@ -60,8 +120,12 @@
       });
       const auth = getAuth(app);
 
-      const DETAILS_URL = "https://us-central1-smartcert-f1965.cloudfunctions.net/getSubscriptionDetails";
-      const PORTAL_URL = "https://us-central1-smartcert-f1965.cloudfunctions.net/createBillingPortalSession";
+      const BASE_URL = "https://us-central1-smartcert-f1965.cloudfunctions.net";
+      const DETAILS_URL = BASE_URL + "/getSubscriptionDetails";
+      const PAUSE_URL = BASE_URL + "/pauseSubscription";
+      const RESUME_URL = BASE_URL + "/resumeSubscription";
+      const CANCEL_URL = BASE_URL + "/cancelSubscription";
+      const REACTIVATE_URL = BASE_URL + "/reactivateSubscription";
 
       onAuthStateChanged(auth, async (user) => {
         const loading = document.getElementById("loadingMsg");
@@ -76,7 +140,10 @@
         }
 
         try {
-          const res = await fetch(DETAILS_URL + "?uid=" + user.uid);
+          const idToken = await user.getIdToken();
+          const res = await fetch(DETAILS_URL, {
+            headers: { "Authorization": "Bearer " + idToken },
+          });
           if (!res.ok) {
             loading.style.display = "none";
             noSub.style.display = "block";
@@ -88,34 +155,150 @@
           details.style.display = "block";
           actions.style.display = "block";
 
-          document.getElementById("subStatus").textContent = data.isActive ? "Active" : "Inactive";
-          document.getElementById("subStatus").style.color = data.isActive ? "#16a34a" : "#e53e3e";
+          // Fill in details
+          document.getElementById("planName").textContent = data.planName || "Certi";
           document.getElementById("startDate").textContent = data.startDate;
           document.getElementById("nextBillingDate").textContent = data.nextBillingDate;
           document.getElementById("paymentMethod").textContent = data.paymentMethod;
 
-          // Manage billing via Stripe portal
-          document.getElementById("manageStripeBtn").addEventListener("click", async () => {
+          // Status display
+          const statusEl = document.getElementById("subStatus");
+          if (data.isPaused) {
+            statusEl.textContent = "Paused";
+            statusEl.style.color = "#d97706";
+          } else if (data.isCanceling) {
+            statusEl.textContent = "Cancelling";
+            statusEl.style.color = "#e53e3e";
+          } else if (data.isActive) {
+            statusEl.textContent = "Active";
+            statusEl.style.color = "#16a34a";
+          } else {
+            statusEl.textContent = data.status || "Inactive";
+            statusEl.style.color = "#e53e3e";
+          }
+
+          // Show/hide buttons and banners based on state
+          const pauseBtn = document.getElementById("pauseBtn");
+          const resumeBtn = document.getElementById("resumeBtn");
+          const cancelBtn = document.getElementById("cancelBtn");
+          const cancelingBanner = document.getElementById("cancelingBanner");
+          const pausedBanner = document.getElementById("pausedBanner");
+
+          if (data.isPaused) {
+            pauseBtn.style.display = "none";
+            resumeBtn.style.display = "block";
+            cancelBtn.style.display = "none";
+            pausedBanner.style.display = "block";
+          } else if (data.isCanceling) {
+            pauseBtn.style.display = "none";
+            resumeBtn.style.display = "none";
+            cancelBtn.style.display = "none";
+            cancelingBanner.style.display = "block";
+          } else {
+            pauseBtn.style.display = "block";
+            resumeBtn.style.display = "none";
+            cancelBtn.style.display = "block";
+          }
+
+          // Helper for authenticated POST requests
+          async function authPost(url) {
+            const idToken = await user.getIdToken();
+            return fetch(url, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer " + idToken,
+              },
+            });
+          }
+
+          // Upgrade button
+          document.getElementById("upgradeBtn").addEventListener("click", () => {
+            window.location.href = "pricing.html";
+          });
+
+          // Pause flow
+          document.getElementById("pauseBtn").addEventListener("click", () => {
+            document.getElementById("pauseModal").classList.remove("hidden");
+          });
+          document.getElementById("pauseCancelBtn").addEventListener("click", () => {
+            document.getElementById("pauseModal").classList.add("hidden");
+          });
+          document.getElementById("pauseConfirmBtn").addEventListener("click", async () => {
+            document.getElementById("pauseConfirmBtn").disabled = true;
+            document.getElementById("pauseConfirmBtn").textContent = "Pausing...";
             try {
-              const idToken = await user.getIdToken();
-              const portalRes = await fetch(PORTAL_URL, {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                  "Authorization": "Bearer " + idToken,
-                },
-              });
-              const portalData = await portalRes.json();
-              if (portalData.url) {
-                window.location.href = portalData.url;
+              const r = await authPost(PAUSE_URL);
+              if (r.ok) {
+                window.location.reload();
               } else {
-                alert("Could not open billing portal.");
+                const err = await r.json();
+                alert("Failed to pause: " + (err.error || "Unknown error"));
               }
-            } catch (err) {
-              console.error("Portal error:", err);
-              alert("Error opening billing portal.");
+            } catch (e) {
+              alert("Error pausing subscription.");
+            }
+            document.getElementById("pauseConfirmBtn").disabled = false;
+            document.getElementById("pauseConfirmBtn").textContent = "Yes, pause";
+          });
+
+          // Resume flow
+          async function handleResume() {
+            try {
+              const r = await authPost(RESUME_URL);
+              if (r.ok) {
+                window.location.reload();
+              } else {
+                const err = await r.json();
+                alert("Failed to resume: " + (err.error || "Unknown error"));
+              }
+            } catch (e) {
+              alert("Error resuming subscription.");
+            }
+          }
+          document.getElementById("resumeBtn").addEventListener("click", handleResume);
+          document.getElementById("resumeFromBannerBtn").addEventListener("click", handleResume);
+
+          // Cancel flow
+          document.getElementById("cancelBtn").addEventListener("click", () => {
+            document.getElementById("cancelModal").classList.remove("hidden");
+          });
+          document.getElementById("cancelCancelBtn").addEventListener("click", () => {
+            document.getElementById("cancelModal").classList.add("hidden");
+          });
+          document.getElementById("cancelConfirmBtn").addEventListener("click", async () => {
+            document.getElementById("cancelConfirmBtn").disabled = true;
+            document.getElementById("cancelConfirmBtn").textContent = "Cancelling...";
+            try {
+              const r = await authPost(CANCEL_URL);
+              if (r.ok) {
+                window.location.reload();
+              } else {
+                const err = await r.json();
+                alert("Failed to cancel: " + (err.error || "Unknown error"));
+              }
+            } catch (e) {
+              alert("Error cancelling subscription.");
+            }
+            document.getElementById("cancelConfirmBtn").disabled = false;
+            document.getElementById("cancelConfirmBtn").textContent = "Yes, cancel";
+          });
+
+          // Reactivate (undo cancel)
+          document.getElementById("reactivateBtn").addEventListener("click", async () => {
+            try {
+              const r = await authPost(REACTIVATE_URL);
+              if (r.ok) {
+                window.location.reload();
+              } else {
+                const err = await r.json();
+                alert("Failed to reactivate: " + (err.error || "Unknown error"));
+              }
+            } catch (e) {
+              alert("Error reactivating subscription.");
             }
           });
+
         } catch (err) {
           console.error("Error fetching subscription:", err);
           loading.style.display = "none";

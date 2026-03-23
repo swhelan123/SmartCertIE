@@ -21,6 +21,22 @@ exports.stripeWebhook = onRequest({
     return res.status(400).send(`Webhook Error: ${err.message}`);
   }
 
+  const db = admin.firestore();
+
+  /**
+   * Finds a Firebase user document by their Stripe customer ID.
+   * @param {string} customerId - The Stripe customer ID.
+   * @return {Object|null} The user document or null.
+   */
+  async function findUserByCustomerId(customerId) {
+    const snapshot = await db.collection("users")
+        .where("stripeCustomerId", "==", customerId)
+        .limit(1)
+        .get();
+    if (snapshot.empty) return null;
+    return snapshot.docs[0];
+  }
+
   // Handle the event
   switch (event.type) {
     case "checkout.session.completed": {
@@ -30,7 +46,6 @@ exports.stripeWebhook = onRequest({
 
       if (firebaseUserId) {
         try {
-          const db = admin.firestore();
           await db.collection("users").doc(firebaseUserId).update({
             subscriptionStatus: "active",
             stripeCustomerId: session.customer,
@@ -41,6 +56,37 @@ exports.stripeWebhook = onRequest({
         } catch (updateError) {
           console.error("Error updating Firestore:", updateError);
         }
+      }
+      break;
+    }
+    case "customer.subscription.updated": {
+      const sub = event.data.object;
+      const userDoc = await findUserByCustomerId(sub.customer);
+      if (userDoc) {
+        const updates = {
+          updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+        };
+        if (sub.pause_collection) {
+          updates.subscriptionStatus = "paused";
+        } else if (sub.cancel_at_period_end) {
+          updates.subscriptionStatus = "active";
+        } else if (sub.status === "active") {
+          updates.subscriptionStatus = "active";
+        }
+        await userDoc.ref.update(updates);
+        console.log("Subscription updated for user:", userDoc.id);
+      }
+      break;
+    }
+    case "customer.subscription.deleted": {
+      const sub = event.data.object;
+      const userDoc = await findUserByCustomerId(sub.customer);
+      if (userDoc) {
+        await userDoc.ref.update({
+          subscriptionStatus: "cancelled",
+          updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+        });
+        console.log("Subscription cancelled for user:", userDoc.id);
       }
       break;
     }

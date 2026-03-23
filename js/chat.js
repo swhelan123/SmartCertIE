@@ -33,8 +33,89 @@ function clearConversationHistory() {
   localStorage.removeItem("smartcert_conversation_history");
 }
 
-// Clear on page load
-clearConversationHistory();
+// Don't auto-clear on page load — sessions handle state now
+
+// Expose functions for script.js session integration
+window.setConversationHistory = function (messages) {
+  conversationHistory = messages.slice();
+};
+
+window.clearConversationHistoryFn = function () {
+  clearConversationHistory();
+};
+
+window.displaySessionMessages = function (messages) {
+  const chatMsgs = document.getElementById("chatMessages");
+  if (!chatMsgs) return;
+
+  chatMsgs.innerHTML = "";
+
+  messages.forEach((msg) => {
+    if (msg.role === "user") {
+      const userRow = document.createElement("div");
+      userRow.classList.add("chat-message", "message-user", "overlay-row");
+      const userBubbleContainer = document.createElement("div");
+      userBubbleContainer.classList.add("bubble-container");
+      const userAvatar = document.createElement("img");
+      userAvatar.classList.add("chat-avatar");
+      userAvatar.src = window.userAvatarUrl || "assets/img/pfp.avif";
+      userAvatar.alt = "User Avatar";
+      userAvatar.onerror = function () { this.src = "assets/img/pfp.avif"; };
+      const userBubble = document.createElement("div");
+      userBubble.classList.add("chat-bubble");
+      userBubble.textContent = msg.content;
+      userBubbleContainer.appendChild(userAvatar);
+      userBubbleContainer.appendChild(userBubble);
+      userRow.appendChild(userBubbleContainer);
+      chatMsgs.appendChild(userRow);
+    } else {
+      const botRow = document.createElement("div");
+      botRow.classList.add("chat-message", "message-bot", "overlay-row");
+      const botBubbleContainer = document.createElement("div");
+      botBubbleContainer.classList.add("bubble-container");
+      const botAvatar = document.createElement("img");
+      botAvatar.classList.add("chat-avatar");
+      botAvatar.src = "assets/img/certi.png";
+      botAvatar.alt = "Bot Avatar";
+      const botBubble = document.createElement("div");
+      botBubble.classList.add("chat-bubble");
+      if (typeof marked !== "undefined") {
+        botBubble.innerHTML = marked.parse(msg.content);
+      } else {
+        botBubble.textContent = msg.content;
+      }
+
+      // Add "Save to Notebook" button
+      const saveBtn = document.createElement("button");
+      saveBtn.textContent = "Save to Notebook";
+      Object.assign(saveBtn.style, {
+        marginLeft: "10px",
+        padding: "2px 6px",
+        fontSize: "0.8rem",
+        cursor: "pointer",
+        borderRadius: "6px",
+        border: "none",
+        backgroundColor: "var(--primary-color)",
+        color: "#fff",
+      });
+      // Find the matching user question (previous message)
+      const msgIndex = messages.indexOf(msg);
+      const prevMsg = msgIndex > 0 ? messages[msgIndex - 1] : null;
+      const question = prevMsg && prevMsg.role === "user" ? prevMsg.content : "";
+      saveBtn.addEventListener("click", () => {
+        window.saveNotebookEntry(msg.content, question);
+      });
+      botBubble.appendChild(saveBtn);
+
+      botBubbleContainer.appendChild(botAvatar);
+      botBubbleContainer.appendChild(botBubble);
+      botRow.appendChild(botBubbleContainer);
+      chatMsgs.appendChild(botRow);
+    }
+  });
+
+  chatMsgs.scrollTop = chatMsgs.scrollHeight;
+};
 
 // Query Certi via Cloud Function
 async function queryGeminiApi(question) {
@@ -115,29 +196,13 @@ async function typeMarkdownAsHtml(markdownString, container, speed = 20) {
 const sendBtn = document.getElementById("sendBtn");
 const chatInput = document.getElementById("chatInput");
 const chatMessages = document.getElementById("chatMessages");
-const savedResponses = document.getElementById("savedResponses");
 const clearHistoryBtn = document.getElementById("clearHistoryBtn");
 
-// Clear History button functionality
+// New Chat button functionality (was Clear History)
 if (clearHistoryBtn) {
   clearHistoryBtn.addEventListener("click", () => {
-    if (confirm("Are you sure you want to clear the conversation history? This will remove context from future responses.")) {
-      clearConversationHistory();
-      
-      // Optionally clear the visible chat messages too
-      if (confirm("Would you also like to clear the visible chat messages?")) {
-        chatMessages.innerHTML = `
-          <div class="chat-message message-bot overlay-row">
-            <div class="bubble-container">
-              <img class="chat-avatar" src="assets/img/certi.png" alt="Bot Avatar" />
-              <div class="chat-bubble">
-                Hi! I'm Certi, your friendly Leaving Certificate biology tutor. How can I help you today?
-                <br><small style="opacity: 0.7; margin-top: 5px; display: block;">Conversation history cleared.</small>
-              </div>
-            </div>
-          </div>
-        `;
-      }
+    if (typeof window.startNewChat === "function") {
+      window.startNewChat();
     }
   });
 }
@@ -236,6 +301,28 @@ if (sendBtn && chatInput && chatMessages) {
 
     // Scroll to bottom
     chatMessages.scrollTop = chatMessages.scrollHeight;
+
+    // Save to chat session
+    try {
+      if (window.currentSessionId) {
+        // Append to existing session
+        window.currentSessionMessages.push(
+          { role: "user", content: question },
+          { role: "assistant", content: answer }
+        );
+        window.saveSessionMessages(window.currentSessionMessages);
+      } else if (typeof window.createChatSession === "function") {
+        // Create new session with first question as title
+        await window.createChatSession(question);
+        window.currentSessionMessages = [
+          { role: "user", content: question },
+          { role: "assistant", content: answer },
+        ];
+        window.saveSessionMessages(window.currentSessionMessages);
+      }
+    } catch (err) {
+      console.error("Error saving to chat session:", err);
+    }
   });
 
   // Press Enter to send

@@ -30,8 +30,8 @@
                 <div class="account-details">
                     <!-- We’ll fill these from Firestore & Auth in script.js -->
                     <p id="accountInfo" class="account-welcome-text"></p>
-                    <p id="accountEmail" style="margin: 0.5rem 0; color: #666"></p>
-                    <p id="accountPhone" style="margin: 0.5rem 0; color: #666"></p>
+                    <p id="accountEmail" style="margin: 0.5rem 0;" class="muted-text"></p>
+                    <p id="accountPhone" style="margin: 0.5rem 0;" class="muted-text"></p>
                 </div>
             </div>
 
@@ -47,19 +47,24 @@
                 <input type="tel" id="updatePhone" placeholder="+353 87 1234567" />
 
                 <label for="newProfilePic">Change Profile Picture</label>
-                <input type="file" id="newProfilePic" accept="image/*" style="padding: 0.3rem" />
+                <div class="file-upload-wrapper">
+                    <button type="button" class="file-upload-btn" onclick="document.getElementById('newProfilePic').click()">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                        Choose Image
+                    </button>
+                    <span id="fileNameDisplay" class="file-name-display">No file chosen</span>
+                    <input type="file" id="newProfilePic" accept="image/*" style="display:none" />
+                </div>
 
             </form>
 
-            <!-- Navigation Layout Preference -->
-            <div style="margin-top:1.5rem;">
-                <label style="font-weight:600;font-size:0.95rem;">Navigation Layout</label>
-                <p style="font-size:0.85rem;color:#666;margin:0.3rem 0 0.8rem;">Choose how the navigation appears on the chat page (desktop only).</p>
-                <div id="layoutToggle" style="display:flex;gap:0.5rem;">
-                    <button type="button" data-layout="topbar" style="flex:1;padding:0.6rem 1rem;border:2px solid #3b82f6;border-radius:8px;background:#3b82f6;color:#fff;cursor:pointer;font-size:0.9rem;transition:all 0.2s;">Top Bar</button>
-                    <button type="button" data-layout="sidebar" style="flex:1;padding:0.6rem 1rem;border:2px solid #ccc;border-radius:8px;background:#fff;color:#333;cursor:pointer;font-size:0.9rem;transition:all 0.2s;">Sidebar</button>
-                </div>
-            </div>
+<!-- Update file name display when a file is picked -->
+            <script>
+                document.getElementById("newProfilePic").addEventListener("change", function() {
+                    const name = this.files[0] ? this.files[0].name : "No file chosen";
+                    document.getElementById("fileNameDisplay").textContent = name;
+                });
+            </script>
 
             <!-- Save Changes Button (submits the update form above) -->
             <button type="button" id="saveChangesBtn" style="display:block;width:100%;margin-top:1rem;padding:0.8rem;background-color:#3b82f6;color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:1rem;">Save Changes</button>

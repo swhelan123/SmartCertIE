@@ -18,6 +18,11 @@ service cloud.firestore {
       match /notebook/{entryId} {
         allow read, write: if request.auth != null && request.auth.uid == userId;
       }
+
+      // Chat sessions subcollection: users can only access their own chat sessions
+      match /chatSessions/{sessionId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
     }
 
     // Biology context: readable by any authenticated user, not writable from client
