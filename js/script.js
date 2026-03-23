@@ -103,6 +103,26 @@ if (allModeIcons.length) {
 document.body.classList.add("layout-sidebar");
 
 /*******************************************************
+ * AVATAR THUMBNAIL — downscale profile pic for chat use
+ *******************************************************/
+function createAvatarThumbnail(srcUrl, size = 80) {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.onload = () => {
+      const canvas = document.createElement("canvas");
+      canvas.width = size;
+      canvas.height = size;
+      const ctx = canvas.getContext("2d");
+      ctx.drawImage(img, 0, 0, size, size);
+      resolve(canvas.toDataURL("image/webp", 0.8));
+    };
+    img.onerror = () => resolve(srcUrl);
+    img.src = srcUrl;
+  });
+}
+
+/*******************************************************
  * AUTH STATE & UI TOGGLING
  *******************************************************/
 // Elements for desktop + mobile
@@ -132,9 +152,10 @@ onAuthStateChanged(auth, async (user) => {
       const userData = userSnap.data();
       const subscriptionStatus = userData.subscriptionStatus || "not-subscribed";
 
-      // Set global userAvatarUrl using the user's profile photo or fallback
-      window.userAvatarUrl = userData.photoURL || "assets/img/pfp.avif";
-      if (sidebarPfp) sidebarPfp.src = userData.photoURL || "assets/img/pfp.avif";
+      // Set nav/sidebar pics to full URL, but create a small
+      // thumbnail for chat avatars to avoid repeated large downloads
+      const photoSrc = userData.photoURL || "assets/img/pfp.avif";
+      if (sidebarPfp) sidebarPfp.src = photoSrc;
       if (userData.photoURL) {
         allProfilePics.forEach((pic) => {
           pic.src = userData.photoURL;
@@ -149,6 +170,10 @@ onAuthStateChanged(auth, async (user) => {
       } else if (sidebarPfp) {
         sidebarPfp.src = "assets/img/pfp.avif";
       }
+      // Generate a small 80x80 thumbnail for chat message avatars
+      createAvatarThumbnail(photoSrc).then((thumb) => {
+        window.userAvatarUrl = thumb;
+      });
 
       if (subscriptionStatus === "active") {
         chatInput.disabled = false;
@@ -547,7 +572,7 @@ const chapters = {
   C: [
     {name: "Diversity of Organisms", id: "topic-12-diversity-of-organisms"},
     {name: "Organisation and the Vascular Structures", id: "topic-13-organisation-and-the-vascular-structure"},
-    {name: "Transport and Nutrition", id: "topic-14-transport-and-nutrition"},
+    {name: "Transport and Nutrition", id: "topic-14-transportation-and-nutrition"},
     {name: "Breathing System and Excretion", id: "topic-15-breathing-system-and-excretion"},
     {name: "Responses to Stimuli", id: "topic-16-responses-to-stimuli"},
     {name: "Reproduction and Growth", id: "topic-17-reproduction-and-growth"},
@@ -930,8 +955,9 @@ if (updateAccountForm) {
 
       // 4) Update the <img> on account page (if you want immediate UI update)
       accountProfilePic.src = newPhotoURL || "assets/img/pfp.avif";
-      // Also update the global userAvatarUrl for chat usage
-      window.userAvatarUrl = newPhotoURL || "assets/img/pfp.avif";
+      // Regenerate chat thumbnail from new photo
+      createAvatarThumbnail(newPhotoURL || "assets/img/pfp.avif")
+          .then((thumb) => { window.userAvatarUrl = thumb; });
       // Update the top navigation profile pic if it exists
       if (profilePic) {
         profilePic.src = newPhotoURL || "assets/img/pfp.avif";

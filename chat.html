@@ -121,17 +121,20 @@
         <section id="chatSection" class="chat-container">
           <!-- Topic Selector (Group -> Chapter -> Selected Topic) -->
           <div class="topic-selector" id="topicSelector">
-            <h3>Choose a topic to give Certi some context</h3>
+            <p class="topic-selector-hint">Select a topic for context</p>
             <!-- Unit Buttons Container (initially visible) -->
             <div id="unitContainer" class="unit-container">
               <button class="unit-button unit-green" data-unit="A">
-                Unit 1: The Study of Life
+                <span class="unit-icon">🧬</span>
+                <span class="unit-label">The Study of Life</span>
               </button>
               <button class="unit-button unit-purple" data-unit="B">
-                Unit 2: The Cell
+                <span class="unit-icon">🔬</span>
+                <span class="unit-label">The Cell</span>
               </button>
               <button class="unit-button unit-red" data-unit="C">
-                Unit 3: The Organism
+                <span class="unit-icon">🫀</span>
+                <span class="unit-label">The Organism</span>
               </button>
             </div>
 
@@ -145,7 +148,7 @@
             >
               <span id="selectedTopicLabel" class="selected-topic-label"></span>
               <button id="changeTopicBtn" class="change-topic-button">
-                Change Topic
+                Change
               </button>
             </div>
           </div>
