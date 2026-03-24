@@ -96,8 +96,17 @@ function checkRateLimit(uid) {
   return true;
 }
 
+const ALLOWED_ORIGINS = [
+  "https://smartcert.ie",
+  "http://localhost:8000",
+  "http://127.0.0.1:8000",
+];
+
 exports.askCerti = onRequest(async (req, res) => {
-  res.set("Access-Control-Allow-Origin", "https://smartcert.ie");
+  const origin = req.headers.origin;
+  if (ALLOWED_ORIGINS.includes(origin)) {
+    res.set("Access-Control-Allow-Origin", origin);
+  }
 
   if (req.method === "OPTIONS") {
     res.set("Access-Control-Allow-Methods", "POST");
@@ -186,16 +195,35 @@ exports.askCerti = onRequest(async (req, res) => {
     systemInstruction += "\n\nContinue the conversation naturally.";
   }
 
+  // Stream the response using Server-Sent Events
+  res.set("Content-Type", "text/event-stream");
+  res.set("Cache-Control", "no-cache");
+  res.set("Connection", "keep-alive");
+
   try {
-    const result = await ai.models.generateContent({
+    const result = await ai.models.generateContentStream({
       model: "gemini-2.0-flash",
       contents: question,
       config: {systemInstruction},
     });
-    return res.status(200).json({answer: result.text});
+
+    for await (const chunk of result) {
+      if (chunk.text) {
+        res.write(`data: ${JSON.stringify({text: chunk.text})}\n\n`);
+      }
+    }
+    res.write("data: [DONE]\n\n");
+    res.end();
   } catch (e) {
     console.error("Gemini error:", e);
-    return res.status(500).json({error: "Failed to get response"});
+    // If headers already sent, send error as SSE event
+    if (res.headersSent) {
+      const errPayload = JSON.stringify({error: "Failed"});
+      res.write(`data: ${errPayload}\n\n`);
+      res.end();
+    } else {
+      return res.status(500).json({error: "Failed to get response"});
+    }
   }
 });
 

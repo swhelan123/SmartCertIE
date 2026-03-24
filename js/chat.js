@@ -117,10 +117,9 @@ window.displaySessionMessages = function (messages) {
   chatMsgs.scrollTop = chatMsgs.scrollHeight;
 };
 
-// Query Certi via Cloud Function
-async function queryGeminiApi(question) {
+// Stream Certi response via Cloud Function SSE
+async function streamGeminiApi(question, botBubble) {
   try {
-    // Get Firebase auth token for server-side verification
     const {getAuth} = await import(
       "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js"
     );
@@ -148,48 +147,55 @@ async function queryGeminiApi(question) {
       throw new Error(`Function returned status ${response.status}`);
     }
 
-    const data = await response.json();
-    const answer = data.answer || "Sorry, I didn't get a response.";
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+    let fullAnswer = "";
+    let buffer = "";
+
+    botBubble.innerHTML = "";
+
+    while (true) {
+      const {done, value} = await reader.read();
+      if (done) break;
+
+      buffer += decoder.decode(value, {stream: true});
+      const lines = buffer.split("\n");
+      // Keep the last potentially incomplete line in the buffer
+      buffer = lines.pop();
+
+      for (const line of lines) {
+        if (!line.startsWith("data: ")) continue;
+        const payload = line.slice(6);
+        if (payload === "[DONE]") break;
+        try {
+          const parsed = JSON.parse(payload);
+          if (parsed.error) {
+            fullAnswer = "Something went wrong — please try again.";
+            botBubble.innerHTML = marked.parse(fullAnswer);
+            return fullAnswer;
+          }
+          if (parsed.text) {
+            fullAnswer += parsed.text;
+            botBubble.innerHTML = marked.parse(fullAnswer);
+            const chatMsgs = document.getElementById("chatMessages");
+            if (chatMsgs) chatMsgs.scrollTop = chatMsgs.scrollHeight;
+          }
+        } catch (e) {
+          // skip malformed lines
+        }
+      }
+    }
+
+    const answer = fullAnswer || "Sorry, I didn't get a response.";
     addToHistory("user", question);
     addToHistory("assistant", answer);
     return answer;
   } catch (error) {
     console.error("askCerti error:", error);
-    return "Something went wrong — please try again.";
+    const errMsg = "Something went wrong — please try again.";
+    botBubble.innerHTML = marked.parse(errMsg);
+    return errMsg;
   }
-}
-
-/**
- * Recursively types out the sourceNode's DOM structure into targetNode,
- * preserving all formatting (bold, lists, code, etc.) as they appear.
- */
-async function typeHtml(sourceNode, targetNode, speed = 20) {
-  for (const child of sourceNode.childNodes) {
-    if (child.nodeType === Node.TEXT_NODE) {
-      const text = child.textContent;
-      for (let i = 0; i < text.length; i++) {
-        targetNode.append(text.charAt(i));
-        await new Promise((r) => setTimeout(r, speed));
-      }
-    } else if (child.nodeType === Node.ELEMENT_NODE) {
-      const newEl = document.createElement(child.tagName);
-      for (const attr of child.attributes) {
-        newEl.setAttribute(attr.name, attr.value);
-      }
-      targetNode.appendChild(newEl);
-      await typeHtml(child, newEl, speed);
-    }
-  }
-}
-
-// Helper to create a typed effect of the final rendered HTML
-async function typeMarkdownAsHtml(markdownString, container, speed = 20) {
-  const htmlString = marked.parse(markdownString);
-  const tempDiv = document.createElement("div");
-  tempDiv.innerHTML = htmlString;
-
-  container.innerHTML = ""; // clear
-  await typeHtml(tempDiv, container, speed);
 }
 
 // Grab DOM references
@@ -270,16 +276,10 @@ if (sendBtn && chatInput && chatMessages) {
     // Scroll to bottom
     chatMessages.scrollTop = chatMessages.scrollHeight;
 
-    // 4) Query the AI
-    const answer = await queryGeminiApi(question);
+    // 4) Stream the AI response directly into the bubble
+    const answer = await streamGeminiApi(question, botBubble);
 
-    // 5) Replace "Thinking..." with typed-out answer
-    botBubble.innerHTML = ""; // clear out "Thinking..."
-
-    // === 6) Type out the final *formatted* HTML
-    await typeMarkdownAsHtml(answer, botBubble, 5);
-
-    // === 7) Add a "Save to Notebook" button
+    // 5) Add a "Save to Notebook" button
     const saveBtn = document.createElement("button");
     saveBtn.textContent = "Save to Notebook";
     Object.assign(saveBtn.style, {

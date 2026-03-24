@@ -75,3 +75,10 @@ stripe_secret.txt
 
 # dataconnect generated files
 .dataconnect
+
+# Claude Code
+.claude/
+
+# OS files
+.DS_Store
+**/.DS_Store
